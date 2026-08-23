@@ -10,12 +10,13 @@ type SendPixEmailInput = {
 };
 
 type SendPixEmailConfig = {
-  brevoApiKey?: string;
+  mailjetApiKey?: string;
+  mailjetSecretKey?: string;
   fromEmail?: string;
   fromName?: string;
 };
 
-const BREVO_ENDPOINT = "https://api.brevo.com/v3/smtp/email";
+const MAILJET_ENDPOINT = "https://api.mailjet.com/v3.1/send";
 
 function escapeHtml(value: string) {
   return String(value || "")
@@ -85,11 +86,12 @@ export async function sendPixCreatedEmail(
   config: SendPixEmailConfig,
 ): Promise<boolean> {
   const to = input.to.trim();
-  const apiKey = config.brevoApiKey?.trim();
+  const apiKey = config.mailjetApiKey?.trim();
+  const secretKey = config.mailjetSecretKey?.trim();
   const fromEmail = (config.fromEmail || "sitegrande@proton.me").trim();
   const fromName = (config.fromName || "Pagamentos").trim();
 
-  if (!apiKey || !validEmail(to) || !validEmail(fromEmail)) return false;
+  if (!apiKey || !secretKey || !validEmail(to) || !validEmail(fromEmail)) return false;
 
   try {
     const qrDataUrl = await QRCode.toDataURL(input.pixCode, {
@@ -100,45 +102,58 @@ export async function sendPixCreatedEmail(
     const qrBase64 = qrDataUrl.split(",", 2)[1];
     if (!qrBase64) return false;
 
-    const response = await fetch(BREVO_ENDPOINT, {
+    const auth = Buffer.from(`${apiKey}:${secretKey}`, "utf8").toString("base64");
+
+    const response = await fetch(MAILJET_ENDPOINT, {
       method: "POST",
       headers: {
         accept: "application/json",
         "content-type": "application/json",
-        "api-key": apiKey,
+        authorization: `Basic ${auth}`,
       },
       body: JSON.stringify({
-        sender: {
-          name: fromName,
-          email: fromEmail,
-        },
-        to: [{ email: to, name: input.customerName || "Cliente" }],
-        subject: `Seu Pix de ${formatBrl(input.amountCents)} foi gerado`,
-        htmlContent: buildEmailHtml(input),
-        attachment: [
+        Messages: [
           {
-            content: qrBase64,
-            name: "pix-qrcode.png",
+            From: {
+              Email: fromEmail,
+              Name: fromName,
+            },
+            To: [
+              {
+                Email: to,
+                Name: input.customerName || "Cliente",
+              },
+            ],
+            Subject: `Seu Pix de ${formatBrl(input.amountCents)} foi gerado`,
+            HTMLPart: buildEmailHtml(input),
+            CustomID: `pix-${input.transactionId}`.slice(0, 100),
+            Attachments: [
+              {
+                ContentType: "image/png",
+                Filename: "pix-qrcode.png",
+                Base64Content: qrBase64,
+              },
+            ],
           },
         ],
-        headers: {
-          "X-Pix-Transaction-Id": input.transactionId,
-        },
-        tags: ["pix-gerado"],
       }),
     });
 
     if (!response.ok) {
       const body = await response.text().catch(() => "");
       console.warn(
-        `Brevo recusou o email do Pix (${response.status}) para ${input.transactionId}: ${body.slice(0, 300)}`,
+        `Mailjet recusou o email do Pix (${response.status}) para ${input.transactionId}: ${body.slice(0, 300)}`,
       );
       return false;
     }
 
-    return true;
+    const result = (await response.json().catch(() => null)) as
+      | { Messages?: Array<{ Status?: string }> }
+      | null;
+    const status = result?.Messages?.[0]?.Status;
+    return !status || status.toLowerCase() === "success";
   } catch (error) {
-    console.warn(`Falha ao enviar email do Pix ${input.transactionId}.`, error);
+    console.warn(`Falha ao enviar email do Pix ${input.transactionId} via Mailjet.`, error);
     return false;
   }
 }
