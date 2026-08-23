@@ -1,4 +1,5 @@
 import QRCode from "qrcode";
+import tls from "node:tls";
 
 type SendPixEmailInput = {
   to: string;
@@ -10,8 +11,10 @@ type SendPixEmailInput = {
 };
 
 type SendPixEmailConfig = {
-  apiKey?: string;
-  from?: string;
+  gmailUser?: string;
+  gmailAppPassword?: string;
+  resendApiKey?: string;
+  resendFrom?: string;
 };
 
 const RESEND_ENDPOINT = "https://api.resend.com/emails";
@@ -21,7 +24,7 @@ function escapeHtml(value: string) {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
+    .replace(/\"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
 
@@ -36,33 +39,18 @@ function validEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
 }
 
-export async function sendPixCreatedEmail(
-  input: SendPixEmailInput,
-  config: SendPixEmailConfig,
-): Promise<boolean> {
-  const apiKey = config.apiKey?.trim();
-  const from = config.from?.trim();
-  const to = input.to.trim();
+function sanitizeHeader(value: string) {
+  return String(value || "").replace(/[\r\n]+/g, " ").trim();
+}
 
-  // O Pix nunca deve falhar só porque o provedor de email não está configurado.
-  if (!apiKey || !from || !validEmail(to)) return false;
+function buildEmailHtml(input: SendPixEmailInput) {
+  const safeName = escapeHtml(input.customerName || "Cliente");
+  const safeTitle = escapeHtml(input.itemTitle || "Produto");
+  const safePixCode = escapeHtml(input.pixCode);
+  const safeTransactionId = escapeHtml(input.transactionId);
+  const amount = formatBrl(input.amountCents);
 
-  try {
-    const qrDataUrl = await QRCode.toDataURL(input.pixCode, {
-      width: 360,
-      margin: 1,
-      errorCorrectionLevel: "M",
-    });
-    const qrBase64 = qrDataUrl.split(",", 2)[1];
-    if (!qrBase64) return false;
-
-    const safeName = escapeHtml(input.customerName || "Cliente");
-    const safeTitle = escapeHtml(input.itemTitle || "Produto");
-    const safePixCode = escapeHtml(input.pixCode);
-    const safeTransactionId = escapeHtml(input.transactionId);
-    const amount = formatBrl(input.amountCents);
-
-    const html = `<!doctype html>
+  return `<!doctype html>
 <html lang="pt-BR">
   <body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,Helvetica,sans-serif;color:#222;">
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f5f5f5;padding:24px 12px;">
@@ -72,7 +60,7 @@ export async function sendPixCreatedEmail(
             <tr>
               <td style="padding:28px 24px 12px;text-align:center;">
                 <div style="font-size:22px;font-weight:700;margin-bottom:8px;">Seu Pix foi gerado</div>
-                <div style="font-size:14px;color:#666;">Olá, ${safeName}. Use o QR Code ou o Pix Copia e Cola abaixo.</div>
+                <div style="font-size:14px;color:#666;">Olá, ${safeName}. Use o QR Code ou o Pix Copia e Cola abaixo para concluir o pagamento.</div>
               </td>
             </tr>
             <tr>
@@ -100,36 +88,209 @@ export async function sendPixCreatedEmail(
     </table>
   </body>
 </html>`;
+}
 
-    const response = await fetch(RESEND_ENDPOINT, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-        "Idempotency-Key": `pix-created/${input.transactionId}`,
-      },
-      body: JSON.stringify({
-        from,
-        to: [to],
-        subject: `Seu Pix de ${amount} foi gerado`,
-        html,
-        attachments: [
-          {
-            filename: "pix-qrcode.png",
-            content: qrBase64,
-            content_type: "image/png",
-            content_id: "pix-qrcode",
-          },
-        ],
-      }),
-    });
+function waitForSmtpCode(
+  socket: tls.TLSSocket,
+  expected: number | number[],
+  timeoutMs = 15000,
+): Promise<string> {
+  const expectedCodes = Array.isArray(expected) ? expected : [expected];
 
-    if (!response.ok) {
-      console.warn(`Falha ao enviar email do Pix (${response.status}) para a transação ${input.transactionId}.`);
-      return false;
+  return new Promise((resolve, reject) => {
+    let buffer = "";
+    const timer = setTimeout(() => cleanup(new Error("Timeout no servidor SMTP.")), timeoutMs);
+
+    const onData = (chunk: Buffer) => {
+      buffer += chunk.toString("utf8");
+      const lines = buffer.split(/\r?\n/).filter(Boolean);
+      const last = lines[lines.length - 1] || "";
+      const match = last.match(/^(\d{3})([ -])/);
+      if (!match || match[2] === "-") return;
+      const code = Number(match[1]);
+      if (!expectedCodes.includes(code)) {
+        cleanup(new Error(`SMTP respondeu ${code}: ${last.slice(0, 180)}`));
+        return;
+      }
+      cleanup(undefined, buffer);
+    };
+
+    const onError = (error: Error) => cleanup(error);
+    const onClose = () => cleanup(new Error("Conexão SMTP encerrada inesperadamente."));
+
+    function cleanup(error?: Error, result?: string) {
+      clearTimeout(timer);
+      socket.off("data", onData);
+      socket.off("error", onError);
+      socket.off("close", onClose);
+      if (error) reject(error);
+      else resolve(result || buffer);
     }
 
+    socket.on("data", onData);
+    socket.on("error", onError);
+    socket.on("close", onClose);
+  });
+}
+
+async function smtpCommand(
+  socket: tls.TLSSocket,
+  command: string,
+  expected: number | number[],
+) {
+  socket.write(`${command}\r\n`);
+  return waitForSmtpCode(socket, expected);
+}
+
+async function sendViaGmailSmtp(
+  input: SendPixEmailInput,
+  gmailUser: string,
+  gmailAppPassword: string,
+  qrBase64: string,
+  html: string,
+) {
+  const user = gmailUser.trim();
+  const password = gmailAppPassword.replace(/\s+/g, "");
+  if (!validEmail(user) || !password) return false;
+
+  const socket = tls.connect({
+    host: "smtp.gmail.com",
+    port: 465,
+    servername: "smtp.gmail.com",
+    rejectUnauthorized: true,
+  });
+
+  try {
+    await waitForSmtpCode(socket, 220);
+    await smtpCommand(socket, "EHLO promo-doano-full.vercel.app", 250);
+    await smtpCommand(socket, "AUTH LOGIN", 334);
+    await smtpCommand(socket, Buffer.from(user).toString("base64"), 334);
+    await smtpCommand(socket, Buffer.from(password).toString("base64"), 235);
+    await smtpCommand(socket, `MAIL FROM:<${user}>`, 250);
+    await smtpCommand(socket, `RCPT TO:<${input.to}>`, [250, 251]);
+    await smtpCommand(socket, "DATA", 354);
+
+    const boundary = `pix-${input.transactionId.replace(/[^a-zA-Z0-9]/g, "").slice(0, 40)}-${Date.now()}`;
+    const amount = formatBrl(input.amountCents);
+    const subject = `Seu Pix de ${amount} foi gerado`;
+    const messageId = `<pix-${Date.now()}-${Math.random().toString(36).slice(2)}@gmail.com>`;
+
+    const mime = [
+      `From: Pagamentos <${user}>`,
+      `To: <${sanitizeHeader(input.to)}>`,
+      `Subject: ${sanitizeHeader(subject)}`,
+      `Message-ID: ${messageId}`,
+      `Date: ${new Date().toUTCString()}`,
+      "MIME-Version: 1.0",
+      `Content-Type: multipart/related; boundary=\"${boundary}\"`,
+      "",
+      `--${boundary}`,
+      "Content-Type: text/html; charset=UTF-8",
+      "Content-Transfer-Encoding: 8bit",
+      "",
+      html,
+      "",
+      `--${boundary}`,
+      "Content-Type: image/png; name=\"pix-qrcode.png\"",
+      "Content-Transfer-Encoding: base64",
+      "Content-ID: <pix-qrcode>",
+      "Content-Disposition: inline; filename=\"pix-qrcode.png\"",
+      "",
+      qrBase64.replace(/(.{76})/g, "$1\r\n"),
+      "",
+      `--${boundary}--`,
+      "",
+      ".",
+    ].join("\r\n");
+
+    socket.write(mime + "\r\n");
+    await waitForSmtpCode(socket, 250);
+    try {
+      await smtpCommand(socket, "QUIT", 221);
+    } catch {}
     return true;
+  } catch (error) {
+    console.warn(`Falha no Gmail SMTP da transação ${input.transactionId}.`, error);
+    return false;
+  } finally {
+    socket.destroy();
+  }
+}
+
+async function sendViaResend(
+  input: SendPixEmailInput,
+  apiKey: string,
+  from: string,
+  qrBase64: string,
+  html: string,
+) {
+  const response = await fetch(RESEND_ENDPOINT, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+      "Idempotency-Key": `pix-created/${input.transactionId}`,
+    },
+    body: JSON.stringify({
+      from,
+      to: [input.to],
+      subject: `Seu Pix de ${formatBrl(input.amountCents)} foi gerado`,
+      html,
+      attachments: [
+        {
+          filename: "pix-qrcode.png",
+          content: qrBase64,
+          content_type: "image/png",
+          content_id: "pix-qrcode",
+        },
+      ],
+    }),
+  });
+
+  return response.ok;
+}
+
+export async function sendPixCreatedEmail(
+  input: SendPixEmailInput,
+  config: SendPixEmailConfig,
+): Promise<boolean> {
+  const to = input.to.trim();
+  if (!validEmail(to)) return false;
+
+  try {
+    const qrDataUrl = await QRCode.toDataURL(input.pixCode, {
+      width: 360,
+      margin: 1,
+      errorCorrectionLevel: "M",
+    });
+    const qrBase64 = qrDataUrl.split(",", 2)[1];
+    if (!qrBase64) return false;
+
+    const html = buildEmailHtml(input);
+
+    // Sem domínio próprio: use uma conta Gmail existente + senha de app.
+    if (config.gmailUser && config.gmailAppPassword) {
+      return await sendViaGmailSmtp(
+        input,
+        config.gmailUser,
+        config.gmailAppPassword,
+        qrBase64,
+        html,
+      );
+    }
+
+    // Fallback opcional para quem configurar Resend depois.
+    if (config.resendApiKey && config.resendFrom) {
+      return await sendViaResend(
+        input,
+        config.resendApiKey,
+        config.resendFrom,
+        qrBase64,
+        html,
+      );
+    }
+
+    return false;
   } catch (error) {
     console.warn(`Falha ao preparar/enviar email do Pix da transação ${input.transactionId}.`, error);
     return false;
