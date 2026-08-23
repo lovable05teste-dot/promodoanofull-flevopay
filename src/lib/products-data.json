@@ -2960,6 +2960,8 @@
       {
         "name": "Azul",
         "image": "https://i.imgur.com/MvH5Hp1.jpg",
+        "oldPrice": "329,29",
+        "newPrice": "89,90",
         "carousel": [
           "https://i.imgur.com/MvH5Hp1.jpg",
           "https://i.imgur.com/nxgf8TQ.jpg",
