@@ -2944,5 +2944,165 @@
         ]
       }
     ]
+  },
+  {
+    "id": "2079000026",
+    "title": "Chave De Impacto Parafusadeira Furadeira Several Importados Verde",
+    "oldPrice": "207,90",
+    "newPrice": "89,90",
+    "colors": [
+      "Azul",
+      "Verde"
+    ],
+    "activeColor": "Verde",
+    "compactColorSelector": true,
+    "colorVariants": [
+      {
+        "name": "Azul",
+        "image": "https://i.imgur.com/MvH5Hp1.jpg",
+        "carousel": [
+          "https://i.imgur.com/MvH5Hp1.jpg",
+          "https://i.imgur.com/nxgf8TQ.jpg",
+          "https://i.imgur.com/TGmdyjq.jpg",
+          "https://i.imgur.com/IwcXWPe.jpg",
+          "https://i.imgur.com/Iv2zDOT.jpg",
+          "https://i.imgur.com/A0QlQgn.jpg",
+          "https://i.imgur.com/t1IqnHs.jpg",
+          "https://i.imgur.com/9Nwzt62.jpg",
+          "https://i.imgur.com/RFjYak2.jpg",
+          "https://i.imgur.com/czEffy5.jpg"
+        ]
+      },
+      {
+        "name": "Verde",
+        "image": "https://i.imgur.com/7PggA45.jpg",
+        "carousel": [
+          "https://i.imgur.com/7PggA45.jpg",
+          "https://i.imgur.com/R1kYZ2J.jpg",
+          "https://i.imgur.com/OveAKaK.jpg",
+          "https://i.imgur.com/Lcf4rmH.jpg",
+          "https://i.imgur.com/NH6Vyiv.jpg",
+          "https://i.imgur.com/coNwSx2.jpg",
+          "https://i.imgur.com/MOYgUHL.jpg",
+          "https://i.imgur.com/iXPeFjo.jpg"
+        ]
+      }
+    ],
+    "voltage": null,
+    "carousel": [
+      "https://i.imgur.com/7PggA45.jpg",
+      "https://i.imgur.com/R1kYZ2J.jpg",
+      "https://i.imgur.com/OveAKaK.jpg",
+      "https://i.imgur.com/Lcf4rmH.jpg",
+      "https://i.imgur.com/NH6Vyiv.jpg",
+      "https://i.imgur.com/coNwSx2.jpg",
+      "https://i.imgur.com/MOYgUHL.jpg",
+      "https://i.imgur.com/iXPeFjo.jpg"
+    ],
+    "photos": [
+      "https://i.imgur.com/NBik14E.jpg",
+      "https://i.imgur.com/rFZJlBs.jpg",
+      "https://i.imgur.com/nwATQCE.jpg",
+      "https://i.imgur.com/gLvkkXe.jpg",
+      "https://i.imgur.com/alPV5Y8.jpg",
+      "https://i.imgur.com/nxsd9Tw.jpg"
+    ],
+    "reviews": [
+      [
+        "https://i.imgur.com/BV69ySB.jpg",
+        "https://i.imgur.com/9iNkSv9.jpg",
+        "https://i.imgur.com/wGa7Bbp.jpg",
+        "https://i.imgur.com/Lmq9SUH.jpg",
+        "https://i.imgur.com/kNtJyyb.jpg"
+      ],
+      [
+        "https://i.imgur.com/Sxpec1D.jpg",
+        "https://i.imgur.com/U2O518p.jpg",
+        "https://i.imgur.com/OGooCDw.jpg"
+      ],
+      [
+        "https://i.imgur.com/aFtXXzy.jpg"
+      ],
+      [
+        "https://i.imgur.com/1P6uRnz.jpg",
+        "https://i.imgur.com/CyfYkqy.jpg"
+      ],
+      [
+        "https://i.imgur.com/CyfYkqy.jpg",
+        "https://i.imgur.com/OYxhcnH.jpg",
+        "https://i.imgur.com/yaDelae.jpg",
+        "https://i.imgur.com/vYSsZBD.jpg",
+        "https://i.imgur.com/p0RZTSZ.jpg"
+      ],
+      [
+        "https://i.imgur.com/Vu5yYXl.jpg",
+        "https://i.imgur.com/g1OOpfL.jpg",
+        "https://i.imgur.com/OFFj84t.jpg"
+      ],
+      [
+        "https://i.imgur.com/gFDcD47.jpg",
+        "https://i.imgur.com/C8RCxQ4.jpg"
+      ],
+      [
+        "https://i.imgur.com/I3Zavo5.jpg",
+        "https://i.imgur.com/rMzVpqk.jpg",
+        "https://i.imgur.com/no7TjVH.jpg",
+        "https://i.imgur.com/nlovqMo.jpg"
+      ],
+      [
+        "https://i.imgur.com/YfYYBgI.jpg",
+        "https://i.imgur.com/6o3K7v8.jpg",
+        "https://i.imgur.com/quO6dVy.jpg"
+      ],
+      [
+        "https://i.imgur.com/izTcwm1.jpg",
+        "https://i.imgur.com/b9NIhBI.jpg"
+      ]
+    ],
+    "hideReviews": false,
+    "category": "Ferramentas",
+    "features": [
+      "Funções de chave de impacto, parafusadeira e furadeira.",
+      "Disponível nas cores Azul e Verde.",
+      "Carrossel específico para cada opção de cor.",
+      "Formato compacto para transporte e armazenamento.",
+      "Itens e acessórios conforme as imagens do anúncio."
+    ],
+    "specGroups": [
+      {
+        "title": "Características gerais",
+        "rows": [
+          [
+            "Marca",
+            "Several Importados"
+          ],
+          [
+            "Tipo",
+            "Chave de impacto, parafusadeira e furadeira"
+          ],
+          [
+            "Cores disponíveis",
+            "Azul e Verde"
+          ]
+        ]
+      },
+      {
+        "title": "Conteúdo da oferta",
+        "rows": [
+          [
+            "Produto",
+            "Ferramenta elétrica portátil"
+          ],
+          [
+            "Itens inclusos",
+            "Conforme as imagens do anúncio"
+          ],
+          [
+            "Condição",
+            "Novo"
+          ]
+        ]
+      }
+    ]
   }
 ]
