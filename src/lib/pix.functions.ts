@@ -7,6 +7,7 @@ import {
   type PixChargeInput,
   type PixChargeResult,
 } from "./pix.server";
+import { sendPixCreatedEmail } from "./pix-email.server";
 
 export const createPixCharge = createServerFn({ method: "POST" })
   .inputValidator((data: PixChargeInput) => data)
@@ -18,11 +19,33 @@ export const createPixCharge = createServerFn({ method: "POST" })
       );
     }
 
-    return createFlevopayPixCharge(data, {
+    const result = await createFlevopayPixCharge(data, {
       apiKey,
       baseUrl: process.env.FLEVOPAY_BASE_URL,
       postbackUrl: process.env.FLEVOPAY_POSTBACK_URL,
     });
+
+    // O envio é best-effort: se o provedor de email falhar, o Pix continua válido
+    // e é exibido normalmente ao comprador.
+    void sendPixCreatedEmail(
+      {
+        to: data.email,
+        customerName: data.name,
+        itemTitle: data.itemTitle || "Produto",
+        amountCents:
+          Number.isFinite(data.amountCents) && (data.amountCents ?? 0) > 0
+            ? Math.round(data.amountCents as number)
+            : 6193,
+        pixCode: result.pixCode,
+        transactionId: result.transactionId,
+      },
+      {
+        apiKey: process.env.RESEND_API_KEY,
+        from: process.env.PIX_EMAIL_FROM,
+      },
+    );
+
+    return result;
   });
 
 export const getPixStatus = createServerFn({ method: "GET" })
