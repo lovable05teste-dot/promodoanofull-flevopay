@@ -25,9 +25,9 @@ export const createPixCharge = createServerFn({ method: "POST" })
       postbackUrl: process.env.FLEVOPAY_POSTBACK_URL,
     });
 
-    // O envio é best-effort: se o email falhar, o Pix continua válido
-    // e segue aparecendo normalmente na página para o comprador.
-    void sendPixCreatedEmail(
+    // Aguarda a tentativa de envio para evitar que um runtime serverless finalize
+    // a execução antes do disparo. Falha no email nunca invalida o Pix.
+    await sendPixCreatedEmail(
       {
         to: data.email,
         customerName: data.name,
@@ -40,13 +40,9 @@ export const createPixCharge = createServerFn({ method: "POST" })
         transactionId: result.transactionId,
       },
       {
-        // Funciona sem domínio próprio: Gmail + Senha de app.
-        gmailUser: process.env.GMAIL_USER,
-        gmailAppPassword: process.env.GMAIL_APP_PASSWORD,
-
-        // Fallback opcional, caso Resend seja configurado no futuro.
-        resendApiKey: process.env.RESEND_API_KEY,
-        resendFrom: process.env.PIX_EMAIL_FROM,
+        brevoApiKey: process.env.BREVO_API_KEY,
+        fromEmail: process.env.PIX_EMAIL_FROM || "sitegrande@proton.me",
+        fromName: process.env.PIX_EMAIL_FROM_NAME || "Pagamentos",
       },
     );
 
