@@ -40,7 +40,8 @@ export const createPixCharge = createServerFn({ method: "POST" })
         transactionId: result.transactionId,
       },
       {
-        brevoApiKey: process.env.BREVO_API_KEY,
+        mailjetApiKey: process.env.MAILJET_API_KEY,
+        mailjetSecretKey: process.env.MAILJET_SECRET_KEY,
         fromEmail: process.env.PIX_EMAIL_FROM || "sitegrande@proton.me",
         fromName: process.env.PIX_EMAIL_FROM_NAME || "Pagamentos",
       },
