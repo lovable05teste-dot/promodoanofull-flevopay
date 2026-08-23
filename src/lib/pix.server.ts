@@ -9,9 +9,14 @@ export type PixChargeInput = {
   utm?: string;
   amountCents?: number;
   itemTitle?: string;
+  itemId?: string;
 };
 
-export type PixChargeResult = { pixCode: string; transactionId: string };
+export type PixChargeResult = {
+  pixCode: string;
+  transactionId: string;
+  createdAt: string;
+};
 
 type JsonRecord = Record<string, unknown>;
 
@@ -202,7 +207,11 @@ export async function createFlevopayPixCharge(
     throw new Error("A FlevoPay não retornou o código Pix completo.");
   }
 
-  return { pixCode, transactionId };
+  return {
+    pixCode,
+    transactionId,
+    createdAt: new Date().toISOString().slice(0, 19).replace("T", " "),
+  };
 }
 
 export async function readFlevopayPixStatus(
