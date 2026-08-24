@@ -7,7 +7,7 @@ const VARIANT_IMAGE_OVERRIDES: Record<string, Record<string, string>> = {
   "1497000015": { Azul: furadeiraAzul, Verde: furadeiraVerde },
 };
 
-import { trackInitiateCheckout, trackInitiateCheckoutFallback } from "@/lib/tracking";
+import { ensureUtmifyBeforeCheckout } from "@/lib/tracking";
 import { withUtms } from "@/lib/utm";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -95,6 +95,7 @@ function ProductView({ p }: { p: Product }) {
   const [extra, setExtra] = useState(p.extra?.active ?? "");
   const [showAllChars, setShowAllChars] = useState(false);
   const [showAllPhotos, setShowAllPhotos] = useState(false);
+  const [checkoutHref, setCheckoutHref] = useState("/endereco?checkout=1");
   const overrides = VARIANT_IMAGE_OVERRIDES[p.id] ?? {};
   const baseVariant = p.colorVariants?.find((v) => v.name === color);
   const variant = baseVariant
@@ -129,10 +130,12 @@ function ProductView({ p }: { p: Product }) {
   useEffect(() => {
     setIdx(0);
   }, [color]);
+  useEffect(() => {
+    setCheckoutHref(withUtms("/endereco?checkout=1"));
+  }, [p.id]);
   const viewportRef = useRef<HTMLDivElement>(null);
   const startX = useRef<number | null>(null);
   const dx = useRef(0);
-  const checkoutStartedRef = useRef(false);
 
   const related = useMemo(
     () => ALL_PRODUCTS.filter((x) => x.id !== p.id).slice(0, 12),
@@ -163,32 +166,7 @@ function ProductView({ p }: { p: Product }) {
     }
   }
 
-  async function goCheckout() {
-    if (checkoutStartedRef.current) return;
-    checkoutStartedRef.current = true;
-
-    const icPayload = {
-      content_ids: [p.id],
-      content_name: p.title,
-      value: Number(newPrice.replace(/\./g, "").replace(",", ".")),
-      currency: "BRL",
-    };
-
-    // Inicia o IC imediatamente, mas não segura a navegação por vários segundos.
-    // O fetch usa keepalive e continua durante a troca de página.
-    try {
-      const icOk = await Promise.race<boolean | null>([
-        trackInitiateCheckout(icPayload),
-        new Promise<null>((resolve) => window.setTimeout(() => resolve(null), 400)),
-      ]);
-      if (icOk === false) {
-        console.warn("[IC] confirmação principal falhou; enviando fallback somente de IC.");
-        trackInitiateCheckoutFallback(icPayload);
-      }
-    } catch (e) {
-      console.error("[IC] falha ao marcar InitiateCheckout:", e);
-      trackInitiateCheckoutFallback(icPayload);
-    }
+  function saveCheckoutProduct() {
     try {
       localStorage.setItem(
         "checkout_product",
@@ -203,7 +181,6 @@ function ProductView({ p }: { p: Product }) {
         })
       );
     } catch {}
-    window.location.href = withUtms("/endereco");
   }
 
   return (
@@ -460,7 +437,7 @@ function ProductView({ p }: { p: Product }) {
             </span>
           </div>
           <p className="mt-2 text-sm text-[#00a650] font-semibold">
-            Chegará até seg. 24 de agosto
+            Chegará até qui. 27 de agosto
           </p>
 
           <p className="mt-5 font-bold text-base text-black/90">Estoque disponível</p>
@@ -476,20 +453,34 @@ function ProductView({ p }: { p: Product }) {
             <span className="ml-auto text-[#3483fa] text-2xl">›</span>
           </div>
 
-          <button
-            onClick={goCheckout}
-            className="mt-4 w-full h-12 rounded-md text-white font-semibold text-base"
+          <a
+            href={checkoutHref}
+            data-product-id={p.id}
+            onPointerDown={saveCheckoutProduct}
+            onClickCapture={saveCheckoutProduct}
+            onClick={(event) => {
+              saveCheckoutProduct();
+              ensureUtmifyBeforeCheckout(event);
+            }}
+            className="mt-4 w-full h-12 rounded-md text-white font-semibold text-base flex items-center justify-center"
             style={{ backgroundColor: "#3483fa" }}
           >
             Comprar agora
-          </button>
-          <button
-            onClick={goCheckout}
-            className="mt-3 w-full h-12 rounded-md text-[#3483fa] font-semibold text-base"
+          </a>
+          <a
+            href={checkoutHref}
+            data-product-id={p.id}
+            onPointerDown={saveCheckoutProduct}
+            onClickCapture={saveCheckoutProduct}
+            onClick={(event) => {
+              saveCheckoutProduct();
+              ensureUtmifyBeforeCheckout(event);
+            }}
+            className="mt-3 w-full h-12 rounded-md text-[#3483fa] font-semibold text-base flex items-center justify-center"
             style={{ backgroundColor: "#e6efff" }}
           >
             Adicionar ao carrinho
-          </button>
+          </a>
         </section>
 
         {/* Seller info */}
@@ -1251,10 +1242,14 @@ function ReviewBlock({
 }
 
 function RelatedCard({ p }: { p: Product }) {
+  const href = `/produto/${encodeURIComponent(p.id)}`;
   return (
-    <Link
-      to="/produto/$id"
-      params={{ id: p.id }}
+    <a
+      href={href}
+      onClick={(event) => {
+        event.preventDefault();
+        window.location.href = withUtms(href);
+      }}
       className="block border border-gray-100 rounded-md p-3 hover:shadow-md transition-shadow"
     >
       <div className="aspect-square bg-white overflow-hidden rounded">
@@ -1280,6 +1275,6 @@ function RelatedCard({ p }: { p: Product }) {
         {p.title}
       </div>
       <div className="text-[13px] text-[#00a650] font-semibold mt-2">Frete grátis</div>
-    </Link>
+    </a>
   );
 }

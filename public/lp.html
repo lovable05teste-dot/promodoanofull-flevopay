@@ -986,13 +986,23 @@
     }
   </style>
   <script>
-    window.pixelId = "69ec5b8f2b0f764574e9768e";
-    var a = document.createElement("script");
-    a.setAttribute("async", "");
-    a.setAttribute("defer", "");
-    a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel.js");
-    document.head.appendChild(a);
-  </script><script async="" defer="" src="/js/pixel.js"></script>
+    window.pixelId = "6a8906df65a3354808dbeac2";
+    (function () {
+      var src = "https://cdn.utmify.com.br/scripts/pixel/pixel.js";
+      if (window.__utmifyPixelBootstrap || document.querySelector('script[src="' + src + '"]')) {
+        window.__utmifyPixelBootstrap = true;
+        return;
+      }
+      window.__utmifyPixelBootstrap = true;
+      var script = document.createElement("script");
+      script.src = src;
+      script.async = true;
+      script.defer = true;
+      script.setAttribute("data-utmify-pixel", "official");
+      script.onerror = function () { window.__utmifyPixelBootstrap = false; };
+      document.head.appendChild(script);
+    })();
+  </script>
 
   <script src="/js/latest.js" async="" defer=""></script>
 </head>
