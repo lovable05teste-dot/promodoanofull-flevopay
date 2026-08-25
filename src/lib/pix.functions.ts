@@ -1,9 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
 
-// Gateway da cópia isolada: FlevoPay.
+// Gateway da cópia isolada: FortPay.
 import {
-  createFlevopayPixCharge,
-  readFlevopayPixStatus,
+  createFortpayPixCharge,
+  readFortpayPixStatus,
   type PixChargeInput,
   type PixChargeResult,
 } from "./pix.server";
@@ -12,17 +12,18 @@ import { sendPixCreatedEmail } from "./pix-email.server";
 export const createPixCharge = createServerFn({ method: "POST" })
   .inputValidator((data: PixChargeInput) => data)
   .handler(async ({ data }): Promise<PixChargeResult> => {
-    const apiKey = process.env.FLEVOPAY_API_KEY;
-    if (!apiKey) {
+    const apiToken = process.env.FORTPAY_API_TOKEN;
+    if (!apiToken) {
       throw new Error(
-        "FlevoPay V2 não está configurada. Adicione FLEVOPAY_API_KEY no ambiente Preview da branch flevopay-v2.",
+        "FortPay não está configurada. Adicione FORTPAY_API_TOKEN nas variáveis de ambiente.",
       );
     }
 
-    const result = await createFlevopayPixCharge(data, {
-      apiKey,
-      baseUrl: process.env.FLEVOPAY_BASE_URL,
-      postbackUrl: process.env.FLEVOPAY_POSTBACK_URL,
+    const result = await createFortpayPixCharge(data, {
+      apiToken,
+      productHash: process.env.FORTPAY_PRODUCT_HASH || "txi2kwhf0r",
+      offerHash: process.env.FORTPAY_OFFER_HASH || "o9ybnwoyun",
+      postbackUrl: process.env.FORTPAY_POSTBACK_URL,
     });
 
     // Aguarda a tentativa de envio para evitar que um runtime serverless finalize
@@ -53,12 +54,11 @@ export const createPixCharge = createServerFn({ method: "POST" })
 export const getPixStatus = createServerFn({ method: "GET" })
   .inputValidator((data: { transactionId: string }) => data)
   .handler(async ({ data }): Promise<{ status: string; paidAt?: string }> => {
-    const apiKey = process.env.FLEVOPAY_API_KEY;
-    if (!apiKey) return { status: "PENDING" };
+    const apiToken = process.env.FORTPAY_API_TOKEN;
+    if (!apiToken) return { status: "PENDING" };
 
-    return readFlevopayPixStatus(
+    return readFortpayPixStatus(
       data.transactionId,
-      apiKey,
-      process.env.FLEVOPAY_BASE_URL,
+      apiToken,
     );
   });
