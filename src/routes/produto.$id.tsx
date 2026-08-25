@@ -14,6 +14,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { getProduct, ALL_PRODUCTS, longDescription, genericSpecGroups, type Product } from "../lib/products";
 import { SiteFooter } from "@/components/SiteFooter";
 import { LazySection } from "@/components/LazySection";
+import { PixLoadingScreen } from "@/components/PixLoadingScreen";
 import { REVIEWS_BY_PRODUCT } from "@/lib/reviews";
 
 export const Route = createFileRoute("/produto/$id")({
@@ -95,6 +96,7 @@ function ProductView({ p }: { p: Product }) {
   const [extra, setExtra] = useState(p.extra?.active ?? "");
   const [showAllChars, setShowAllChars] = useState(false);
   const [showAllPhotos, setShowAllPhotos] = useState(false);
+  const [isNavigatingProduct, setIsNavigatingProduct] = useState(false);
   const [checkoutHref, setCheckoutHref] = useState("/endereco?checkout=1");
   const overrides = VARIANT_IMAGE_OVERRIDES[p.id] ?? {};
   const baseVariant = p.colorVariants?.find((v) => v.name === color);
@@ -182,6 +184,8 @@ function ProductView({ p }: { p: Product }) {
       );
     } catch {}
   }
+
+  if (isNavigatingProduct) return <PixLoadingScreen />;
 
   return (
     <div
@@ -572,7 +576,7 @@ function ProductView({ p }: { p: Product }) {
             <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-3 -mx-4 px-4 md:mx-0 md:px-0">
               {related.map((r) => (
                 <div key={r.id} className="snap-start shrink-0 w-[70%] sm:w-[280px]">
-                  <RelatedCard p={r} />
+                  <RelatedCard p={r} onNavigate={() => setIsNavigatingProduct(true)} />
                 </div>
               ))}
             </div>
@@ -985,7 +989,7 @@ function ProductView({ p }: { p: Product }) {
             <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-3 -mx-4 px-4 md:mx-0 md:px-0">
               {alsoBought.map((r) => (
                 <div key={r.id} className="snap-start shrink-0 w-[70%] sm:w-[280px]">
-                  <RelatedCard p={r} />
+                  <RelatedCard p={r} onNavigate={() => setIsNavigatingProduct(true)} />
                 </div>
               ))}
             </div>
@@ -1241,14 +1245,16 @@ function ReviewBlock({
   );
 }
 
-function RelatedCard({ p }: { p: Product }) {
+function RelatedCard({ p, onNavigate }: { p: Product; onNavigate: () => void }) {
   const href = `/produto/${encodeURIComponent(p.id)}`;
   return (
     <a
       href={href}
       onClick={(event) => {
         event.preventDefault();
-        window.location.href = withUtms(href);
+        const nextHref = withUtms(href);
+        onNavigate();
+        window.setTimeout(() => window.location.assign(nextHref), 60);
       }}
       className="block border border-gray-100 rounded-md p-3 hover:shadow-md transition-shadow"
     >
