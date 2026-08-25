@@ -90,6 +90,8 @@ function PixPage() {
             utm,
             amountCents: amountCents > 0 ? amountCents : 6193,
             itemTitle: product?.title || "Produto",
+            itemId: product?.id || "",
+            itemImage: product?.image || "",
           },
         });
         setPixCode(result.pixCode);

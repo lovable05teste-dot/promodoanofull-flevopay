@@ -1,5 +1,6 @@
-const DEFAULT_FLEVOPAY_BASE_URL = "https://app.flevopay.com.br";
-const ALLOWED_FLEVOPAY_HOSTS = new Set(["app.flevopay.com.br"]);
+const FORTPAY_BASE_URL = "https://api.plataformafortpay.com.br/api/public/v1";
+const FORTPAY_PRODUCT_HASH = "txi2kwhf0r";
+const FORTPAY_OFFER_HASH = "o9ybnwoyun";
 
 export type PixChargeInput = {
   name: string;
@@ -10,6 +11,7 @@ export type PixChargeInput = {
   amountCents?: number;
   itemTitle?: string;
   itemId?: string;
+  itemImage?: string;
 };
 
 export type PixChargeResult = {
@@ -87,18 +89,6 @@ function findPixCode(value: unknown) {
   ]);
 }
 
-function normalizeBaseUrl(baseUrl?: string) {
-  try {
-    const parsed = new URL(baseUrl || DEFAULT_FLEVOPAY_BASE_URL);
-    if (parsed.protocol !== "https:" || !ALLOWED_FLEVOPAY_HOSTS.has(parsed.hostname)) {
-      throw new Error("host não permitido");
-    }
-    return parsed.origin;
-  } catch {
-    return DEFAULT_FLEVOPAY_BASE_URL;
-  }
-}
-
 function safeGatewayMessage(raw: string) {
   try {
     const data = JSON.parse(raw) as JsonRecord;
@@ -109,45 +99,38 @@ function safeGatewayMessage(raw: string) {
   }
 }
 
-async function flevopayFetch(
-  path: string,
-  init: RequestInit & { apiKey: string; baseUrl?: string },
-) {
-  const { apiKey, baseUrl, ...rest } = init;
+async function fortpayFetch(path: string, init: RequestInit & { apiToken: string }) {
+  const { apiToken, ...rest } = init;
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 15000);
+  const url = new URL(`${FORTPAY_BASE_URL}${path}`);
+  if ((rest.method || "GET").toUpperCase() === "GET") {
+    url.searchParams.set("api_token", apiToken);
+  }
   try {
-    return await fetch(`${normalizeBaseUrl(baseUrl)}${path}`, {
+    return await fetch(url, {
       ...rest,
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        "X-API-Key": apiKey,
+        Authorization: `Bearer ${apiToken}`,
         ...(rest.headers || {}),
       },
       signal: controller.signal,
     });
   } catch (error) {
     if (error instanceof Error && error.name === "AbortError") {
-      throw new Error("A FlevoPay demorou para responder. Tente gerar o Pix novamente.");
+      throw new Error("A FortPay demorou para responder. Tente gerar o Pix novamente.");
     }
-    throw new Error("Não foi possível conectar à FlevoPay. Tente novamente.");
+    throw new Error("Não foi possível conectar à FortPay. Tente novamente.");
   } finally {
     clearTimeout(timeout);
   }
 }
 
-function createReference() {
-  const suffix =
-    typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-      ? crypto.randomUUID().replace(/-/g, "").slice(0, 16)
-      : Math.random().toString(36).slice(2, 14);
-  return `SITE-${Date.now()}-${suffix}`;
-}
-
-export async function createFlevopayPixCharge(
+export async function createFortpayPixCharge(
   input: PixChargeInput,
-  config: { apiKey: string; baseUrl?: string; postbackUrl?: string },
+  config: { apiToken: string },
 ): Promise<PixChargeResult> {
   const name = (input.name || "").trim();
   const document = onlyDigits(input.document);
@@ -168,21 +151,38 @@ export async function createFlevopayPixCharge(
       ? Math.round(input.amountCents as number)
       : 6193;
 
+  const title = (input.itemTitle || "Produto").slice(0, 120);
   const payload: JsonRecord = {
+    api_token: config.apiToken,
     amount,
-    description: (input.itemTitle || "Produto").slice(0, 120),
-    reference: createReference(),
-    source: "api_externa",
-    customer: { name, email, document, phone },
+    payment_method: "pix",
+    installments: 1,
+    expire_in_days: 1,
+    transaction_origin: "api",
+    customer: {
+      name,
+      email,
+      document,
+      phone_number: phone,
+    },
+    cart: [
+      {
+        product_hash: FORTPAY_PRODUCT_HASH,
+        offer_hash: FORTPAY_OFFER_HASH,
+        price: amount,
+        quantity: 1,
+        operation_type: 1,
+        title,
+        ...(input.itemImage?.startsWith("https://") ? { cover: input.itemImage } : {}),
+      },
+    ],
   };
 
   const tracking = buildTracking(input.utm);
   if (Object.keys(tracking).length) payload.tracking = tracking;
-  if (config.postbackUrl?.startsWith("https://")) payload.postback_url = config.postbackUrl;
 
-  const response = await flevopayFetch("/api/v1/transaction", {
-    apiKey: config.apiKey,
-    baseUrl: config.baseUrl,
+  const response = await fortpayFetch("/transactions", {
+    apiToken: config.apiToken,
     method: "POST",
     body: JSON.stringify(payload),
   });
@@ -190,7 +190,7 @@ export async function createFlevopayPixCharge(
 
   if (!response.ok) {
     throw new Error(
-      `A FlevoPay recusou a geração do Pix (${response.status})${safeGatewayMessage(raw)}`,
+      `A FortPay recusou a geração do Pix (${response.status})${safeGatewayMessage(raw)}`,
     );
   }
 
@@ -198,13 +198,18 @@ export async function createFlevopayPixCharge(
   try {
     json = JSON.parse(raw);
   } catch {
-    throw new Error("A FlevoPay retornou uma resposta inválida.");
+    throw new Error("A FortPay retornou uma resposta inválida.");
   }
 
   const pixCode = findPixCode(json);
-  const transactionId = findStringByKeys(json, ["transaction_id", "id"]);
+  const transactionId = findStringByKeys(json, [
+    "transaction_hash",
+    "transaction_id",
+    "hash",
+    "id",
+  ]);
   if (!pixCode || !transactionId) {
-    throw new Error("A FlevoPay não retornou o código Pix completo.");
+    throw new Error("A FortPay não retornou o código Pix completo.");
   }
 
   return {
@@ -214,16 +219,11 @@ export async function createFlevopayPixCharge(
   };
 }
 
-export async function readFlevopayPixStatus(
-  transactionId: string,
-  apiKey: string,
-  baseUrl?: string,
-) {
+export async function readFortpayPixStatus(transactionId: string, apiToken: string) {
   try {
-    const path = `/api/v1/query?action=get_transaction&id=${encodeURIComponent(transactionId)}`;
-    const response = await flevopayFetch(path, {
-      apiKey,
-      baseUrl,
+    const path = `/transactions/${encodeURIComponent(transactionId)}`;
+    const response = await fortpayFetch(path, {
+      apiToken,
       method: "GET",
     });
     if (!response.ok) return { status: "PENDING" };
