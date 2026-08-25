@@ -185,13 +185,12 @@ function ProductView({ p }: { p: Product }) {
     } catch {}
   }
 
-  if (isNavigatingProduct) return <PixLoadingScreen />;
-
   return (
     <div
       className="min-h-screen bg-white text-[#333]"
       style={{ fontFamily: "'Proxima Nova', -apple-system, Roboto, Arial, sans-serif" }}
     >
+      {isNavigatingProduct && <PixLoadingScreen overlay />}
       <header className="w-full" style={{ backgroundColor: "#FDD835" }}>
         <div className="mx-auto max-w-[1200px] flex items-center gap-3 px-3 py-2">
           <Link to="/">
@@ -217,7 +216,11 @@ function ProductView({ p }: { p: Product }) {
             style={{ margin: "0 10px" }}
             className="shrink-0 cursor-pointer"
             onClick={() => {
-              window.location.href = withUtms("/carrinho");
+              if (isNavigatingProduct) return;
+              setIsNavigatingProduct(true);
+              window.setTimeout(() => {
+                window.location.href = withUtms("/carrinho");
+              }, 60);
             }}
           >
             <path d="M253.61-132.38q-16.43-16.85-16.43-41.04 0-24.2 16.57-40.9 16.56-16.71 40.78-16.71 24.21 0 40.92 16.85 16.7 16.85 16.7 41.04 0 24.19-16.84 40.9-16.85 16.7-41.06 16.7-24.22 0-40.64-16.84Zm375.38 0q-16.43-16.85-16.43-41.04 0-24.2 16.57-40.9 16.57-16.71 40.78-16.71 24.22 0 40.92 16.85 16.71 16.85 16.71 41.04 0 24.19-16.85 40.9-16.84 16.7-41.06 16.7-24.21 0-40.64-16.84ZM232-746.31l110.97 233.03h267.65q6.92 0 12.56-3.46 5.64-3.47 8.97-9.62l109.49-198.41q4.62-8.46.77-15-3.85-6.54-13.08-6.54H232Zm-17.28-33.84h520.62q26.08 0 39.23 21.34 13.15 21.35 1.23 43.89L663.77-510.53q-8.87 14.32-22.64 22.71-13.77 8.38-29.54 8.38H324l-52.51 96.52q-5.64 9.23-.13 20t17.05 10.77h439.13v33.84H291.33q-34.02 0-49.79-25.93-15.77-25.94-.21-54.58l63.23-113.39-149.33-313.94h-72V-860h93.64l37.85 79.85Zm128.25 266.87h282.26-282.26Z" />
@@ -464,6 +467,7 @@ function ProductView({ p }: { p: Product }) {
             onClickCapture={saveCheckoutProduct}
             onClick={(event) => {
               saveCheckoutProduct();
+              setIsNavigatingProduct(true);
               ensureUtmifyBeforeCheckout(event);
             }}
             className="mt-4 w-full h-12 rounded-md text-white font-semibold text-base flex items-center justify-center"
@@ -478,6 +482,7 @@ function ProductView({ p }: { p: Product }) {
             onClickCapture={saveCheckoutProduct}
             onClick={(event) => {
               saveCheckoutProduct();
+              setIsNavigatingProduct(true);
               ensureUtmifyBeforeCheckout(event);
             }}
             className="mt-3 w-full h-12 rounded-md text-[#3483fa] font-semibold text-base flex items-center justify-center"

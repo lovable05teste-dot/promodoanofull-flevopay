@@ -1,7 +1,11 @@
-export function PixLoadingScreen() {
+export function PixLoadingScreen({ overlay = false }: { overlay?: boolean }) {
   return (
     <div
-      className="flex min-h-screen items-center justify-center bg-white"
+      className={
+        overlay
+          ? "fixed inset-0 z-[2147483647] flex items-center justify-center bg-white"
+          : "flex min-h-screen items-center justify-center bg-white"
+      }
       role="status"
       aria-live="polite"
       aria-label="Gerando Pix"

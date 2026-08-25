@@ -102,6 +102,7 @@ function RevisaoPage() {
           <button
             type="button"
             onClick={confirmPurchase}
+            disabled={isGeneratingPix}
             className="block w-full rounded-md bg-[#3483fa] hover:bg-[#2968c8] text-white text-center py-4 text-[16px] font-semibold transition-colors"
           >
             Confirmar a compra
@@ -174,6 +175,7 @@ function RevisaoPage() {
         <button
           type="button"
           onClick={confirmPurchase}
+          disabled={isGeneratingPix}
           className="block w-full rounded-md bg-[#3483fa] hover:bg-[#2968c8] text-white text-center py-4 text-[16px] font-semibold transition-colors"
         >
           Confirmar a compra

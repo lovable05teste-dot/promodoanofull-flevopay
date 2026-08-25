@@ -1,6 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { SiteFooter } from "@/components/SiteFooter";
+import { PixLoadingScreen } from "@/components/PixLoadingScreen";
 
 export const Route = createFileRoute("/pagamento")({
   head: () => ({
@@ -39,6 +40,21 @@ function PixIcon() {
 
 function PagamentoPage() {
   const price = useCheckoutPrice();
+  const navigate = useNavigate();
+  const [isNavigating, setIsNavigating] = useState(false);
+
+  const selectPix = async () => {
+    if (isNavigating) return;
+    setIsNavigating(true);
+    try {
+      await navigate({ to: "/revisao" });
+    } catch {
+      setIsNavigating(false);
+    }
+  };
+
+  if (isNavigating) return <PixLoadingScreen />;
+
   return (
     <div className="min-h-screen bg-[#ededed] flex flex-col" style={{ fontFamily: "'Proxima Nova', -apple-system, Roboto, Arial, sans-serif" }}>
       <div className="flex-1 py-4 sm:py-6 pb-24">
@@ -53,14 +69,14 @@ function PagamentoPage() {
 
             <h2 className="text-[14px] font-semibold text-gray-800 mb-3">Recomendados</h2>
 
-            <Link to="/revisao" className="flex items-center gap-3 sm:gap-4 rounded-md border border-gray-200 px-3 sm:px-4 py-3 sm:py-4 hover:bg-gray-50">
+            <button type="button" onClick={selectPix} disabled={isNavigating} className="flex w-full items-center gap-3 sm:gap-4 rounded-md border border-gray-200 px-3 sm:px-4 py-3 sm:py-4 hover:bg-gray-50 text-left">
               <PixIcon />
               <div className="flex-1 min-w-0">
                 <div className="text-[15px] font-semibold text-gray-900">Pix</div>
                 <div className="text-[13px] text-gray-600">Aprovação imediata</div>
               </div>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" className="shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
-            </Link>
+            </button>
           </section>
         </div>
       </div>
@@ -75,4 +91,3 @@ function PagamentoPage() {
     </div>
   );
 }
-

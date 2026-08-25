@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { SiteFooter } from "@/components/SiteFooter";
+import { PixLoadingScreen } from "@/components/PixLoadingScreen";
 
 export const Route = createFileRoute("/endereco")({
   head: () => ({
@@ -52,6 +53,7 @@ function Field({
 function EnderecoPage() {
   const navigate = useNavigate();
   const [erro, setErro] = useState("");
+  const [isNavigating, setIsNavigating] = useState(false);
   const [form, setForm] = useState({
     cep: "",
     rua: "",
@@ -81,7 +83,8 @@ function EnderecoPage() {
 
   const set = (k: keyof typeof form) => (v: string) => setForm((f) => ({ ...f, [k]: v }));
 
-  const submit = () => {
+  const submit = async () => {
+    if (isNavigating) return;
     const cpf = form.cpf.replace(/\D+/g, "");
     const phone = form.phone.replace(/\D+/g, "").replace(/^55(?=\d{10,11}$)/, "");
     if (cpf.length !== 11 && cpf.length !== 14) {
@@ -96,8 +99,16 @@ function EnderecoPage() {
     try {
       localStorage.setItem("checkout_customer", JSON.stringify({ ...form, cpf, phone }));
     } catch {}
-    navigate({ to: "/entrega" });
+    setIsNavigating(true);
+    try {
+      await navigate({ to: "/entrega" });
+    } catch {
+      setIsNavigating(false);
+      setErro("Não foi possível continuar. Tente novamente.");
+    }
   };
+
+  if (isNavigating) return <PixLoadingScreen />;
 
   return (
     <div className="min-h-screen bg-[#ededed] py-4 sm:py-6" style={{ fontFamily: "'Proxima Nova', -apple-system, Roboto, Arial, sans-serif" }}>
@@ -152,7 +163,9 @@ function EnderecoPage() {
         )}
 
         <button
+          type="button"
           onClick={submit}
+          disabled={isNavigating}
           className="block w-full rounded-md bg-[#3483fa] hover:bg-[#2968c8] text-white text-center py-4 text-[16px] font-semibold transition-colors"
         >
           Continuar

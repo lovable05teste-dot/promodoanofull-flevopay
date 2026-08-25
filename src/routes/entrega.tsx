@@ -1,6 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { SiteFooter } from "@/components/SiteFooter";
+import { PixLoadingScreen } from "@/components/PixLoadingScreen";
 
 export const Route = createFileRoute("/entrega")({
   head: () => ({
@@ -15,7 +16,9 @@ export const Route = createFileRoute("/entrega")({
 });
 
 function EntregaPage() {
+  const navigate = useNavigate();
   const [endereco, setEndereco] = useState("");
+  const [isNavigating, setIsNavigating] = useState(false);
   useEffect(() => {
     try {
       const raw = localStorage.getItem("checkout_customer");
@@ -25,6 +28,19 @@ function EntregaPage() {
       if (text) setEndereco(text);
     } catch {}
   }, []);
+
+  const goToPayment = async () => {
+    if (isNavigating) return;
+    setIsNavigating(true);
+    try {
+      await navigate({ to: "/pagamento" });
+    } catch {
+      setIsNavigating(false);
+    }
+  };
+
+  if (isNavigating) return <PixLoadingScreen />;
+
   return (
     <div className="min-h-screen bg-[#ededed] py-4 sm:py-6" style={{ fontFamily: "'Proxima Nova', -apple-system, Roboto, Arial, sans-serif" }}>
       <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4">
@@ -52,9 +68,9 @@ function EntregaPage() {
             </label>
           </div>
 
-          <Link to="/pagamento" className="block w-full rounded-md bg-[#3483fa] hover:bg-[#2968c8] text-white text-center py-4 text-[15px] font-semibold mt-6 transition-colors">
+          <button type="button" onClick={goToPayment} disabled={isNavigating} className="block w-full rounded-md bg-[#3483fa] hover:bg-[#2968c8] text-white text-center py-4 text-[15px] font-semibold mt-6 transition-colors">
             Ir para pagamento
-          </Link>
+          </button>
         </section>
 
         <p className="text-center text-[13px] text-gray-500 mt-6">
