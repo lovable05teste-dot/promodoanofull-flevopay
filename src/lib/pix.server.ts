@@ -1,4 +1,4 @@
-const FORTPAY_BASE_URL = "https://api.plataformafortpay.com.br/api/public/v1";
+const FORTPAY_BASE_URL = "https://api.fortpayplataforma.com.br/api/public/v1";
 const FORTPAY_PRODUCT_HASH = "txi2kwhf0r";
 const FORTPAY_OFFER_HASH = "o9ybnwoyun";
 
