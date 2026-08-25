@@ -5,6 +5,7 @@ import { createPixCharge, getPixStatus } from "@/lib/pix.functions";
 import { captureUtms, getUtmQuery } from "@/lib/utm";
 import QRCode from "qrcode";
 import { SiteFooter } from "@/components/SiteFooter";
+import { PixLoadingScreen } from "@/components/PixLoadingScreen";
 
 export const Route = createFileRoute("/pix")({
   head: () => ({
@@ -152,6 +153,8 @@ function PixPage() {
       setTimeout(() => setCopied(false), 2000);
     } catch {}
   };
+
+  if (!pixCode && !error) return <PixLoadingScreen />;
 
   return (
     <div className="min-h-screen bg-[#ededed] py-4 sm:py-6" style={{ fontFamily: "'Proxima Nova', -apple-system, Roboto, Arial, sans-serif" }}>

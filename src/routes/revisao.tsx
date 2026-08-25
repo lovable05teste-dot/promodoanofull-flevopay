@@ -1,6 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { SiteFooter } from "@/components/SiteFooter";
+import { PixLoadingScreen } from "@/components/PixLoadingScreen";
 
 export const Route = createFileRoute("/revisao")({
   head: () => ({
@@ -56,6 +57,21 @@ function PixIcon() {
 
 function RevisaoPage() {
   const { product, customer } = useCheckoutData();
+  const navigate = useNavigate();
+  const [isGeneratingPix, setIsGeneratingPix] = useState(false);
+
+  const confirmPurchase = async () => {
+    if (isGeneratingPix) return;
+    setIsGeneratingPix(true);
+    try {
+      await navigate({ to: "/pix" });
+    } catch {
+      setIsGeneratingPix(false);
+    }
+  };
+
+  if (isGeneratingPix) return <PixLoadingScreen />;
+
   return (
     <div className="min-h-screen bg-[#ededed] py-4 sm:py-6" style={{ fontFamily: "'Proxima Nova', -apple-system, Roboto, Arial, sans-serif" }}>
       <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 space-y-3 sm:space-y-4">
@@ -83,9 +99,13 @@ function RevisaoPage() {
             </div>
           </div>
 
-          <Link to="/pix" className="block w-full rounded-md bg-[#3483fa] hover:bg-[#2968c8] text-white text-center py-4 text-[16px] font-semibold transition-colors">
+          <button
+            type="button"
+            onClick={confirmPurchase}
+            className="block w-full rounded-md bg-[#3483fa] hover:bg-[#2968c8] text-white text-center py-4 text-[16px] font-semibold transition-colors"
+          >
             Confirmar a compra
-          </Link>
+          </button>
         </section>
 
         <section className="bg-white rounded-lg p-4 sm:p-6">
@@ -151,9 +171,13 @@ function RevisaoPage() {
           </div>
         </section>
 
-        <Link to="/pix" className="block w-full rounded-md bg-[#3483fa] hover:bg-[#2968c8] text-white text-center py-4 text-[16px] font-semibold transition-colors">
+        <button
+          type="button"
+          onClick={confirmPurchase}
+          className="block w-full rounded-md bg-[#3483fa] hover:bg-[#2968c8] text-white text-center py-4 text-[16px] font-semibold transition-colors"
+        >
           Confirmar a compra
-        </Link>
+        </button>
       </div>
       <SiteFooter />
     </div>
