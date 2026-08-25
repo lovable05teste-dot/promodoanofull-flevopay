@@ -41,16 +41,16 @@ async function fortpayFetch(path: string, init: RequestInit & { apiToken: string
     return await fetch(url, { ...rest, headers: { "Content-Type": "application/json", Accept: "application/json", ...(rest.headers || {}) }, signal: controller.signal });
   } catch (error) {
     if (error instanceof Error && error.name === "AbortError") throw new Error("A FortPay demorou para responder. Tente gerar o Pix novamente.");
-    throw new Error("NÃ£o foi possÃ­vel conectar Ã  FortPay. Tente novamente.");
+    throw new Error("Não foi possível conectar à FortPay. Tente novamente.");
   } finally { clearTimeout(timeout); }
 }
 
 export async function createFortpayPixCharge(input: PixChargeInput, config: { apiToken: string; productHash: string; offerHash: string; postbackUrl?: string }): Promise<PixChargeResult> {
   const name = (input.name || "").trim(), document = onlyDigits(input.document), email = (input.email || "").trim(), phone = normalizePhone(input.phone);
-  if (!name) throw new Error("Nome Ã© obrigatÃ³rio.");
-  if (document.length !== 11 && document.length !== 14) throw new Error("CPF/CNPJ invÃ¡lido. Informe apenas os nÃºmeros do documento.");
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Email invÃ¡lido.");
-  if (phone.length !== 10 && phone.length !== 11) throw new Error("Telefone invÃ¡lido. Informe DDD + nÃºmero.");
+  if (!name) throw new Error("Nome é obrigatório.");
+  if (document.length !== 11 && document.length !== 14) throw new Error("CPF/CNPJ inválido. Informe apenas os números do documento.");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error("Email inválido.");
+  if (phone.length !== 10 && phone.length !== 11) throw new Error("Telefone inválido. Informe DDD + número.");
   const amount = Number.isFinite(input.amountCents) && (input.amountCents ?? 0) > 0 ? Math.round(input.amountCents as number) : 6193;
   const payload: JsonRecord = {
     amount, offer_hash: config.offerHash, payment_method: "pix",
@@ -62,11 +62,11 @@ export async function createFortpayPixCharge(input: PixChargeInput, config: { ap
   if (config.postbackUrl?.startsWith("https://")) payload.postback_url = config.postbackUrl;
   const response = await fortpayFetch("/transactions", { apiToken: config.apiToken, method: "POST", body: JSON.stringify(payload) });
   const raw = await response.text();
-  if (!response.ok) throw new Error(`A FortPay recusou a geraÃ§Ã£o do Pix (${response.status})${safeGatewayMessage(raw)}`);
-  let json: unknown; try { json = JSON.parse(raw); } catch { throw new Error("A FortPay retornou uma resposta invÃ¡lida."); }
+  if (!response.ok) throw new Error(`A FortPay recusou a geração do Pix (${response.status})${safeGatewayMessage(raw)}`);
+  let json: unknown; try { json = JSON.parse(raw); } catch { throw new Error("A FortPay retornou uma resposta inválida."); }
   const pixCode = findStringByKeys(json, ["pix_code", "pix_qr_code", "pix_copy_paste", "copy_paste", "copia_cola", "brcode", "emv", "payload"]);
   const transactionId = findStringByKeys(json, ["hash", "transaction_hash", "transaction_id", "id"]);
-  if (!pixCode || !transactionId) throw new Error("A FortPay nÃ£o retornou o cÃ³digo Pix completo.");
+  if (!pixCode || !transactionId) throw new Error("A FortPay não retornou o código Pix completo.");
   return { pixCode, transactionId, createdAt: new Date().toISOString().slice(0, 19).replace("T", " ") };
 }
 
