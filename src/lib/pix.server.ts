@@ -104,16 +104,15 @@ async function fortpayFetch(path: string, init: RequestInit & { apiToken: string
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 15000);
   const url = new URL(`${FORTPAY_BASE_URL}${path}`);
-  if ((rest.method || "GET").toUpperCase() === "GET") {
-    url.searchParams.set("api_token", apiToken);
-  }
+  // A FortPay exige o token como query parameter em todos os endpoints,
+  // inclusive no POST de criação da transação.
+  url.searchParams.set("api_token", apiToken);
   try {
     return await fetch(url, {
       ...rest,
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        Authorization: `Bearer ${apiToken}`,
         ...(rest.headers || {}),
       },
       signal: controller.signal,
@@ -153,10 +152,9 @@ export async function createFortpayPixCharge(
 
   const title = (input.itemTitle || "Produto").slice(0, 120);
   const payload: JsonRecord = {
-    api_token: config.apiToken,
     amount,
+    offer_hash: FORTPAY_OFFER_HASH,
     payment_method: "pix",
-    installments: 1,
     expire_in_days: 1,
     transaction_origin: "api",
     customer: {
@@ -168,10 +166,10 @@ export async function createFortpayPixCharge(
     cart: [
       {
         product_hash: FORTPAY_PRODUCT_HASH,
-        offer_hash: FORTPAY_OFFER_HASH,
         price: amount,
         quantity: 1,
         operation_type: 1,
+        tangible: true,
         title,
         ...(input.itemImage?.startsWith("https://") ? { cover: input.itemImage } : {}),
       },
