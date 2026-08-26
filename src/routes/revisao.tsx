@@ -63,9 +63,27 @@ function useCheckoutData() {
 
 function PixIcon() {
   return (
-    <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#d5f5e3] shrink-0">
-      <img src="https://i.imgur.com/nNfU78q.png" alt="Pix" className="max-w-[22px] max-h-[22px]" />
-    </span>
+    <div
+      className="shrink-0"
+      style={{
+        marginRight: 20,
+        minWidth: 48,
+        maxWidth: 48,
+        minHeight: 48,
+        maxHeight: 48,
+        borderRadius: "50%",
+        border: "solid 1px #eeeeee",
+        backgroundColor: "#ffffff",
+        display: "flex",
+        alignItems: "center",
+      }}
+    >
+      <img
+        src="https://i.imgur.com/nNfU78q.png"
+        alt="Pix"
+        style={{ margin: "0 auto", maxWidth: 24, maxHeight: 24 }}
+      />
+    </div>
   );
 }
 
@@ -204,7 +222,7 @@ function RevisaoPage() {
 
         <section className="bg-white rounded-lg p-4 sm:p-6">
           <h2 className="text-[16px] font-semibold text-gray-900 mb-4">Detalhe do pagamento</h2>
-          <div className="flex items-start gap-3">
+          <div className="flex items-start">
             <PixIcon />
             <div>
               <div className="text-[15px] font-semibold text-gray-900">Pix</div>

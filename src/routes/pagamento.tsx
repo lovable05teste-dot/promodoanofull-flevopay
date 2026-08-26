@@ -32,9 +32,27 @@ function useCheckoutPrice(): string {
 
 function PixIcon() {
   return (
-    <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#d5f5e3] shrink-0">
-      <img src="https://i.imgur.com/nNfU78q.png" alt="Pix" className="max-w-[24px] max-h-[24px]" />
-    </span>
+    <div
+      className="shrink-0"
+      style={{
+        marginRight: 20,
+        minWidth: 48,
+        maxWidth: 48,
+        minHeight: 48,
+        maxHeight: 48,
+        borderRadius: "50%",
+        border: "solid 1px #eeeeee",
+        backgroundColor: "#ffffff",
+        display: "flex",
+        alignItems: "center",
+      }}
+    >
+      <img
+        src="https://i.imgur.com/nNfU78q.png"
+        alt="Pix"
+        style={{ margin: "0 auto", maxWidth: 24, maxHeight: 24 }}
+      />
+    </div>
   );
 }
 
@@ -69,7 +87,7 @@ function PagamentoPage() {
 
             <h2 className="text-[14px] font-semibold text-gray-800 mb-3">Recomendados</h2>
 
-            <button type="button" onClick={selectPix} disabled={isNavigating} className="flex w-full items-center gap-3 sm:gap-4 rounded-md border border-gray-200 px-3 sm:px-4 py-3 sm:py-4 hover:bg-gray-50 text-left">
+            <button type="button" onClick={selectPix} disabled={isNavigating} className="flex w-full items-center rounded-md border border-gray-200 px-3 sm:px-4 py-3 sm:py-4 hover:bg-gray-50 text-left">
               <PixIcon />
               <div className="flex-1 min-w-0">
                 <div className="text-[15px] font-semibold text-gray-900">Pix</div>

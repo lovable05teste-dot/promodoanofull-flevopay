@@ -537,9 +537,16 @@ function ProductView({ p }: { p: Product }) {
           </p>
 
           <p className="mt-5 font-bold text-base text-black/90">Estoque disponível</p>
-          <p className="text-sm text-gray-600">
+          <p className="flex items-center text-sm text-gray-600">
             Armazenado e enviado pelo{" "}
-            <span className="text-[#00a650] font-bold">⚡FULL</span>
+            <img
+              src="https://i.imgur.com/ulfGCun.png"
+              alt="FULL"
+              loading="lazy"
+              decoding="async"
+              className="ml-1 inline-block"
+              style={{ maxHeight: 16, maxWidth: 45 }}
+            />
           </p>
 
           <div className="mt-4 px-[12px] h-[52px] bg-[#f5f5f5] rounded-md flex items-center">

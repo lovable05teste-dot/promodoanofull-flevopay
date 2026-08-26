@@ -6,6 +6,7 @@ import { UTMIFY_PIXEL_LOADER } from "../lib/utmify-pixel";
 
 const PLACEHOLDER = "/clone-assets/images/placeholder.svg";
 const MAIN_PRODUCT_ID = "6549324";
+const FULL_LOGO_HTML = '<img src="https://i.imgur.com/ulfGCun.png" alt="FULL" loading="lazy" decoding="async" style="margin-left:4px;display:inline-block;max-height:16px;max-width:45px;vertical-align:middle;">';
 const PRODUCT_LOADING_SCRIPT = `<script>(function(){function removeLoader(){var old=document.getElementById('product-navigation-loader');if(old)old.remove()}window.__showProductLoader=function(){if(document.getElementById('product-navigation-loader'))return;var style=document.getElementById('product-navigation-loader-style');if(!style){style=document.createElement('style');style.id='product-navigation-loader-style';style.textContent='@keyframes product-loader-spin{to{transform:rotate(360deg)}}';document.head.appendChild(style)}var overlay=document.createElement('div');overlay.id='product-navigation-loader';overlay.setAttribute('role','status');overlay.setAttribute('aria-label','Carregando produto');overlay.style.cssText='position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;background:#fff;';var spinner=document.createElement('span');spinner.style.cssText='display:block;width:56px;height:56px;border:4px solid #3483fa;border-right-color:transparent;border-radius:50%;animation:product-loader-spin .75s linear infinite;';overlay.appendChild(spinner);document.body.appendChild(overlay)};window.addEventListener('pageshow',removeLoader)})();</script>`;
 function buildHomepageTrackingScript() {
   const item = {
@@ -93,6 +94,7 @@ const actualPaymentMethodsSection = `<section class="px-4 md:px-8 py-6 border-t 
 const relatedSection = buildRelatedSection();
 const optimizedHtml = html
   .replace(/seg\. 24 de agosto/g, "qui. 27 de agosto")
+  .replace(/<span class="text-\[#00a650\] font-bold">⚡FULL<\/span>/g, FULL_LOGO_HTML)
   .replace(
     /<h1 class="mt-2 text-base font-normal text-black\/90 leading-snug break-words">([\s\S]*?)<\/h1>/,
     '<span id="titulo-do-produto" style="margin-top:8px;display:block;line-height:1.375;overflow-wrap:anywhere;font-family:proximanovaregular;font-size:16px;font-weight:400;color:rgba(0,0,0,.9);">$1</span>',
