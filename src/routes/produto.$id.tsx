@@ -96,6 +96,32 @@ function PaymentMethods() {
   );
 }
 
+function DescriptionParagraph({ text }: { text: string }) {
+  const dashIndex = text.indexOf(" — ");
+  if (dashIndex > 0) {
+    return (
+      <p>
+        <strong className="mb-2 block text-[15px] font-semibold text-black/90">
+          {text.slice(0, dashIndex)}
+        </strong>
+        <span>{text.slice(dashIndex + 3)}</span>
+      </p>
+    );
+  }
+
+  const colonIndex = text.indexOf(":");
+  if (colonIndex > 0 && colonIndex < 40) {
+    return (
+      <p>
+        <strong className="font-semibold text-black/90">{text.slice(0, colonIndex + 1)}</strong>{" "}
+        <span>{text.slice(colonIndex + 1).trim()}</span>
+      </p>
+    );
+  }
+
+  return <p>{text}</p>;
+}
+
 // Algumas imagens hospedadas externamente podem ter sido removidas (404).
 // Troca qualquer imagem quebrada por um placeholder para a página não ficar bugada.
 function useBrokenImageFallback() {
@@ -899,9 +925,12 @@ function ProductView({ p }: { p: Product }) {
         {/* Descrição */}
         <section className="px-4 md:px-8 py-6 border-t border-gray-200 text-[#333]">
           <h2 className="text-lg font-semibold mb-4">Descrição</h2>
-          <div className="space-y-4 text-sm leading-relaxed">
+          <div
+            className="space-y-5 text-sm leading-relaxed"
+            style={{ margin: "0", borderRadius: "0" }}
+          >
             {longDescription(p).map((par, i) => (
-              <p key={i}>{par}</p>
+              <DescriptionParagraph key={i} text={par} />
             ))}
             <p>
               Aproveite a promoção especial: de R$ {oldPrice} por apenas R$ {newPrice}{" "}
