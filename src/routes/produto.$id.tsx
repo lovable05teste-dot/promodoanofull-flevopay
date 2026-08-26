@@ -62,6 +62,21 @@ export const Route = createFileRoute("/produto/$id")({
 
 const PLACEHOLDER = "/clone-assets/images/placeholder.svg";
 
+const RELATED_CATEGORY_GROUPS: Record<string, string> = {
+  "Acessórios para motos": "veiculos",
+  "Acessórios para Veículos": "veiculos",
+  "Pneus e acessórios": "veiculos",
+  "Eletrodomésticos": "eletrodomesticos",
+  "Eletroportáteis": "eletrodomesticos",
+  "Climatização": "eletrodomesticos",
+  "Casa": "casa-e-lazer",
+  "Ar Livre": "casa-e-lazer",
+};
+
+function relatedCategoryGroup(category: string) {
+  return RELATED_CATEGORY_GROUPS[category] ?? category.trim().toLocaleLowerCase("pt-BR");
+}
+
 function optimizedImage(src: string, size: "m" | "h" = "h") {
   const match = src.match(/^https:\/\/i\.imgur\.com\/([A-Za-z0-9]+)\.(?:jpg|jpeg|png|webp)$/i);
   if (!match) return src;
@@ -140,14 +155,25 @@ function ProductView({ p }: { p: Product }) {
   const startX = useRef<number | null>(null);
   const dx = useRef(0);
 
+  const currentRelatedGroup = relatedCategoryGroup(p.category);
+
   const related = useMemo(
-    () => ALL_PRODUCTS.filter((x) => x.id !== p.id).slice(0, 12),
-    [p.id]
+    () =>
+      ALL_PRODUCTS.filter(
+        (x) => x.id !== p.id && relatedCategoryGroup(x.category) === currentRelatedGroup
+      ).slice(0, 12),
+    [p.id, currentRelatedGroup]
   );
 
   const alsoBought = useMemo(
-    () => ALL_PRODUCTS.filter((x) => x.id !== p.id).slice().reverse().slice(0, 12),
-    [p.id]
+    () =>
+      ALL_PRODUCTS.filter(
+        (x) => x.id !== p.id && relatedCategoryGroup(x.category) !== currentRelatedGroup
+      )
+        .slice()
+        .reverse()
+        .slice(0, 12),
+    [p.id, currentRelatedGroup]
   );
 
   function onStart(x: number) {
