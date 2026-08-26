@@ -1,5 +1,5 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState, type MouseEvent as ReactMouseEvent } from "react";
 import { SiteFooter } from "@/components/SiteFooter";
 import { PixLoadingScreen } from "@/components/PixLoadingScreen";
 
@@ -15,7 +15,21 @@ export const Route = createFileRoute("/revisao")({
   component: RevisaoPage,
 });
 
-type CheckoutProduct = { title: string; price: string; image: string };
+type CheckoutProduct = {
+  title: string;
+  price: string;
+  image: string;
+  quantity?: number;
+  cartItems?: Array<{
+    key: string;
+    title: string;
+    image: string;
+    color?: string;
+    voltage?: string;
+    extra?: string;
+    quantity: number;
+  }>;
+};
 type CheckoutCustomer = {
   name?: string;
   cpf?: string;
@@ -60,7 +74,10 @@ function RevisaoPage() {
   const navigate = useNavigate();
   const [isGeneratingPix, setIsGeneratingPix] = useState(false);
 
-  const confirmPurchase = async () => {
+  const confirmPurchase = async (event: ReactMouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    event.nativeEvent.stopImmediatePropagation();
     if (isGeneratingPix) return;
     setIsGeneratingPix(true);
     try {
@@ -77,9 +94,14 @@ function RevisaoPage() {
       <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4 space-y-3 sm:space-y-4">
         <section className="bg-white rounded-lg p-4 sm:p-6">
           <div className="flex items-center gap-3 mb-5">
-            <Link to="/pagamento" className="text-gray-800">
+            <button
+              type="button"
+              onClick={() => navigate({ to: "/pagamento" })}
+              className="text-gray-800"
+              aria-label="Voltar para pagamento"
+            >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-            </Link>
+            </button>
             <h1 className="text-[20px] font-semibold text-gray-900">Revise e confirme</h1>
           </div>
 
@@ -101,7 +123,7 @@ function RevisaoPage() {
 
           <button
             type="button"
-            onClick={confirmPurchase}
+            onClickCapture={confirmPurchase}
             disabled={isGeneratingPix}
             className="block w-full rounded-md bg-[#3483fa] hover:bg-[#2968c8] text-white text-center py-4 text-[16px] font-semibold transition-colors"
           >
@@ -111,20 +133,40 @@ function RevisaoPage() {
 
         <section className="bg-white rounded-lg p-4 sm:p-6">
           <h2 className="text-[16px] font-semibold text-gray-900 mb-4">Carrinho</h2>
-          <div className="flex gap-3">
-            <img src={product.image} alt="Produto" className="h-20 w-20 object-contain rounded-md border border-gray-100" />
-            <div className="flex-1 min-w-0">
-              <div className="text-[13px] text-gray-600 flex items-center gap-1">
-                Envio |
-                <span className="inline-flex items-center gap-1 text-[#00a650] font-bold italic">
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                  FULL
-                </span>
+          <div className="space-y-4">
+            {(product.cartItems?.length
+              ? product.cartItems
+              : [{
+                  key: "checkout-product",
+                  title: product.title,
+                  image: product.image,
+                  quantity: product.quantity || 1,
+                  color: undefined,
+                  voltage: undefined,
+                  extra: undefined,
+                }]
+            ).map((item) => (
+              <div key={item.key} className="flex gap-3">
+                <img src={item.image} alt={item.title} className="h-20 w-20 object-contain rounded-md border border-gray-100" />
+                <div className="flex-1 min-w-0">
+                  <div className="text-[13px] text-gray-600 flex items-center gap-1">
+                    Envio |
+                    <span className="inline-flex items-center gap-1 text-[#00a650] font-bold italic">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                      FULL
+                    </span>
+                  </div>
+                  <div className="text-[13px] text-gray-800 mt-1">Quinta-feira, 27 de agosto</div>
+                  <div className="text-[14px] text-gray-900 mt-1 font-medium leading-snug">{item.title}</div>
+                  {(item.color || item.voltage || item.extra) && (
+                    <div className="text-[12px] text-gray-500 mt-1">
+                      {[item.color, item.voltage, item.extra].filter(Boolean).join(" · ")}
+                    </div>
+                  )}
+                  <div className="text-[12px] text-gray-500 mt-1">Quantidade: {item.quantity}</div>
+                </div>
               </div>
-              <div className="text-[13px] text-gray-800 mt-1">Quinta-feira, 27 de agosto</div>
-              <div className="text-[14px] text-gray-900 mt-1 font-medium leading-snug">{product.title}</div>
-              <div className="text-[12px] text-gray-500 mt-1">Quantidade: 1</div>
-            </div>
+            ))}
           </div>
         </section>
 
@@ -174,7 +216,7 @@ function RevisaoPage() {
 
         <button
           type="button"
-          onClick={confirmPurchase}
+          onClickCapture={confirmPurchase}
           disabled={isGeneratingPix}
           className="block w-full rounded-md bg-[#3483fa] hover:bg-[#2968c8] text-white text-center py-4 text-[16px] font-semibold transition-colors"
         >

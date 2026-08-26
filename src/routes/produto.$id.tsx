@@ -7,10 +7,11 @@ const VARIANT_IMAGE_OVERRIDES: Record<string, Record<string, string>> = {
   "1497000015": { Azul: furadeiraAzul, Verde: furadeiraVerde },
 };
 
-import { ensureUtmifyBeforeCheckout } from "@/lib/tracking";
+import { metaPixelIsReady, trackInitiateCheckout } from "@/lib/tracking";
+import { addCartItem } from "@/lib/cart";
 import { withUtms } from "@/lib/utm";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent } from "react";
 import { getProduct, ALL_PRODUCTS, longDescription, genericSpecGroups, type Product } from "../lib/products";
 import { SiteFooter } from "@/components/SiteFooter";
 import { LazySection } from "@/components/LazySection";
@@ -183,6 +184,68 @@ function ProductView({ p }: { p: Product }) {
         })
       );
     } catch {}
+  }
+
+  function beginCheckout(event: ReactMouseEvent<HTMLAnchorElement>) {
+    const link = event.currentTarget;
+    if (link.dataset.icReplay === "1") {
+      delete link.dataset.icReplay;
+      return;
+    }
+
+    event.preventDefault();
+    if (isNavigatingProduct) {
+      event.stopPropagation();
+      event.nativeEvent.stopImmediatePropagation();
+      return;
+    }
+
+    saveCheckoutProduct();
+    const pixelWasReady = metaPixelIsReady();
+    if (!pixelWasReady) {
+      event.stopPropagation();
+      event.nativeEvent.stopImmediatePropagation();
+    }
+    setIsNavigatingProduct(true);
+    const href = link.href;
+    void trackInitiateCheckout({
+      id: p.id,
+      name: p.title,
+      value: newPrice,
+      numItems: 1,
+    }).then((result) => {
+      if (!pixelWasReady) {
+        if (result.sent && link.isConnected) {
+          link.dataset.icReplay = "1";
+          link.click();
+          window.setTimeout(() => window.location.assign(href), 8000);
+        } else {
+          window.location.assign(href);
+        }
+      } else {
+        window.setTimeout(() => window.location.assign(href), 8000);
+      }
+    });
+  }
+
+  function addProductToCart(event: ReactMouseEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+    event.nativeEvent.stopImmediatePropagation();
+    if (isNavigatingProduct) return;
+    addCartItem({
+      id: p.id,
+      title: p.title,
+      price: newPrice,
+      image: carousel[0],
+      color,
+      voltage: volt,
+      extra,
+    });
+    setIsNavigatingProduct(true);
+    window.setTimeout(() => {
+      window.location.assign(withUtms("/carrinho"));
+    }, 60);
   }
 
   return (
@@ -464,32 +527,21 @@ function ProductView({ p }: { p: Product }) {
             href={checkoutHref}
             data-product-id={p.id}
             onPointerDown={saveCheckoutProduct}
-            onClickCapture={saveCheckoutProduct}
-            onClick={(event) => {
-              saveCheckoutProduct();
-              setIsNavigatingProduct(true);
-              ensureUtmifyBeforeCheckout(event);
-            }}
+            onClickCapture={beginCheckout}
             className="mt-4 w-full h-12 rounded-md text-white font-semibold text-base flex items-center justify-center"
             style={{ backgroundColor: "#3483fa" }}
           >
             Comprar agora
           </a>
-          <a
-            href={checkoutHref}
+          <button
+            type="button"
             data-product-id={p.id}
-            onPointerDown={saveCheckoutProduct}
-            onClickCapture={saveCheckoutProduct}
-            onClick={(event) => {
-              saveCheckoutProduct();
-              setIsNavigatingProduct(true);
-              ensureUtmifyBeforeCheckout(event);
-            }}
+            onClickCapture={addProductToCart}
             className="mt-3 w-full h-12 rounded-md text-[#3483fa] font-semibold text-base flex items-center justify-center"
             style={{ backgroundColor: "#e6efff" }}
           >
             Adicionar ao carrinho
-          </a>
+          </button>
         </section>
 
         {/* Seller info */}

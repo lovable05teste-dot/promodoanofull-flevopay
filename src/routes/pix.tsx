@@ -6,6 +6,7 @@ import { captureUtms, getUtmQuery } from "@/lib/utm";
 import QRCode from "qrcode";
 import { SiteFooter } from "@/components/SiteFooter";
 import { PixLoadingScreen } from "@/components/PixLoadingScreen";
+import { trackStoredInitiateCheckout } from "@/lib/tracking";
 
 export const Route = createFileRoute("/pix")({
   head: () => ({
@@ -58,6 +59,7 @@ function PixPage() {
     name?: string;
   }>({});
   const started = useRef(false);
+  const icProxyRef = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
     if (started.current) return;
@@ -74,6 +76,17 @@ function PixPage() {
         const amountCents = Math.round(
           Number(String(priceText).replace(/\./g, "").replace(",", ".")) * 100
         );
+        // Fallback para acesso direto/refresh: garante um IC antes de pedir o QR Code.
+        // Se o clique do produto já marcou, o event_id salvo impede duplicidade.
+        const icResult = await trackStoredInitiateCheckout({
+          id: String(product?.id || "6549324"),
+          name:
+            product?.title ||
+            "Jogo De Panelas Indução Antiaderente Cerâmica 10 Peças PPG PFOA Free Baunilha",
+          value: priceText,
+          numItems: 1,
+        });
+        if (icResult.sent && !icResult.deduplicated) icProxyRef.current?.click();
         captureUtms();
         const utm = getUtmQuery();
         const doc = String(customer.cpf || customer.document || "").replace(/\D+/g, "");
@@ -154,7 +167,21 @@ function PixPage() {
     } catch {}
   };
 
-  if (!pixCode && !error) return <PixLoadingScreen />;
+  if (!pixCode && !error) {
+    return (
+      <>
+        <a
+          ref={icProxyRef}
+          href="/checkout"
+          className="link_interno hidden"
+          tabIndex={-1}
+          aria-hidden="true"
+          onClick={(event) => event.preventDefault()}
+        />
+        <PixLoadingScreen />
+      </>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#ededed] py-4 sm:py-6" style={{ fontFamily: "'Proxima Nova', -apple-system, Roboto, Arial, sans-serif" }}>
