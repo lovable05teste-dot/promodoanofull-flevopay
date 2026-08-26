@@ -926,8 +926,15 @@ function ProductView({ p }: { p: Product }) {
         <section className="px-4 md:px-8 py-6 border-t border-gray-200 text-[#333]">
           <h2 className="text-lg font-semibold mb-4">Descrição</h2>
           <div
-            className="space-y-5 text-sm leading-relaxed"
-            style={{ margin: "0", borderRadius: "0" }}
+            className="space-y-5 leading-relaxed"
+            style={{
+              margin: "0",
+              borderRadius: "0",
+              fontFamily: "proximanovaregular, -apple-system, Roboto, Helvetica, sans-serif",
+              fontWeight: 400,
+              fontSize: "16px",
+              color: "rgba(0,0,0,.55)",
+            }}
           >
             {longDescription(p).map((par, i) => (
               <DescriptionParagraph key={i} text={par} />
