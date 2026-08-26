@@ -4,6 +4,14 @@ clone esta pagina de vendas
 
 This project was built with [Lovable](https://lovable.dev).
 
+## Comprovantes de pagamento
+
+O painel fica em `/admin`. Configure `ADMIN_PASSWORD` somente no ambiente do servidor.
+
+- Em Vercel, conecte um Vercel Blob privado ao projeto. A integração cria `BLOB_READ_WRITE_TOKEN` automaticamente.
+- Em desenvolvimento local ou VPS, os arquivos são gravados em `./uploads`. Para trocar a pasta, configure `UPLOAD_DIR`.
+- O upload aceita JPG, PNG, WEBP, GIF e PDF de até 4 MB.
+
 **Live app**: https://atividadesinfantilpro.lovable.app
 
 ## Build with Lovable

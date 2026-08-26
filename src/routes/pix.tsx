@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { createPixCharge, getPixStatus } from "@/lib/pix.functions";
 import { captureUtms, getUtmQuery } from "@/lib/utm";
@@ -47,6 +47,10 @@ function PixPage() {
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string>("");
   const [paid, setPaid] = useState(false);
+  const [receiptFile, setReceiptFile] = useState<File | null>(null);
+  const [receiptSending, setReceiptSending] = useState(false);
+  const [receiptMessage, setReceiptMessage] = useState("");
+  const [receiptSent, setReceiptSent] = useState(false);
   const [priceStr, setPriceStr] = useState("61,93");
   const [address, setAddress] = useState<{
     rua?: string;
@@ -167,6 +171,32 @@ function PixPage() {
     } catch {}
   };
 
+  const sendReceipt = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!receiptFile || receiptSending) return;
+    setReceiptSending(true);
+    setReceiptMessage("");
+    try {
+      const form = new FormData();
+      form.append("file", receiptFile);
+      if (transactionId) form.append("transactionId", transactionId);
+      const response = await fetch("/api/receipts", { method: "POST", body: form });
+      const payload = (await response.json()) as { ok?: boolean; message?: string };
+      if (!response.ok || !payload.ok) {
+        throw new Error(payload.message || "Não foi possível enviar o comprovante.");
+      }
+      setReceiptSent(true);
+      setReceiptFile(null);
+      setReceiptMessage("Comprovante enviado com sucesso.");
+    } catch (uploadError) {
+      setReceiptMessage(
+        uploadError instanceof Error ? uploadError.message : "Não foi possível enviar o comprovante.",
+      );
+    } finally {
+      setReceiptSending(false);
+    }
+  };
+
   if (!pixCode && !error) {
     return (
       <>
@@ -258,6 +288,40 @@ function PixPage() {
             >
               Já fiz o pagamento
             </button>
+          </section>
+        )}
+
+        {!paid && (
+          <section className="bg-white rounded-lg p-4 sm:p-6">
+            <h2 className="text-[16px] font-semibold text-gray-900">Enviar comprovante</h2>
+            <p className="mt-1 text-[13px] text-gray-500">
+              Depois de pagar, envie uma imagem ou PDF de até 4 MB.
+            </p>
+            <form onSubmit={sendReceipt} className="mt-4">
+              <input
+                key={receiptSent ? "receipt-sent" : "receipt-pending"}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
+                onChange={(event) => {
+                  setReceiptFile(event.target.files?.[0] || null);
+                  setReceiptSent(false);
+                  setReceiptMessage("");
+                }}
+                className="block w-full rounded-md border border-gray-200 bg-white p-3 text-[13px] text-gray-700 file:mr-3 file:rounded file:border-0 file:bg-[#eaf3ff] file:px-3 file:py-2 file:font-semibold file:text-[#3483fa]"
+              />
+              <button
+                type="submit"
+                disabled={!receiptFile || receiptSending || receiptSent}
+                className="mt-3 block w-full rounded-md bg-[#3483fa] py-4 text-[16px] font-semibold text-white transition-colors hover:bg-[#2968c8] disabled:opacity-60"
+              >
+                {receiptSending ? "Enviando…" : receiptSent ? "Comprovante enviado" : "Enviar comprovante"}
+              </button>
+            </form>
+            {receiptMessage && (
+              <div className={`mt-3 rounded-md p-3 text-[13px] ${receiptSent ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>
+                {receiptMessage}
+              </div>
+            )}
           </section>
         )}
 
