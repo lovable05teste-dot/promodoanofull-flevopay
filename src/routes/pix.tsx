@@ -64,6 +64,7 @@ function PixPage() {
   }>({});
   const started = useRef(false);
   const icProxyRef = useRef<HTMLAnchorElement>(null);
+  const receiptSectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (started.current) return;
@@ -80,13 +81,9 @@ function PixPage() {
         const amountCents = Math.round(
           Number(String(priceText).replace(/\./g, "").replace(",", ".")) * 100
         );
-        // Fallback para acesso direto/refresh: garante um IC antes de pedir o QR Code.
-        // Se o clique do produto já marcou, o event_id salvo impede duplicidade.
         const icResult = await trackStoredInitiateCheckout({
           id: String(product?.id || "6549324"),
-          name:
-            product?.title ||
-            "Jogo De Panelas Indução Antiaderente Cerâmica 10 Peças PPG PFOA Free Baunilha",
+          name: product?.title || "Jogo De Panelas Indução Antiaderente Cerâmica 10 Peças PPG PFOA Free Baunilha",
           value: priceText,
           numItems: 1,
         });
@@ -113,11 +110,7 @@ function PixPage() {
           },
         });
         setPixCode(result.pixCode);
-        QRCode.toDataURL(result.pixCode, {
-          width: 260,
-          margin: 1,
-          errorCorrectionLevel: "L",
-        })
+        QRCode.toDataURL(result.pixCode, { width: 260, margin: 1, errorCorrectionLevel: "L" })
           .then(setQrDataUrl)
           .catch(() => setQrDataUrl(""));
         setTransactionId(result.transactionId);
@@ -171,6 +164,10 @@ function PixPage() {
     } catch {}
   };
 
+  const goToReceipt = () => {
+    receiptSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   const sendReceipt = async (event: FormEvent) => {
     event.preventDefault();
     if (!receiptFile || receiptSending) return;
@@ -187,11 +184,9 @@ function PixPage() {
       }
       setReceiptSent(true);
       setReceiptFile(null);
-      setReceiptMessage("Comprovante enviado com sucesso.");
+      setReceiptMessage("Comprovante enviado com sucesso. Aguarde a confirmação do pagamento.");
     } catch (uploadError) {
-      setReceiptMessage(
-        uploadError instanceof Error ? uploadError.message : "Não foi possível enviar o comprovante.",
-      );
+      setReceiptMessage(uploadError instanceof Error ? uploadError.message : "Não foi possível enviar o comprovante.");
     } finally {
       setReceiptSending(false);
     }
@@ -200,14 +195,7 @@ function PixPage() {
   if (!pixCode && !error) {
     return (
       <>
-        <a
-          ref={icProxyRef}
-          href="/checkout"
-          className="link_interno hidden"
-          tabIndex={-1}
-          aria-hidden="true"
-          onClick={(event) => event.preventDefault()}
-        />
+        <a ref={icProxyRef} href="/checkout" className="link_interno hidden" tabIndex={-1} aria-hidden="true" onClick={(event) => event.preventDefault()} />
         <PixLoadingScreen />
       </>
     );
@@ -220,13 +208,8 @@ function PixPage() {
           <div className="flex justify-center mb-3"><MoneyIcon /></div>
           <div className="text-[13px] text-gray-500">{paid ? "Pagamento confirmado!" : "Falta pouco!"}</div>
           <h1 className="text-[19px] sm:text-[22px] font-semibold text-gray-900 leading-tight mt-2">
-            {paid ? (
-              <>Compra concluída com sucesso.</>
-            ) : (
-              <>Pague R$ {priceStr} via Pix<br />para concluir sua compra</>
-            )}
+            {paid ? <>Compra concluída com sucesso.</> : <>Pague R$ {priceStr} via Pix<br />para concluir sua compra</>}
           </h1>
-
         </section>
 
         {!paid && (
@@ -237,91 +220,38 @@ function PixPage() {
               <li>2. Escolha pagar via Pix.</li>
               <li>3. Cole o código abaixo.</li>
             </ol>
-
             <div className="my-4 min-h-[72px]">
               {pixCode ? (
                 <>
-                  {qrDataUrl && (
-                    <div className="flex justify-center mb-4">
-                      <img
-                        src={qrDataUrl}
-                        alt="QR Code Pix para pagamento"
-                        className="h-[220px] w-[220px] rounded-md border border-gray-200 bg-white p-2"
-                      />
-                    </div>
-                  )}
-                  <div className="rounded-md border border-gray-200 px-4 py-3 text-[13px] text-gray-700 break-all font-medium">
-                    {pixCode}
-                  </div>
+                  {qrDataUrl && <div className="flex justify-center mb-4"><img src={qrDataUrl} alt="QR Code Pix para pagamento" className="h-[220px] w-[220px] rounded-md border border-gray-200 bg-white p-2" /></div>}
+                  <div className="rounded-md border border-gray-200 px-4 py-3 text-[13px] text-gray-700 break-all font-medium">{pixCode}</div>
                 </>
               ) : error ? (
-                <div className="text-sm text-red-600">
-                  {error}
-                  <a href="/endereco" className="ml-1 underline text-[#3483fa]">
-                    Corrigir meus dados
-                  </a>
-                </div>
-              ) : (
-                <div className="text-sm text-gray-500">Gerando código Pix…</div>
-              )}
+                <div className="text-sm text-red-600">{error}<a href="/endereco" className="ml-1 underline text-[#3483fa]">Corrigir meus dados</a></div>
+              ) : <div className="text-sm text-gray-500">Gerando código Pix…</div>}
             </div>
-
             <div className="flex items-center gap-2 mt-4 text-[14px] text-gray-700">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
               Pague e será creditado na hora.
             </div>
-
-            <div className="mt-3 rounded-md border-l-4 border-[#3483fa] bg-[#eaf3ff] px-4 py-3 text-[14px] text-gray-800">
-              Em caso de não pagamento sua compra será cancelada automaticamente.
-            </div>
-
-            <button
-              onClick={copy}
-              disabled={!pixCode}
-              className="block w-full rounded-md bg-[#3483fa] hover:bg-[#2968c8] disabled:opacity-60 text-white text-center py-4 text-[16px] font-semibold mt-6 transition-colors"
-            >
-              {copied ? "Código copiado!" : "Copiar código"}
-            </button>
-            <button
-              type="button"
-              className="block w-full rounded-md border border-[#3483fa] text-[#3483fa] hover:bg-[#eaf3ff] text-center py-4 text-[16px] font-semibold mt-3 transition-colors"
-            >
-              Já fiz o pagamento
-            </button>
+            <div className="mt-3 rounded-md border-l-4 border-[#3483fa] bg-[#eaf3ff] px-4 py-3 text-[14px] text-gray-800">Em caso de não pagamento sua compra será cancelada automaticamente.</div>
+            <button onClick={copy} disabled={!pixCode} className="block w-full rounded-md bg-[#3483fa] hover:bg-[#2968c8] disabled:opacity-60 text-white text-center py-4 text-[16px] font-semibold mt-6 transition-colors">{copied ? "Código copiado!" : "Copiar código"}</button>
+            <button type="button" onClick={goToReceipt} className="block w-full rounded-md border border-[#3483fa] text-[#3483fa] hover:bg-[#eaf3ff] text-center py-4 text-[16px] font-semibold mt-3 transition-colors">Já paguei — enviar comprovante</button>
           </section>
         )}
 
         {!paid && (
-          <section className="bg-white rounded-lg p-4 sm:p-6">
-            <h2 className="text-[16px] font-semibold text-gray-900">Enviar comprovante</h2>
-            <p className="mt-1 text-[13px] text-gray-500">
-              Depois de pagar, envie uma imagem ou PDF de até 4 MB.
-            </p>
+          <section ref={receiptSectionRef} className="bg-white rounded-lg p-4 sm:p-6 scroll-mt-4">
+            <h2 className="text-[17px] font-semibold text-gray-900">Pagamento feito? Envie o comprovante aqui</h2>
+            <div className="mt-3 rounded-md border-l-4 border-[#3483fa] bg-[#eaf3ff] px-4 py-3 text-[14px] leading-relaxed text-gray-800">
+              <strong>Como enviar:</strong> depois de pagar no app do banco, toque em <strong>Salvar comprovante</strong> ou tire um print da confirmação. Volte aqui, escolha a imagem ou PDF salvo e clique em <strong>Enviar comprovante</strong>.
+            </div>
+            <p className="mt-3 text-[13px] text-gray-600">Aceitamos imagem ou PDF de até 4 MB. O comprovante fica salvo para conferência do pagamento.</p>
             <form onSubmit={sendReceipt} className="mt-4">
-              <input
-                key={receiptSent ? "receipt-sent" : "receipt-pending"}
-                type="file"
-                accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
-                onChange={(event) => {
-                  setReceiptFile(event.target.files?.[0] || null);
-                  setReceiptSent(false);
-                  setReceiptMessage("");
-                }}
-                className="block w-full rounded-md border border-gray-200 bg-white p-3 text-[13px] text-gray-700 file:mr-3 file:rounded file:border-0 file:bg-[#eaf3ff] file:px-3 file:py-2 file:font-semibold file:text-[#3483fa]"
-              />
-              <button
-                type="submit"
-                disabled={!receiptFile || receiptSending || receiptSent}
-                className="mt-3 block w-full rounded-md bg-[#3483fa] py-4 text-[16px] font-semibold text-white transition-colors hover:bg-[#2968c8] disabled:opacity-60"
-              >
-                {receiptSending ? "Enviando…" : receiptSent ? "Comprovante enviado" : "Enviar comprovante"}
-              </button>
+              <input key={receiptSent ? "receipt-sent" : "receipt-pending"} type="file" accept="image/jpeg,image/png,image/webp,image/gif,application/pdf" onChange={(event) => { setReceiptFile(event.target.files?.[0] || null); setReceiptSent(false); setReceiptMessage(""); }} className="block w-full rounded-md border border-gray-200 bg-white p-3 text-[13px] text-gray-700 file:mr-3 file:rounded file:border-0 file:bg-[#eaf3ff] file:px-3 file:py-2 file:font-semibold file:text-[#3483fa]" />
+              <button type="submit" disabled={!receiptFile || receiptSending || receiptSent} className="mt-3 block w-full rounded-md bg-[#3483fa] py-4 text-[16px] font-semibold text-white transition-colors hover:bg-[#2968c8] disabled:opacity-60">{receiptSending ? "Enviando…" : receiptSent ? "Comprovante enviado" : "Enviar comprovante"}</button>
             </form>
-            {receiptMessage && (
-              <div className={`mt-3 rounded-md p-3 text-[13px] ${receiptSent ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>
-                {receiptMessage}
-              </div>
-            )}
+            {receiptMessage && <div className={`mt-3 rounded-md p-3 text-[13px] ${receiptSent ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>{receiptMessage}</div>}
           </section>
         )}
 
@@ -331,19 +261,10 @@ function PixPage() {
             <div className="text-[14px] text-gray-800">
               {address.name && <div className="font-medium">{address.name}</div>}
               <div>{[address.rua, address.numero, address.complemento].filter(Boolean).join(", ")}</div>
-              <div className="text-gray-500">
-                {[address.bairro, address.cidade, address.estado].filter(Boolean).join(" - ")}
-                {address.cep ? ` · CEP ${address.cep}` : ""}
-              </div>
+              <div className="text-gray-500">{[address.bairro, address.cidade, address.estado].filter(Boolean).join(" - ")}{address.cep ? ` · CEP ${address.cep}` : ""}</div>
             </div>
-          ) : (
-            <div className="text-[14px] text-gray-500">
-              Nenhum endereço informado.{" "}
-              <a href="/endereco" className="underline text-[#3483fa]">Preencher endereço</a>
-            </div>
-          )}
+          ) : <div className="text-[14px] text-gray-500">Nenhum endereço informado.{" "}<a href="/endereco" className="underline text-[#3483fa]">Preencher endereço</a></div>}
         </section>
-
       </div>
       <SiteFooter />
     </div>
