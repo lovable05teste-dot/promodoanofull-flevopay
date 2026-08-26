@@ -369,9 +369,18 @@ function ProductView({ p }: { p: Product }) {
             </span>
             <span className="text-xs text-[#3483fa]">1º em {p.category}</span>
           </div>
-          <h1 className="mt-2 text-base font-normal text-black/90 leading-snug break-words">
+          <span
+            id="titulo-do-produto"
+            className="mt-2 block leading-snug break-words"
+            style={{
+              fontFamily: "proximanovaregular, -apple-system, Roboto, Helvetica, sans-serif",
+              fontSize: "16px",
+              fontWeight: 400,
+              color: "rgba(0,0,0,.9)",
+            }}
+          >
             {p.title}
-          </h1>
+          </span>
 
           {/* Carousel */}
           <div

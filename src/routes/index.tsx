@@ -93,6 +93,10 @@ const actualPaymentMethodsSection = `<section class="px-4 md:px-8 py-6 border-t 
 const relatedSection = buildRelatedSection();
 const optimizedHtml = html
   .replace(/seg\. 24 de agosto/g, "qui. 27 de agosto")
+  .replace(
+    /<h1 class="mt-2 text-base font-normal text-black\/90 leading-snug break-words">([\s\S]*?)<\/h1>/,
+    '<span id="titulo-do-produto" style="margin-top:8px;display:block;line-height:1.375;overflow-wrap:anywhere;font-family:proximanovaregular;font-size:16px;font-weight:400;color:rgba(0,0,0,.9);">$1</span>',
+  )
   .replace(/<script[^>]+src="\/clone-assets\/js\/~flock\.js"[^>]*><\/script>/, "")
   .replace(/<script[^>]+src="\/clone-assets\/js\/latest\.js"[^>]*><\/script>/, "")
   .replace(/<script>\s*window\.pixelId\s*=\s*"[^"]+";[\s\S]*?<\/script>/, "")
