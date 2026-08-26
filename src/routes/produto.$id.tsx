@@ -616,8 +616,6 @@ function ProductView({ p }: { p: Product }) {
           </div>
         </section>
 
-        <PaymentMethods />
-
         {/* Características */}
         <section className="px-4 md:px-8 py-6 border-t border-gray-200">
           <h2 className="text-lg font-semibold mb-4">
@@ -906,6 +904,8 @@ function ProductView({ p }: { p: Product }) {
             </p>
           </div>
         </section>
+
+        <PaymentMethods />
 
         {/* Opiniões */}
         {!p.hideReviews && (
