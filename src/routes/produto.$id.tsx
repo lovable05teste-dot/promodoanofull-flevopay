@@ -68,60 +68,6 @@ function optimizedImage(src: string, size: "m" | "h" = "h") {
   return `https://i.imgur.com/${match[1]}${size}.jpg`;
 }
 
-function PaymentMethods() {
-  return (
-    <section className="px-4 md:px-8 py-6 border-t border-gray-200">
-      <span className="block mb-4 font-semibold text-lg text-black/90">Meios de pagamento</span>
-      <div className="p-3 px-5 bg-[#00a650] rounded flex items-center">
-        <span className="text-white text-sm">Pague em <b>até 18X sem juros!</b></span>
-      </div>
-      <span className="mt-6 block text-base text-black/90">Até 12x sem cartão de crédito!</span>
-      <img loading="lazy" decoding="async" src="https://i.imgur.com/c6SPYdL.png" className="block my-5 max-h-6" alt="Mercado Crédito" />
-      <span className="mt-6 block text-base text-black/90">Cartões de crédito</span>
-      <div className="mt-5 flex items-center flex-wrap gap-5">
-        <img loading="lazy" decoding="async" src="https://i.imgur.com/3EZP0De.png" className="max-h-8" alt="Visa" />
-        <img loading="lazy" decoding="async" src="https://i.imgur.com/X3AlbP5.png" className="max-h-8" alt="Mastercard" />
-        <img loading="lazy" decoding="async" src="https://i.imgur.com/DRMHWTQ.png" className="max-h-8" alt="Hipercard" />
-        <img loading="lazy" decoding="async" src="https://i.imgur.com/EFVnNYl.png" className="max-h-8" alt="Elo" />
-        <img loading="lazy" decoding="async" src="https://i.imgur.com/xGDrqMw.png" className="max-h-8" alt="American Express" />
-      </div>
-      <span className="mt-6 block text-base text-black/90">Cartões de débito</span>
-      <img loading="lazy" decoding="async" src="https://i.imgur.com/yLZGokp.png" className="mt-5 max-h-8" alt="Caixa" />
-      <span className="mt-6 block text-base text-black/90">Boleto bancário</span>
-      <img loading="lazy" decoding="async" src="https://i.imgur.com/HJfO3Ye.png" className="mt-5 max-h-8" alt="Boleto" />
-      <span className="mt-6 block text-base text-black/90">Pix</span>
-      <span className="block text-sm text-black/60">Aprovação imediata.</span>
-      <img loading="lazy" decoding="async" src="https://i.imgur.com/LboqL3B.png" className="mt-5 max-h-8" alt="Pix" />
-    </section>
-  );
-}
-
-function DescriptionParagraph({ text }: { text: string }) {
-  const dashIndex = text.indexOf(" — ");
-  if (dashIndex > 0) {
-    return (
-      <p>
-        <strong className="mb-2 block text-[15px] font-semibold text-black/90">
-          {text.slice(0, dashIndex)}
-        </strong>
-        <span>{text.slice(dashIndex + 3)}</span>
-      </p>
-    );
-  }
-
-  const colonIndex = text.indexOf(":");
-  if (colonIndex > 0 && colonIndex < 40) {
-    return (
-      <p>
-        <strong className="font-semibold text-black/90">{text.slice(0, colonIndex + 1)}</strong>{" "}
-        <span>{text.slice(colonIndex + 1).trim()}</span>
-      </p>
-    );
-  }
-
-  return <p>{text}</p>;
-}
-
 // Algumas imagens hospedadas externamente podem ter sido removidas (404).
 // Troca qualquer imagem quebrada por um placeholder para a página não ficar bugada.
 function useBrokenImageFallback() {
@@ -369,18 +315,9 @@ function ProductView({ p }: { p: Product }) {
             </span>
             <span className="text-xs text-[#3483fa]">1º em {p.category}</span>
           </div>
-          <span
-            id="titulo-do-produto"
-            className="mt-2 block leading-snug break-words"
-            style={{
-              fontFamily: "proximanovaregular, -apple-system, Roboto, Helvetica, sans-serif",
-              fontSize: "16px",
-              fontWeight: 400,
-              color: "rgba(0,0,0,.9)",
-            }}
-          >
+          <h1 className="mt-2 text-base font-normal text-black/90 leading-snug break-words">
             {p.title}
-          </span>
+          </h1>
 
           {/* Carousel */}
           <div
@@ -655,6 +592,7 @@ function ProductView({ p }: { p: Product }) {
             </p>
           </div>
         </section>
+
 
         {/* Características */}
         <section className="px-4 md:px-8 py-6 border-t border-gray-200">
@@ -934,19 +872,9 @@ function ProductView({ p }: { p: Product }) {
         {/* Descrição */}
         <section className="px-4 md:px-8 py-6 border-t border-gray-200 text-[#333]">
           <h2 className="text-lg font-semibold mb-4">Descrição</h2>
-          <div
-            className="space-y-5 leading-relaxed"
-            style={{
-              margin: "0",
-              borderRadius: "0",
-              fontFamily: "proximanovaregular, -apple-system, Roboto, Helvetica, sans-serif",
-              fontWeight: 400,
-              fontSize: "16px",
-              color: "rgba(0,0,0,.55)",
-            }}
-          >
+          <div className="space-y-4 text-sm leading-relaxed">
             {longDescription(p).map((par, i) => (
-              <DescriptionParagraph key={i} text={par} />
+              <p key={i}>{par}</p>
             ))}
             <p>
               Aproveite a promoção especial: de R$ {oldPrice} por apenas R$ {newPrice}{" "}
@@ -954,8 +882,6 @@ function ProductView({ p }: { p: Product }) {
             </p>
           </div>
         </section>
-
-        <PaymentMethods />
 
         {/* Opiniões */}
         {!p.hideReviews && (
@@ -1217,7 +1143,31 @@ function ReviewBlock({
   const color = liked ? "#3483fa" : "rgba(0, 0, 0, 0.55)";
   if (imagesOnly) {
     return (
-      <div className="border-t border-gray-100 py-4">
+      <div className="border-t border-gray-100 pt-4 pb-4">
+        <div style={{ width: "100%", display: "flex", alignItems: "center" }}>
+          <span style={{ margin: "0 auto 0 0", color: "rgba(0,0,0,.75)", fontSize: 14, fontWeight: 600 }}>Registro com fotos</span>
+          <span
+            style={{
+              margin: "0 0 0 auto",
+              fontFamily: "proximanovaregular, -apple-system, Roboto, Helvetica, sans-serif",
+              fontSize: 12,
+              color: "rgba(0,0,0,.55)",
+            }}
+          >
+            Sem texto
+          </span>
+        </div>
+        <p
+          style={{
+            marginTop: 10,
+            fontFamily: "proximanovaregular, -apple-system, Roboto, Helvetica, sans-serif",
+            fontSize: 14,
+            lineHeight: 1.5,
+            color: "rgba(0,0,0,.65)",
+          }}
+        >
+          Fotos fornecidas para visualização do produto.
+        </p>
         <div className="flex flex-wrap gap-2">
           {images.map((src, i) => (
             <img
