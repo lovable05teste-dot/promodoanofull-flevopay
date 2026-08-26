@@ -12,7 +12,7 @@ import { addCartItem } from "@/lib/cart";
 import { withUtms } from "@/lib/utm";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent } from "react";
-import { getProduct, ALL_PRODUCTS, longDescription, genericSpecGroups, type Product } from "../lib/products";
+import { getProduct, ALL_PRODUCTS, longDescription, genericSpecGroups, priceToNumber, type Product } from "../lib/products";
 import { SiteFooter } from "@/components/SiteFooter";
 import { LazySection } from "@/components/LazySection";
 import { PixLoadingScreen } from "@/components/PixLoadingScreen";
@@ -1378,6 +1378,7 @@ function ReviewBlock({
 
 function RelatedCard({ p, onNavigate }: { p: Product; onNavigate: () => void }) {
   const href = `/produto/${encodeURIComponent(p.id)}`;
+  const installment = (priceToNumber(p.newPrice) / 12).toFixed(2).replace(".", ",");
   return (
     <a
       href={href}
@@ -1387,7 +1388,7 @@ function RelatedCard({ p, onNavigate }: { p: Product; onNavigate: () => void }) 
         onNavigate();
         window.setTimeout(() => window.location.assign(nextHref), 60);
       }}
-      className="block border border-gray-100 rounded-md p-3 hover:shadow-md transition-shadow"
+      className="block overflow-hidden border border-gray-100 rounded-md hover:shadow-md transition-shadow"
     >
       <div className="aspect-square bg-white overflow-hidden rounded">
         <img
@@ -1400,18 +1401,30 @@ function RelatedCard({ p, onNavigate }: { p: Product; onNavigate: () => void }) 
           decoding="async"
         />
       </div>
-      <div className="mt-3 text-[13px] text-gray-500 line-through">R$ {p.oldPrice}</div>
-      <div className="text-[22px] leading-tight text-black/90">
-        R$ {p.newPrice.split(",")[0]}
-        <sup className="text-[12px]">,{p.newPrice.split(",")[1]}</sup>
-        <span className="ml-2 align-middle text-[12px] font-bold text-[#00a650]">
-          {computeOffPct(p.oldPrice, p.newPrice)}% OFF
+      <div style={{ margin: 15 }}>
+        <span style={{ fontFamily: "proximanovaregular", fontSize: 12, color: "rgba(0,0,0,.55)", textDecoration: "line-through" }}>
+          R$ {p.oldPrice}
         </span>
+        <div style={{ width: "max-content", display: "flex", alignItems: "flex-start" }}>
+          <span style={{ fontFamily: "proximaNovaLight", fontSize: 24, color: "#333333" }}>R$ {p.newPrice}</span>
+          <span style={{ margin: "5px 0 0 5px", fontFamily: "proximanovasemibold", fontSize: 14, color: "#00a650", backgroundColor: "rgba(0,166,80,.1)", borderRadius: 2, padding: "0 3px", maxHeight: "max-content" }}>
+            {computeOffPct(p.oldPrice, p.newPrice)}% OFF
+          </span>
+        </div>
+        <span style={{ marginTop: 5, display: "block", fontFamily: "proximanovaregular", fontSize: 14, color: "rgba(0,0,0,.8)", lineHeight: 1 }}>
+          em até 12x de {installment}
+        </span>
+        <div style={{ marginTop: 5, width: "100%", display: "flex", alignItems: "center" }}>
+          <span style={{ display: "block", fontFamily: "proximanovasemibold", fontSize: 14, color: "#00a650" }}>
+            Chegará até <span style={{ fontFamily: "proximanovaregular", fontSize: 16, fontWeight: 400, color: "#333333" }}>Qui. 27 de Agosto</span>
+          </span>
+        </div>
+        <div style={{ marginTop: 10, flexGrow: 1, height: 30, wordBreak: "break-word", textAlign: "left", display: "flex", alignItems: "center" }}>
+          <span style={{ fontFamily: "proximanovaregular", fontSize: 14, color: "rgba(0,0,0,.8)", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+            {p.title}
+          </span>
+        </div>
       </div>
-      <div className="mt-2 text-[14px] text-gray-800 line-clamp-2 min-h-[40px]">
-        {p.title}
-      </div>
-      <div className="text-[13px] text-[#00a650] font-semibold mt-2">Frete grátis</div>
     </a>
   );
 }

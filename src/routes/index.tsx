@@ -53,21 +53,32 @@ function discountPercent(oldPrice: string, newPrice: string) {
   return Math.round((1 - newValue / oldValue) * 100);
 }
 
+function installmentPrice(price: string) {
+  return (priceNumber(price) / 12).toFixed(2).replace(".", ",");
+}
+
 function productCard(product: (typeof ALL_PRODUCTS)[number], index = 0) {
-  const [reais, centavos = "00"] = product.newPrice.split(",");
   const image = product.carousel[0] || PLACEHOLDER;
   const href = `/produto/${encodeURIComponent(product.id)}`;
 
   const eager = index < 2;
 
-  return `<a href="${href}" onclick="event.preventDefault();window.__showProductLoader&&window.__showProductLoader();var next='${href}'+(window.location.search||'');setTimeout(function(){window.location.href=next;},60);" data-product-card="${escapeHtml(product.id)}" style="display:block !important;flex:0 0 46% !important;width:46% !important;min-width:46% !important;max-width:46% !important;scroll-snap-align:start;border:1px solid #eeeeee;border-radius:6px;padding:8px;background:#fff;color:#333;text-decoration:none;box-sizing:border-box;position:relative;z-index:999;pointer-events:auto;visibility:visible !important;opacity:1 !important;min-height:340px;">
+  return `<a href="${href}" onclick="event.preventDefault();window.__showProductLoader&&window.__showProductLoader();var next='${href}'+(window.location.search||'');setTimeout(function(){window.location.href=next;},60);" data-product-card="${escapeHtml(product.id)}" style="display:block !important;flex:0 0 46% !important;width:46% !important;min-width:46% !important;max-width:46% !important;scroll-snap-align:start;border:1px solid #eeeeee;border-radius:6px;padding:0;background:#fff;color:#333;text-decoration:none;box-sizing:border-box;position:relative;z-index:999;pointer-events:auto;visibility:visible !important;opacity:1 !important;min-height:340px;overflow:hidden;">
     <div style="width:100%;aspect-ratio:1/1;min-height:150px;background:#fff;overflow:hidden;border-radius:4px;display:flex;align-items:center;justify-content:center;"><img src="${escapeHtml(image)}" alt="${escapeHtml(product.title)}" width="300" height="300" style="display:block !important;width:100% !important;height:100% !important;aspect-ratio:1/1;object-fit:contain;visibility:visible !important;opacity:1 !important;" loading="${eager ? "eager" : "lazy"}" decoding="async"${eager ? ' fetchpriority="high"' : ""} onerror="this.onerror=null;this.src='${PLACEHOLDER}';" /></div>
-    <div style="margin-top:8px;font-size:12px;color:#777;text-decoration:line-through;">R$ ${escapeHtml(product.oldPrice)}</div>
-    <div style="font-size:16px;color:#222;line-height:1.15;">R$ ${escapeHtml(reais)}<sup style="font-size:10px;">,${escapeHtml(centavos)}</sup></div>
-    <div style="margin-top:4px;font-size:11px;color:#00a650;font-weight:700;">${discountPercent(product.oldPrice, product.newPrice)}% OFF</div>
-    <div style="margin-top:4px;font-size:12px;color:#333;line-height:1.25;min-height:45px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">${escapeHtml(product.title)}</div>
-    <div style="margin-top:6px;font-size:11px;color:#00a650;font-weight:700;">Frete grátis</div>
-    <div style="margin-top:8px;height:32px;border-radius:5px;background:#3483fa;color:#fff;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;">Ver produto</div>
+    <div style="margin:15px;">
+      <span style="font-family:proximanovaregular;font-size:12px;color:rgba(0,0,0,.55);text-decoration:line-through;">R$ ${escapeHtml(product.oldPrice)}</span>
+      <div style="width:max-content;display:flex;align-items:flex-start;">
+        <span style="font-family:proximaNovaLight;font-size:24px;color:#333333;">R$ ${escapeHtml(product.newPrice)}</span>
+        <span style="margin:5px 0 0 5px;font-family:proximanovasemibold;font-size:14px;color:#00a650;background-color:rgba(0,166,80,.1);border-radius:2px;padding:0 3px;max-height:max-content;">${discountPercent(product.oldPrice, product.newPrice)}% OFF</span>
+      </div>
+      <span style="margin-top:5px;display:block;font-family:proximanovaregular;font-size:14px;color:rgba(0,0,0,.8);line-height:1;">em até 12x de ${installmentPrice(product.newPrice)}</span>
+      <div style="margin-top:5px;width:100%;display:flex;align-items:center;">
+        <span style="display:block;font-family:proximanovasemibold;font-size:14px;color:#00a650;">Chegará até <span style="font-family:proximanovaregular;font-size:16px;font-weight:400;color:#333333;">Qui. 27 de Agosto</span></span>
+      </div>
+      <div style="margin-top:10px;flex-grow:1;height:30px;word-break:break-word;text-align:left;display:flex;align-items:center;">
+        <span style="font-family:proximanovaregular;font-size:14px;color:rgba(0,0,0,.8);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${escapeHtml(product.title)}</span>
+      </div>
+    </div>
   </a>`;
 }
 
