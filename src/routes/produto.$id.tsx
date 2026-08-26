@@ -68,6 +68,29 @@ function optimizedImage(src: string, size: "m" | "h" = "h") {
   return `https://i.imgur.com/${match[1]}${size}.jpg`;
 }
 
+function PaymentMethods() {
+  return (
+    <section className="border-t border-gray-200 px-4 py-6 md:px-8">
+      <h2 className="mb-4 text-lg font-semibold text-black/90">Meios de pagamento</h2>
+      <div className="flex items-center gap-3 rounded-md bg-[#00a650] px-4 py-3 text-white">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M7.5 4.5 12 2l4.5 2.5v5L12 12 7.5 9.5v-5Z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" />
+          <path d="M7.5 14.5 12 12l4.5 2.5v5L12 22l-4.5-2.5v-5Z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" />
+          <path d="m3 9.5 4.5 2.5v5L3 14.5v-5ZM21 9.5 16.5 12v5l4.5-2.5v-5Z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" />
+        </svg>
+        <span className="text-sm">Pague com Pix, com <b>aprovação imediata</b>.</span>
+      </div>
+      <div className="mt-6 flex items-center gap-3">
+        <img src="https://i.imgur.com/LboqL3B.png" alt="Pix" className="h-8 w-auto object-contain" loading="lazy" decoding="async" />
+        <div>
+          <div className="text-base text-black/90">Pix</div>
+          <div className="text-sm text-black/60">Use o QR Code ou código copia e cola ao finalizar a compra.</div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // Algumas imagens hospedadas externamente podem ter sido removidas (404).
 // Troca qualquer imagem quebrada por um placeholder para a página não ficar bugada.
 function useBrokenImageFallback() {
@@ -593,6 +616,7 @@ function ProductView({ p }: { p: Product }) {
           </div>
         </section>
 
+        <PaymentMethods />
 
         {/* Características */}
         <section className="px-4 md:px-8 py-6 border-t border-gray-200">

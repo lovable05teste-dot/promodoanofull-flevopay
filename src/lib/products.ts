@@ -136,7 +136,7 @@ export function longDescription(p: Product): string[] {
     `SEGURANÇA NA COMPRA — Você conta com a Compra Garantida do Mercado Livre: receba o produto que está esperando ou devolvemos o seu dinheiro. Além disso, a devolução é grátis em até 30 dias a partir da data de recebimento, sem burocracia e sem custo adicional.`,
     `GARANTIA DE FÁBRICA — O produto acompanha 12 meses de garantia de fábrica contra defeitos de fabricação. Em caso de qualquer problema, basta acionar o atendimento pela própria plataforma que resolvemos rapidamente para você.`,
     `ENVIO IMEDIATO — Estoque disponível e pronto para envio. Pedidos aprovados são despachados no mesmo dia útil, com rastreio completo pelo aplicativo. Frete grátis para compras acima de R$ 19 e prazos reduzidos com o selo FULL.`,
-    `FORMAS DE PAGAMENTO — Pague no Pix com aprovação imediata e o melhor preço, ou parcele no cartão de crédito. A promoção é por tempo limitado: de R$ ${p.oldPrice} por apenas R$ ${p.newPrice} no Pix.`,
+    `FORMAS DE PAGAMENTO — Pague no Pix com aprovação imediata e o melhor preço. A promoção é por tempo limitado: de R$ ${p.oldPrice} por apenas R$ ${p.newPrice} no Pix.`,
     `IMPORTANTE — As imagens são meramente ilustrativas; pequenas variações de tonalidade podem ocorrer de acordo com a configuração da sua tela. Verifique as medidas e especificações técnicas antes de finalizar a compra. Em caso de dúvidas, envie uma pergunta ao vendedor — respondemos em poucos minutos.`,
   ];
 }
@@ -177,8 +177,7 @@ export function genericSpecGroups(p: Product): { title: string; rows: [string, s
       title: "Pagamento",
       rows: [
         ["Pix", "Aprovação imediata"],
-        ["Cartão de crédito", "Parcelamento disponível"],
-        ["Boleto", "Não disponível nesta oferta"],
+        ["Como pagar", "QR Code ou código copia e cola"],
         ["Preço promocional", `R$ ${p.newPrice}`],
       ],
     },

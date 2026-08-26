@@ -88,13 +88,16 @@ function buildRelatedFallbackScript() {
 }
 
 const relatedSectionPattern = /<section class="px-4 md:px-8 py-6 border-t border-gray-200 max-w-\[1200px\] mx-auto"><h2 class="text-lg font-semibold mb-4">Quem viu este produto também comprou<\/h2>[\s\S]*?<\/section>/;
+const paymentMethodsPattern = /<section class="px-4 md:px-8 py-6 border-t border-gray-200"><span class="block mb-4 font-semibold text-lg text-black\/90">Meios de pagamento<\/span>[\s\S]*?<\/section>/;
+const actualPaymentMethodsSection = `<section class="px-4 md:px-8 py-6 border-t border-gray-200"><span class="block mb-4 font-semibold text-lg text-black/90">Meios de pagamento</span><div class="p-3 px-5 bg-[#00a650] rounded flex items-center gap-3 text-white"><span aria-hidden="true" style="font-size:22px">◆</span><span class="text-sm">Pague com Pix, com <b>aprovação imediata</b>.</span></div><div class="mt-6 flex items-center gap-3"><img loading="lazy" decoding="async" src="https://i.imgur.com/LboqL3B.png" class="max-h-8" alt="Pix"><div><span class="block text-base text-black/90">Pix</span><span class="block text-sm text-black/60">Use o QR Code ou código copia e cola ao finalizar a compra.</span></div></div></section>`;
 const relatedSection = buildRelatedSection();
 const optimizedHtml = html
   .replace(/seg\. 24 de agosto/g, "qui. 27 de agosto")
   .replace(/<script[^>]+src="\/clone-assets\/js\/~flock\.js"[^>]*><\/script>/, "")
   .replace(/<script[^>]+src="\/clone-assets\/js\/latest\.js"[^>]*><\/script>/, "")
   .replace(/<script>\s*window\.pixelId\s*=\s*"[^"]+";[\s\S]*?<\/script>/, "")
-  .replace(/<script[^>]+src="\/clone-assets\/js\/pixel\.js"[^>]*><\/script>/, "");
+  .replace(/<script[^>]+src="\/clone-assets\/js\/pixel\.js"[^>]*><\/script>/, "")
+  .replace(paymentMethodsPattern, actualPaymentMethodsSection);
 const pageHtmlWithoutOldRelated = optimizedHtml.replace(relatedSectionPattern, "");
 const footerOpenIndex = pageHtmlWithoutOldRelated.search(/<footer[\s>]/);
 const pageHtmlWithRelated =
