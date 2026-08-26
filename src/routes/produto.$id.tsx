@@ -105,6 +105,64 @@ function ProductPage() {
   return <ProductView p={product} />;
 }
 
+function RecentSaleNotice({ productId, productTitle }: { productId: string; productTitle: string }) {
+  const [visible, setVisible] = useState(true);
+  const examples = [
+    { name: "Ana", city: "São Paulo - SP", minutes: 2 },
+    { name: "Carlos", city: "Belo Horizonte - MG", minutes: 4 },
+    { name: "Mariana", city: "Curitiba - PR", minutes: 6 },
+    { name: "Rafael", city: "Rio de Janeiro - RJ", minutes: 8 },
+    { name: "Juliana", city: "Salvador - BA", minutes: 11 },
+  ];
+  const seed = productId.split("").reduce((total, digit) => total + Number(digit || 0), 0);
+  const example = examples[seed % examples.length];
+
+  useEffect(() => {
+    setVisible(true);
+  }, [productId]);
+
+  if (!visible) return null;
+
+  return (
+    <div className="mx-auto max-w-[1200px] px-3 pt-3" data-venda-recente="true">
+      <div
+        className="flex items-center rounded-lg border border-gray-200 bg-white px-3 py-3 shadow-sm"
+        role="status"
+        aria-live="polite"
+      >
+        <span className="mr-3 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#00a650] text-lg font-bold text-white">
+          ✓
+        </span>
+        <div className="min-w-0 flex-1">
+          <h1 id="venda-recente-nome" className="text-[13px] font-semibold text-gray-900">
+            Simulação: {example.name} comprou
+          </h1>
+          <h2 id="venda-recente-produto" className="truncate text-[13px] text-gray-800">
+            {productTitle}
+          </h2>
+          <h3 id="venda-recente-cidade-time" className="text-[12px] font-normal text-gray-500">
+            {example.city} • há {example.minutes} minutos
+          </h3>
+        </div>
+        <svg
+          onClick={() => setVisible(false)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") setVisible(false);
+          }}
+          role="button"
+          tabIndex={0}
+          aria-label="Fechar aviso"
+          className="ml-3 h-5 w-5 shrink-0 cursor-pointer text-gray-500"
+          viewBox="0 -960 960 960"
+          fill="currentColor"
+        >
+          <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
+        </svg>
+      </div>
+    </div>
+  );
+}
+
 function ProductView({ p }: { p: Product }) {
   const [idx, setIdx] = useState(0);
   const [color, setColor] = useState(p.activeColor ?? p.colors?.[0] ?? "");
@@ -317,6 +375,8 @@ function ProductView({ p }: { p: Product }) {
 
         </div>
       </header>
+
+      <RecentSaleNotice productId={p.id} productTitle={p.title} />
 
       <main className="mx-auto max-w-[1200px] bg-white">
         <section className="px-4 md:px-8 py-4 md:py-6">
@@ -662,10 +722,15 @@ function ProductView({ p }: { p: Product }) {
         {related.length > 0 && (
           <LazySection minHeight={420}>
           <section className="px-4 md:px-8 py-6 border-t border-gray-200">
-            <h2 className="text-lg font-semibold mb-4">Produtos relacionados</h2>
+            <h2
+              className="mb-4"
+              style={{ fontFamily: "Arial, Helvetica, sans-serif", fontSize: 16, fontWeight: 600, color: "#111" }}
+            >
+              Produtos relacionados
+            </h2>
             <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory pb-3 -mx-4 px-4 md:mx-0 md:px-0">
               {related.map((r) => (
-                <div key={r.id} className="snap-start shrink-0 w-[70%] sm:w-[280px]">
+                <div key={r.id} className="snap-start shrink-0 w-[46%] sm:w-[180px]">
                   <RelatedCard p={r} onNavigate={() => setIsNavigatingProduct(true)} />
                 </div>
               ))}
@@ -903,9 +968,14 @@ function ProductView({ p }: { p: Product }) {
         </section>
 
         {/* Descrição */}
-        <section className="px-4 md:px-8 py-6 border-t border-gray-200 text-[#333]">
-          <h2 className="text-lg font-semibold mb-4">Descrição</h2>
-          <div className="space-y-4 text-sm leading-relaxed">
+        <section
+          className="px-4 md:px-8 py-6 border-t border-gray-200"
+          style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
+        >
+          <h2 style={{ marginBottom: 18, fontSize: 16, lineHeight: 1.25, fontWeight: 600, color: "#111" }}>
+            Descrição
+          </h2>
+          <div className="space-y-3" style={{ fontSize: 13, lineHeight: "19px", fontWeight: 400, color: "#777" }}>
             {longDescription(p).map((par, i) => (
               <p key={i}>{par}</p>
             ))}
@@ -1098,6 +1168,14 @@ function computeOffPct(oldP: string, newP: string): number {
   const n = Number(newP.replace(/\./g, "").replace(",", "."));
   if (!o || !n) return 0;
   return Math.round((1 - n / o) * 100);
+}
+
+function installmentValue(price: string) {
+  const value = Number(price.replace(/\./g, "").replace(",", "."));
+  return (value / 12).toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 }
 
 function Star({ size = 12 }: { size?: number }) {
@@ -1370,7 +1448,8 @@ function RelatedCard({ p, onNavigate }: { p: Product; onNavigate: () => void }) 
         onNavigate();
         window.setTimeout(() => window.location.assign(nextHref), 60);
       }}
-      className="block border border-gray-100 rounded-md p-3 hover:shadow-md transition-shadow"
+      className="block h-full border border-[#eeeeee] rounded-[4px] p-3 hover:shadow-md transition-shadow"
+      style={{ fontFamily: "Arial, Helvetica, sans-serif" }}
     >
       <div className="aspect-square bg-white overflow-hidden rounded">
         <img
@@ -1383,18 +1462,23 @@ function RelatedCard({ p, onNavigate }: { p: Product; onNavigate: () => void }) 
           decoding="async"
         />
       </div>
-      <div className="mt-3 text-[13px] text-gray-500 line-through">R$ {p.oldPrice}</div>
-      <div className="text-[22px] leading-tight text-black/90">
+      <div className="mt-3 text-[11px] leading-4 text-[#777] line-through">R$ {p.oldPrice}</div>
+      <div className="flex items-center text-[18px] font-normal leading-6 text-[#333]">
         R$ {p.newPrice.split(",")[0]}
-        <sup className="text-[12px]">,{p.newPrice.split(",")[1]}</sup>
-        <span className="ml-2 align-middle text-[12px] font-bold text-[#00a650]">
+        <sup className="self-start pt-[2px] text-[10px]">,{p.newPrice.split(",")[1]}</sup>
+        <span className="ml-2 rounded-[2px] bg-[#e6f7ed] px-[3px] py-[1px] text-[11px] font-normal leading-none text-[#00a650]">
           {computeOffPct(p.oldPrice, p.newPrice)}% OFF
         </span>
       </div>
-      <div className="mt-2 text-[14px] text-gray-800 line-clamp-2 min-h-[40px]">
+      <div className="text-[11px] leading-[17px] text-[#555]">
+        em até 12x de R$ {installmentValue(p.newPrice)}
+      </div>
+      <div className="mt-1 text-[12px] font-semibold leading-[18px] text-[#00a650]">
+        Chegará até qui. 27 de agosto
+      </div>
+      <div className="mt-1 line-clamp-3 min-h-[48px] text-[12px] font-normal leading-4 text-[#555]">
         {p.title}
       </div>
-      <div className="text-[13px] text-[#00a650] font-semibold mt-2">Frete grátis</div>
     </a>
   );
 }
