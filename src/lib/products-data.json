@@ -3106,5 +3106,174 @@
         ]
       }
     ]
+  },
+  {
+    "id": "3029100030",
+    "title": "Capacete Para Moto Integral Helt Street Polar",
+    "oldPrice": "302,91",
+    "newPrice": "97,90",
+    "colors": ["Brake | Fosco", "Cinza | Fosco", "Preto"],
+    "activeColor": "Brake | Fosco",
+    "compactColorSelector": true,
+    "colorVariants": [
+      { "name": "Brake | Fosco", "image": "https://i.imgur.com/2OKGMt8.jpg", "carousel": ["https://i.imgur.com/2OKGMt8.jpg", "https://i.imgur.com/XRP29Kd.jpg"] },
+      { "name": "Cinza | Fosco", "image": "https://i.imgur.com/IabfDTE.jpg", "carousel": ["https://i.imgur.com/IabfDTE.jpg"] },
+      { "name": "Preto", "image": "https://i.imgur.com/fgBT0Bc.jpg", "carousel": ["https://i.imgur.com/fgBT0Bc.jpg", "https://i.imgur.com/A5O6f9E.jpg"] }
+    ],
+    "voltage": null,
+    "extra": { "label": "Tamanho do capacete", "options": ["55/56", "57/58", "59/60", "61/62", "63/64"], "active": "55/56" },
+    "carousel": ["https://i.imgur.com/2OKGMt8.jpg", "https://i.imgur.com/XRP29Kd.jpg"],
+    "photos": ["https://i.imgur.com/2OKGMt8.jpg", "https://i.imgur.com/XRP29Kd.jpg"],
+    "reviews": [
+      ["https://i.imgur.com/qgvFh1v.jpg"],
+      ["https://i.imgur.com/h3i1wWI.jpg", "https://i.imgur.com/qFO4AVm.jpg", "https://i.imgur.com/abSFOSs.jpg", "https://i.imgur.com/AOLjwkC.jpg", "https://i.imgur.com/sYMbqd1.jpg"]
+    ],
+    "reviewImagesOnly": true,
+    "category": "Acessórios para motos",
+    "features": ["Capacete integral", "Opções de acabamento fosco", "Cinco opções de tamanho"]
+  },
+  {
+    "id": "5289100031",
+    "title": "Pneu Direction 2 Touring Aro 13 175/70R13 82T Goodyear",
+    "oldPrice": "528,91",
+    "newPrice": "221,90",
+    "colors": null,
+    "voltage": null,
+    "carousel": ["https://i.imgur.com/LK4m1Eo.jpg", "https://i.imgur.com/7gCcXV7.jpg", "https://i.imgur.com/Mvo0RVT.jpg"],
+    "photos": ["https://i.imgur.com/LK4m1Eo.jpg", "https://i.imgur.com/7gCcXV7.jpg", "https://i.imgur.com/Mvo0RVT.jpg"],
+    "reviews": [["https://i.imgur.com/yl4Z9sF.jpg", "https://i.imgur.com/yzHMdXE.jpg", "https://i.imgur.com/DwL7NgT.jpg"]],
+    "reviewImagesOnly": true,
+    "category": "Pneus e acessórios",
+    "features": ["Aro 13", "Medida 175/70R13", "Índice 82T"]
+  },
+  {
+    "id": "5218200032",
+    "title": "Lavadora De Alta Pressão 1700W 2000 PSI Bosch GHP 200",
+    "oldPrice": "521,82",
+    "newPrice": "106,93",
+    "colors": ["Azul"],
+    "activeColor": "Azul",
+    "voltage": { "options": ["127V", "220V"], "active": "127V" },
+    "carousel": ["https://i.imgur.com/9kZUcxz.jpg", "https://i.imgur.com/1WX53tV.jpg", "https://i.imgur.com/8zTZ0XB.jpg", "https://i.imgur.com/FsNydXl.jpg", "https://i.imgur.com/lkYvM95.jpg", "https://i.imgur.com/laNttD4.jpg", "https://i.imgur.com/54AankZ.jpg", "https://i.imgur.com/pe06ptA.jpg", "https://i.imgur.com/yi5NoWD.jpg", "https://i.imgur.com/CClR2H9.jpg", "https://i.imgur.com/ueAl0b8.jpg"],
+    "photos": ["https://i.imgur.com/9kZUcxz.jpg", "https://i.imgur.com/1WX53tV.jpg", "https://i.imgur.com/8zTZ0XB.jpg", "https://i.imgur.com/FsNydXl.jpg", "https://i.imgur.com/lkYvM95.jpg", "https://i.imgur.com/laNttD4.jpg", "https://i.imgur.com/54AankZ.jpg", "https://i.imgur.com/pe06ptA.jpg", "https://i.imgur.com/yi5NoWD.jpg", "https://i.imgur.com/CClR2H9.jpg", "https://i.imgur.com/ueAl0b8.jpg"],
+    "reviews": [
+      ["https://i.imgur.com/5KDX4jm.jpg", "https://i.imgur.com/gc69kdp.jpg"],
+      ["https://i.imgur.com/6HamB9c.jpg"],
+      ["https://i.imgur.com/EopqXbC.jpg", "https://i.imgur.com/7IpXy89.jpg", "https://i.imgur.com/DmMoqph.jpg", "https://i.imgur.com/d4E4eCq.jpg", "https://i.imgur.com/9JZTVR3.jpg"]
+    ],
+    "reviewImagesOnly": true,
+    "category": "Ferramentas",
+    "features": ["Potência de 1700 W", "Pressão máxima de 2000 PSI", "Disponível em 127V e 220V"]
+  },
+  {
+    "id": "1522920033",
+    "title": "Sony PlayStation 4 PS4 Slim 500GB + 2 Controles + Jogo",
+    "oldPrice": "1.522,92",
+    "newPrice": "499,90",
+    "colors": ["Preto"],
+    "activeColor": "Preto",
+    "voltage": null,
+    "carousel": ["https://i.imgur.com/s2SEa02.jpg", "https://i.imgur.com/IbStCDV.jpg", "https://i.imgur.com/eyZdGTV.jpg", "https://i.imgur.com/kTN0ESw.jpg", "https://i.imgur.com/RTd59oQ.jpg"],
+    "photos": ["https://i.imgur.com/s2SEa02.jpg", "https://i.imgur.com/IbStCDV.jpg", "https://i.imgur.com/eyZdGTV.jpg", "https://i.imgur.com/kTN0ESw.jpg", "https://i.imgur.com/RTd59oQ.jpg"],
+    "reviews": [
+      ["https://i.imgur.com/NssOSBx.jpg", "https://i.imgur.com/R8gxFjm.jpg", "https://i.imgur.com/fRiYMEZ.jpg", "https://i.imgur.com/oBm5d0w.jpg"],
+      ["https://i.imgur.com/wxCNgYp.jpg"],
+      ["https://i.imgur.com/PEdwxIT.jpg", "https://i.imgur.com/qoyj7Oy.jpg"],
+      ["https://i.imgur.com/dCi61cS.jpg", "https://i.imgur.com/DRpJo3m.jpg"],
+      ["https://i.imgur.com/HFuwHjz.jpg", "https://i.imgur.com/prPNbGW.jpg"],
+      ["https://i.imgur.com/YHrqua6.jpg", "https://i.imgur.com/7b1aied.jpg"]
+    ],
+    "reviewImagesOnly": true,
+    "category": "Games",
+    "features": ["Armazenamento de 500 GB", "Inclui dois controles", "Inclui jogo"]
+  },
+  {
+    "id": "3284920034",
+    "title": "PlayStation 5 Slim Disk com Astro Bot e Gran Turismo 7",
+    "oldPrice": "3.284,92",
+    "newPrice": "789,90",
+    "colors": ["Branco"],
+    "activeColor": "Branco",
+    "voltage": null,
+    "carousel": ["https://i.imgur.com/tILMKmI.jpg", "https://i.imgur.com/lAPMrBN.jpg", "https://i.imgur.com/0qj8Ap6.jpg", "https://i.imgur.com/MxnmpTk.jpg", "https://i.imgur.com/BQVgmAH.jpg"],
+    "photos": ["https://i.imgur.com/tILMKmI.jpg", "https://i.imgur.com/lAPMrBN.jpg", "https://i.imgur.com/0qj8Ap6.jpg", "https://i.imgur.com/MxnmpTk.jpg", "https://i.imgur.com/BQVgmAH.jpg"],
+    "reviews": [
+      ["https://i.imgur.com/LKPtNl5.jpg"],
+      ["https://i.imgur.com/fixmmv8.jpg"],
+      ["https://i.imgur.com/pphnq3D.jpg"],
+      ["https://i.imgur.com/uv05AxA.jpg", "https://i.imgur.com/llVPF6N.jpg"],
+      ["https://i.imgur.com/zsIST5i.jpg", "https://i.imgur.com/0BjgCrE.jpg", "https://i.imgur.com/8dotAxE.jpg", "https://i.imgur.com/19pmiIa.jpg", "https://i.imgur.com/GkxOjUl.jpg", "https://i.imgur.com/PuB2rbr.jpg", "https://i.imgur.com/JTH1Ycw.jpg", "https://i.imgur.com/DT4z2hU.jpg", "https://i.imgur.com/9lQSfi0.jpg", "https://i.imgur.com/33OHjT1.jpg"]
+    ],
+    "reviewImagesOnly": true,
+    "category": "Games",
+    "features": ["Edição Slim com leitor de discos", "Inclui Astro Bot", "Inclui Gran Turismo 7"]
+  },
+  {
+    "id": "1896900035",
+    "title": "Console Xbox Series X 1 TB Branco com Controle",
+    "oldPrice": "1.896,90",
+    "newPrice": "759,90",
+    "colors": ["Branco"],
+    "activeColor": "Branco",
+    "voltage": null,
+    "carousel": ["https://i.imgur.com/8jw6m92.jpg", "https://i.imgur.com/18BbwkX.jpg", "https://i.imgur.com/agodeoD.jpg", "https://i.imgur.com/jtULA6H.jpg", "https://i.imgur.com/DYYq6np.jpg"],
+    "photos": ["https://i.imgur.com/8jw6m92.jpg", "https://i.imgur.com/18BbwkX.jpg", "https://i.imgur.com/agodeoD.jpg", "https://i.imgur.com/jtULA6H.jpg", "https://i.imgur.com/DYYq6np.jpg"],
+    "reviews": [["https://i.imgur.com/8JjRtoc.jpg", "https://i.imgur.com/zPqjvhJ.jpg"]],
+    "reviewImagesOnly": true,
+    "category": "Games",
+    "features": ["Armazenamento de 1 TB", "Cor branca", "Controle incluído"]
+  },
+  {
+    "id": "7329200036",
+    "title": "Climatizador de Ambientes Industrial e Residencial CLI70 SJ Ventisol",
+    "oldPrice": "732,92",
+    "newPrice": "287,90",
+    "colors": ["Branco/Cinza", "Cinza"],
+    "activeColor": "Branco/Cinza",
+    "voltage": { "options": ["127V", "220V"], "active": "127V" },
+    "carousel": ["https://i.imgur.com/ffJAAdM.jpg", "https://i.imgur.com/lQYhlVU.jpg", "https://i.imgur.com/eim5EYq.jpg", "https://i.imgur.com/Yi0VGUw.jpg", "https://i.imgur.com/NOxoUEM.jpg", "https://i.imgur.com/x3ROL22.jpg", "https://i.imgur.com/o9ayOVs.jpg", "https://i.imgur.com/YaSvLbw.jpg", "https://i.imgur.com/QaIIn5t.jpg"],
+    "photos": ["https://i.imgur.com/ffJAAdM.jpg", "https://i.imgur.com/lQYhlVU.jpg", "https://i.imgur.com/eim5EYq.jpg", "https://i.imgur.com/Yi0VGUw.jpg", "https://i.imgur.com/NOxoUEM.jpg", "https://i.imgur.com/x3ROL22.jpg", "https://i.imgur.com/o9ayOVs.jpg", "https://i.imgur.com/YaSvLbw.jpg", "https://i.imgur.com/QaIIn5t.jpg"],
+    "reviews": [
+      ["https://i.imgur.com/mMeIayP.jpg"],
+      ["https://i.imgur.com/OF0VPxK.jpg", "https://i.imgur.com/4K1e6eu.jpg"],
+      ["https://i.imgur.com/c80lYZa.jpg"],
+      ["https://i.imgur.com/DeQ7GsX.jpg"],
+      ["https://i.imgur.com/aKRqmza.jpg", "https://i.imgur.com/ct9gVee.jpg"]
+    ],
+    "reviewImagesOnly": true,
+    "category": "Climatização",
+    "features": ["Uso industrial e residencial", "Opções 127V e 220V", "Cores Branco/Cinza e Cinza"]
+  },
+  {
+    "id": "1660990037",
+    "title": "Freezer Horizontal 418L Inverter Bivolt Branco Midea",
+    "oldPrice": "1.660,99",
+    "newPrice": "499,90",
+    "colors": ["Branco"],
+    "activeColor": "Branco",
+    "voltage": { "options": ["Bivolt"], "active": "Bivolt" },
+    "carousel": ["https://i.imgur.com/UXV4Oh3.jpg", "https://i.imgur.com/Uqdkvd3.jpg", "https://i.imgur.com/sqWqthY.jpg", "https://i.imgur.com/L51ckbP.jpg", "https://i.imgur.com/htZ5xuZ.jpg", "https://i.imgur.com/kTMyENe.jpg"],
+    "photos": ["https://i.imgur.com/UXV4Oh3.jpg", "https://i.imgur.com/Uqdkvd3.jpg", "https://i.imgur.com/sqWqthY.jpg", "https://i.imgur.com/L51ckbP.jpg", "https://i.imgur.com/htZ5xuZ.jpg", "https://i.imgur.com/kTMyENe.jpg"],
+    "reviews": [
+      ["https://i.imgur.com/Db6HWPA.jpg", "https://i.imgur.com/1lViZsf.jpg"],
+      ["https://i.imgur.com/sWPIQWV.jpg", "https://i.imgur.com/zz0SKdF.jpg"]
+    ],
+    "reviewImagesOnly": true,
+    "category": "Eletrodomésticos",
+    "features": ["Capacidade de 418 litros", "Tecnologia Inverter", "Bivolt"]
+  },
+  {
+    "id": "7999000038",
+    "title": "Smart TV AOC 50U6125 50 Polegadas 4K LED",
+    "oldPrice": "799,90",
+    "newPrice": "299,90",
+    "colors": null,
+    "voltage": null,
+    "carousel": ["https://i.imgur.com/BTeLBun.jpg", "https://i.imgur.com/EoiEky7.jpg", "https://i.imgur.com/zIAzAcT.jpg", "https://i.imgur.com/NRfygw2.jpg", "https://i.imgur.com/LiuvIjf.jpg", "https://i.imgur.com/yyIT0et.jpg", "https://i.imgur.com/4oq8aKE.jpg"],
+    "photos": ["https://i.imgur.com/BTeLBun.jpg", "https://i.imgur.com/EoiEky7.jpg", "https://i.imgur.com/zIAzAcT.jpg", "https://i.imgur.com/NRfygw2.jpg", "https://i.imgur.com/LiuvIjf.jpg", "https://i.imgur.com/yyIT0et.jpg", "https://i.imgur.com/4oq8aKE.jpg"],
+    "reviews": [["https://i.imgur.com/jSjtg4E.jpg", "https://i.imgur.com/dMzOvD8.jpg"]],
+    "reviewImagesOnly": true,
+    "category": "Eletrônicos",
+    "features": ["Tela de 50 polegadas", "Resolução 4K", "Painel LED"]
   }
 ]
