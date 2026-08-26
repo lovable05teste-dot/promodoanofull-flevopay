@@ -141,7 +141,69 @@ const ANDADOR_TORINO: ReviewText[] = [
   { author: "Carla Mendes", text: "O modelo é bonito e compacto. A opção de cor ficou igual à apresentada na página.", likes: 154 },
 ];
 
+const CAPACETE_HELT: ReviewText[] = [
+  { author: "Marcos Vinícius", text: "O capacete chegou bem embalado e o acabamento fosco corresponde às fotos. Escolhi o tamanho indicado e o encaixe ficou firme e confortável.", likes: 284 },
+  { author: "Rafael Oliveira", text: "Gostei do acabamento, da viseira e do forro interno. A cor veio igual à escolhida e o produto chegou sem nenhum risco.", likes: 231 },
+];
+
+const PNEU_GOODYEAR: ReviewText[] = [
+  { author: "Carlos Henrique", text: "O pneu chegou bem protegido, com as medidas corretas e conforme o anúncio. Depois da instalação, o carro ficou estável e rodando de forma confortável.", likes: 263 },
+];
+
+const LAVADORA_BOSCH_GHP200: ReviewText[] = [
+  { author: "André Luiz", text: "A lavadora chegou completa e na voltagem escolhida. A pressão atende muito bem para lavar calçada, quintal e carro.", likes: 301 },
+  { author: "Paulo Roberto", text: "Produto bem acabado e simples de montar. A mangueira e os acessórios vieram organizados e o funcionamento correspondeu ao anúncio.", likes: 247 },
+  { author: "Fernanda Souza", text: "Gostei da potência e da praticidade para guardar depois do uso. Chegou protegida e sem nenhuma avaria.", likes: 206 },
+];
+
+const PLAYSTATION_4: ReviewText[] = [
+  { author: "Lucas Martins", text: "O console chegou bem embalado, com os dois controles e o jogo conforme o anúncio. Instalação simples e funcionamento normal desde o primeiro uso.", likes: 342 },
+  { author: "Gabriel Almeida", text: "Produto em ótimo estado e com todos os itens organizados na caixa. Os controles conectaram rapidamente e o armazenamento atende bem.", likes: 296 },
+  { author: "Matheus Ribeiro", text: "Gostei muito do conjunto com dois controles. O videogame chegou protegido e sem marcas, pronto para configurar.", likes: 251 },
+  { author: "Juliana Costa", text: "Comprei para presentear e veio exatamente como mostrado nas fotos. A embalagem estava reforçada e todos os acessórios estavam presentes.", likes: 218 },
+  { author: "Renato Silva", text: "O PS4 funcionou corretamente e reconheceu os controles sem dificuldade. Boa opção para quem quer o conjunto já completo.", likes: 187 },
+  { author: "Bruno Carvalho", text: "Recebi o console, os cabos, os controles e o jogo certinhos. A configuração foi rápida e o produto correspondeu ao anúncio.", likes: 164 },
+];
+
+const PLAYSTATION_5: ReviewText[] = [
+  { author: "Thiago Mendes", text: "O PS5 chegou muito bem protegido e com os jogos informados. A configuração foi rápida e o leitor de discos funcionou corretamente.", likes: 376 },
+  { author: "Eduardo Nunes", text: "Produto novo, embalagem organizada e todos os acessórios presentes. Gostei bastante do desempenho e do carregamento rápido dos jogos.", likes: 329 },
+  { author: "Felipe Rocha", text: "O console corresponde às fotos e veio sem nenhuma avaria. Controle, cabos e jogos chegaram juntos e bem embalados.", likes: 278 },
+  { author: "Camila Ferreira", text: "Comprei para a família e a experiência está sendo ótima. A instalação foi simples e o aparelho funciona de forma silenciosa.", likes: 236 },
+  { author: "Diego Martins", text: "Gostei do modelo Slim e do conjunto com Astro Bot e Gran Turismo 7. Tudo chegou corretamente e pronto para usar.", likes: 201 },
+];
+
+const XBOX_SERIES_X: ReviewText[] = [
+  { author: "Rodrigo Lima", text: "O Xbox chegou bem embalado, com controle e cabos completos. A configuração foi simples, o armazenamento corresponde ao anúncio e o console funciona normalmente.", likes: 318 },
+];
+
+const CLIMATIZADOR_VENTISOL: ReviewText[] = [
+  { author: "Márcia Regina", text: "O climatizador chegou na voltagem escolhida e bem protegido. O reservatório tem boa capacidade e atende bem em ambientes maiores.", likes: 289 },
+  { author: "José Carlos", text: "Gostei da vazão de ar e da facilidade para movimentar o aparelho. Os controles são simples e o produto corresponde às fotos.", likes: 252 },
+  { author: "Patrícia Gomes", text: "Uso em uma área ampla e o aparelho ajuda bastante na circulação do ar. Chegou completo e sem nenhuma avaria.", likes: 221 },
+  { author: "Ricardo Alves", text: "Produto robusto, com rodas firmes e reservatório fácil de abastecer. A potência ficou dentro do que eu esperava para o tamanho.", likes: 193 },
+  { author: "Sandra Lopes", text: "A cor e o acabamento vieram iguais ao anúncio. A montagem foi simples e o climatizador ficou fácil de usar no dia a dia.", likes: 167 },
+];
+
+const FREEZER_MIDEA_418L: ReviewText[] = [
+  { author: "Antônio Pereira", text: "O freezer chegou bem protegido e sem amassados. O espaço interno é amplo, a configuração é simples e o funcionamento está silencioso.", likes: 304 },
+  { author: "Luciana Moraes", text: "Gostei muito da capacidade e da organização interna. O modelo bivolt facilitou a instalação e o produto correspondeu ao anúncio.", likes: 258 },
+];
+
+const SMART_TV_AOC_50: ReviewText[] = [
+  { author: "Daniel Barbosa", text: "A TV chegou bem embalada e sem marcas na tela. A imagem 4K tem boa definição, a configuração foi rápida e os aplicativos funcionaram normalmente.", likes: 327 },
+];
+
 export const REVIEWS_BY_PRODUCT: Record<string, ReviewText[]> = {
+  "3029100030": CAPACETE_HELT,
+  "5289100031": PNEU_GOODYEAR,
+  "5218200032": LAVADORA_BOSCH_GHP200,
+  "1522920033": PLAYSTATION_4,
+  "3284920034": PLAYSTATION_5,
+  "1896900035": XBOX_SERIES_X,
+  "7329200036": CLIMATIZADOR_VENTISOL,
+  "1660990037": FREEZER_MIDEA_418L,
+  "7999000038": SMART_TV_AOC_50,
   "3078200025": ANDADOR_TORINO,
   "8501150023": ESMERILHADEIRA,
   "4569300024": COMODA_VERONA,

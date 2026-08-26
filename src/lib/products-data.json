@@ -3128,7 +3128,7 @@
       ["https://i.imgur.com/qgvFh1v.jpg"],
       ["https://i.imgur.com/h3i1wWI.jpg", "https://i.imgur.com/qFO4AVm.jpg", "https://i.imgur.com/abSFOSs.jpg", "https://i.imgur.com/AOLjwkC.jpg", "https://i.imgur.com/sYMbqd1.jpg"]
     ],
-    "reviewImagesOnly": true,
+    "reviewImagesOnly": false,
     "category": "Acessórios para motos",
     "features": ["Capacete integral", "Opções de acabamento fosco", "Cinco opções de tamanho"]
   },
@@ -3142,7 +3142,7 @@
     "carousel": ["https://i.imgur.com/LK4m1Eo.jpg", "https://i.imgur.com/7gCcXV7.jpg", "https://i.imgur.com/Mvo0RVT.jpg"],
     "photos": ["https://i.imgur.com/LK4m1Eo.jpg", "https://i.imgur.com/7gCcXV7.jpg", "https://i.imgur.com/Mvo0RVT.jpg"],
     "reviews": [["https://i.imgur.com/yl4Z9sF.jpg", "https://i.imgur.com/yzHMdXE.jpg", "https://i.imgur.com/DwL7NgT.jpg"]],
-    "reviewImagesOnly": true,
+    "reviewImagesOnly": false,
     "category": "Pneus e acessórios",
     "features": ["Aro 13", "Medida 175/70R13", "Índice 82T"]
   },
@@ -3161,7 +3161,7 @@
       ["https://i.imgur.com/6HamB9c.jpg"],
       ["https://i.imgur.com/EopqXbC.jpg", "https://i.imgur.com/7IpXy89.jpg", "https://i.imgur.com/DmMoqph.jpg", "https://i.imgur.com/d4E4eCq.jpg", "https://i.imgur.com/9JZTVR3.jpg"]
     ],
-    "reviewImagesOnly": true,
+    "reviewImagesOnly": false,
     "category": "Ferramentas",
     "features": ["Potência de 1700 W", "Pressão máxima de 2000 PSI", "Disponível em 127V e 220V"]
   },
@@ -3183,7 +3183,7 @@
       ["https://i.imgur.com/HFuwHjz.jpg", "https://i.imgur.com/prPNbGW.jpg"],
       ["https://i.imgur.com/YHrqua6.jpg", "https://i.imgur.com/7b1aied.jpg"]
     ],
-    "reviewImagesOnly": true,
+    "reviewImagesOnly": false,
     "category": "Games",
     "features": ["Armazenamento de 500 GB", "Inclui dois controles", "Inclui jogo"]
   },
@@ -3204,7 +3204,7 @@
       ["https://i.imgur.com/uv05AxA.jpg", "https://i.imgur.com/llVPF6N.jpg"],
       ["https://i.imgur.com/zsIST5i.jpg", "https://i.imgur.com/0BjgCrE.jpg", "https://i.imgur.com/8dotAxE.jpg", "https://i.imgur.com/19pmiIa.jpg", "https://i.imgur.com/GkxOjUl.jpg", "https://i.imgur.com/PuB2rbr.jpg", "https://i.imgur.com/JTH1Ycw.jpg", "https://i.imgur.com/DT4z2hU.jpg", "https://i.imgur.com/9lQSfi0.jpg", "https://i.imgur.com/33OHjT1.jpg"]
     ],
-    "reviewImagesOnly": true,
+    "reviewImagesOnly": false,
     "category": "Games",
     "features": ["Edição Slim com leitor de discos", "Inclui Astro Bot", "Inclui Gran Turismo 7"]
   },
@@ -3219,7 +3219,7 @@
     "carousel": ["https://i.imgur.com/8jw6m92.jpg", "https://i.imgur.com/18BbwkX.jpg", "https://i.imgur.com/agodeoD.jpg", "https://i.imgur.com/jtULA6H.jpg", "https://i.imgur.com/DYYq6np.jpg"],
     "photos": ["https://i.imgur.com/8jw6m92.jpg", "https://i.imgur.com/18BbwkX.jpg", "https://i.imgur.com/agodeoD.jpg", "https://i.imgur.com/jtULA6H.jpg", "https://i.imgur.com/DYYq6np.jpg"],
     "reviews": [["https://i.imgur.com/8JjRtoc.jpg", "https://i.imgur.com/zPqjvhJ.jpg"]],
-    "reviewImagesOnly": true,
+    "reviewImagesOnly": false,
     "category": "Games",
     "features": ["Armazenamento de 1 TB", "Cor branca", "Controle incluído"]
   },
@@ -3240,7 +3240,7 @@
       ["https://i.imgur.com/DeQ7GsX.jpg"],
       ["https://i.imgur.com/aKRqmza.jpg", "https://i.imgur.com/ct9gVee.jpg"]
     ],
-    "reviewImagesOnly": true,
+    "reviewImagesOnly": false,
     "category": "Climatização",
     "features": ["Uso industrial e residencial", "Opções 127V e 220V", "Cores Branco/Cinza e Cinza"]
   },
@@ -3258,7 +3258,7 @@
       ["https://i.imgur.com/Db6HWPA.jpg", "https://i.imgur.com/1lViZsf.jpg"],
       ["https://i.imgur.com/sWPIQWV.jpg", "https://i.imgur.com/zz0SKdF.jpg"]
     ],
-    "reviewImagesOnly": true,
+    "reviewImagesOnly": false,
     "category": "Eletrodomésticos",
     "features": ["Capacidade de 418 litros", "Tecnologia Inverter", "Bivolt"]
   },
@@ -3272,7 +3272,7 @@
     "carousel": ["https://i.imgur.com/BTeLBun.jpg", "https://i.imgur.com/EoiEky7.jpg", "https://i.imgur.com/zIAzAcT.jpg", "https://i.imgur.com/NRfygw2.jpg", "https://i.imgur.com/LiuvIjf.jpg", "https://i.imgur.com/yyIT0et.jpg", "https://i.imgur.com/4oq8aKE.jpg"],
     "photos": ["https://i.imgur.com/BTeLBun.jpg", "https://i.imgur.com/EoiEky7.jpg", "https://i.imgur.com/zIAzAcT.jpg", "https://i.imgur.com/NRfygw2.jpg", "https://i.imgur.com/LiuvIjf.jpg", "https://i.imgur.com/yyIT0et.jpg", "https://i.imgur.com/4oq8aKE.jpg"],
     "reviews": [["https://i.imgur.com/jSjtg4E.jpg", "https://i.imgur.com/dMzOvD8.jpg"]],
-    "reviewImagesOnly": true,
+    "reviewImagesOnly": false,
     "category": "Eletrônicos",
     "features": ["Tela de 50 polegadas", "Resolução 4K", "Painel LED"]
   }
