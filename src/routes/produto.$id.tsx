@@ -70,23 +70,28 @@ function optimizedImage(src: string, size: "m" | "h" = "h") {
 
 function PaymentMethods() {
   return (
-    <section className="border-t border-gray-200 px-4 py-6 md:px-8">
-      <h2 className="mb-4 text-lg font-semibold text-black/90">Meios de pagamento</h2>
-      <div className="flex items-center gap-3 rounded-md bg-[#00a650] px-4 py-3 text-white">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M7.5 4.5 12 2l4.5 2.5v5L12 12 7.5 9.5v-5Z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" />
-          <path d="M7.5 14.5 12 12l4.5 2.5v5L12 22l-4.5-2.5v-5Z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" />
-          <path d="m3 9.5 4.5 2.5v5L3 14.5v-5ZM21 9.5 16.5 12v5l4.5-2.5v-5Z" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" />
-        </svg>
-        <span className="text-sm">Pague com Pix, com <b>aprovação imediata</b>.</span>
+    <section className="px-4 md:px-8 py-6 border-t border-gray-200">
+      <span className="block mb-4 font-semibold text-lg text-black/90">Meios de pagamento</span>
+      <div className="p-3 px-5 bg-[#00a650] rounded flex items-center">
+        <span className="text-white text-sm">Pague em <b>até 18X sem juros!</b></span>
       </div>
-      <div className="mt-6 flex items-center gap-3">
-        <img src="https://i.imgur.com/LboqL3B.png" alt="Pix" className="h-8 w-auto object-contain" loading="lazy" decoding="async" />
-        <div>
-          <div className="text-base text-black/90">Pix</div>
-          <div className="text-sm text-black/60">Use o QR Code ou código copia e cola ao finalizar a compra.</div>
-        </div>
+      <span className="mt-6 block text-base text-black/90">Até 12x sem cartão de crédito!</span>
+      <img loading="lazy" decoding="async" src="https://i.imgur.com/c6SPYdL.png" className="block my-5 max-h-6" alt="Mercado Crédito" />
+      <span className="mt-6 block text-base text-black/90">Cartões de crédito</span>
+      <div className="mt-5 flex items-center flex-wrap gap-5">
+        <img loading="lazy" decoding="async" src="https://i.imgur.com/3EZP0De.png" className="max-h-8" alt="Visa" />
+        <img loading="lazy" decoding="async" src="https://i.imgur.com/X3AlbP5.png" className="max-h-8" alt="Mastercard" />
+        <img loading="lazy" decoding="async" src="https://i.imgur.com/DRMHWTQ.png" className="max-h-8" alt="Hipercard" />
+        <img loading="lazy" decoding="async" src="https://i.imgur.com/EFVnNYl.png" className="max-h-8" alt="Elo" />
+        <img loading="lazy" decoding="async" src="https://i.imgur.com/xGDrqMw.png" className="max-h-8" alt="American Express" />
       </div>
+      <span className="mt-6 block text-base text-black/90">Cartões de débito</span>
+      <img loading="lazy" decoding="async" src="https://i.imgur.com/yLZGokp.png" className="mt-5 max-h-8" alt="Caixa" />
+      <span className="mt-6 block text-base text-black/90">Boleto bancário</span>
+      <img loading="lazy" decoding="async" src="https://i.imgur.com/HJfO3Ye.png" className="mt-5 max-h-8" alt="Boleto" />
+      <span className="mt-6 block text-base text-black/90">Pix</span>
+      <span className="block text-sm text-black/60">Aprovação imediata.</span>
+      <img loading="lazy" decoding="async" src="https://i.imgur.com/LboqL3B.png" className="mt-5 max-h-8" alt="Pix" />
     </section>
   );
 }
