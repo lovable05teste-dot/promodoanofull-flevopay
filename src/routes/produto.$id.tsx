@@ -105,64 +105,6 @@ function ProductPage() {
   return <ProductView p={product} />;
 }
 
-function RecentSaleNotice({ productId, productTitle }: { productId: string; productTitle: string }) {
-  const [visible, setVisible] = useState(true);
-  const examples = [
-    { name: "Ana", city: "São Paulo - SP", minutes: 2 },
-    { name: "Carlos", city: "Belo Horizonte - MG", minutes: 4 },
-    { name: "Mariana", city: "Curitiba - PR", minutes: 6 },
-    { name: "Rafael", city: "Rio de Janeiro - RJ", minutes: 8 },
-    { name: "Juliana", city: "Salvador - BA", minutes: 11 },
-  ];
-  const seed = productId.split("").reduce((total, digit) => total + Number(digit || 0), 0);
-  const example = examples[seed % examples.length];
-
-  useEffect(() => {
-    setVisible(true);
-  }, [productId]);
-
-  if (!visible) return null;
-
-  return (
-    <div className="mx-auto max-w-[1200px] px-3 pt-3" data-venda-recente="true">
-      <div
-        className="flex items-center rounded-lg border border-gray-200 bg-white px-3 py-3 shadow-sm"
-        role="status"
-        aria-live="polite"
-      >
-        <span className="mr-3 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#00a650] text-lg font-bold text-white">
-          ✓
-        </span>
-        <div className="min-w-0 flex-1">
-          <h1 id="venda-recente-nome" className="text-[13px] font-semibold text-gray-900">
-            Simulação: {example.name} comprou
-          </h1>
-          <h2 id="venda-recente-produto" className="truncate text-[13px] text-gray-800">
-            {productTitle}
-          </h2>
-          <h3 id="venda-recente-cidade-time" className="text-[12px] font-normal text-gray-500">
-            {example.city} • há {example.minutes} minutos
-          </h3>
-        </div>
-        <svg
-          onClick={() => setVisible(false)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" || event.key === " ") setVisible(false);
-          }}
-          role="button"
-          tabIndex={0}
-          aria-label="Fechar aviso"
-          className="ml-3 h-5 w-5 shrink-0 cursor-pointer text-gray-500"
-          viewBox="0 -960 960 960"
-          fill="currentColor"
-        >
-          <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
-        </svg>
-      </div>
-    </div>
-  );
-}
-
 function ProductView({ p }: { p: Product }) {
   const [idx, setIdx] = useState(0);
   const [color, setColor] = useState(p.activeColor ?? p.colors?.[0] ?? "");
@@ -375,8 +317,6 @@ function ProductView({ p }: { p: Product }) {
 
         </div>
       </header>
-
-      <RecentSaleNotice productId={p.id} productTitle={p.title} />
 
       <main className="mx-auto max-w-[1200px] bg-white">
         <section className="px-4 md:px-8 py-4 md:py-6">
