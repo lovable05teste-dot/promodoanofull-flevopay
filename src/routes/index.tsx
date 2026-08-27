@@ -7,8 +7,6 @@ import { UTMIFY_PIXEL_LOADER } from "../lib/utmify-pixel";
 const PLACEHOLDER = "/clone-assets/images/placeholder.svg";
 const MAIN_PRODUCT_ID = "6549324";
 const FULL_LOGO_HTML = '<img src="https://i.imgur.com/ulfGCun.png" alt="FULL" loading="lazy" decoding="async" style="margin-left:4px;display:inline-block;max-height:16px;max-width:45px;vertical-align:middle;">';
-const RECENT_SALE_HOME_HTML = `<div data-venda-recente="true" style="max-width:1200px;margin:0 auto;padding:12px 12px 0;"><div style="display:flex;align-items:center;border:1px solid #e5e7eb;border-radius:8px;background:#fff;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.08);"><span style="margin-right:12px;display:inline-flex;width:40px;height:40px;flex:0 0 40px;align-items:center;justify-content:center;border-radius:50%;background:#00a650;color:#fff;font-size:18px;font-weight:700;">✓</span><div style="min-width:0;flex:1;"><h1 id="venda-recente-nome" style="margin:0;font-size:13px;font-weight:600;color:#111827;">Simulação: Ana comprou</h1><h2 id="venda-recente-produto" style="margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;font-weight:400;color:#1f2937;">Jogo De Panelas Indução Antiaderente Cerâmica 10 Peças PPG PFOA Free Baunilha</h2><h3 id="venda-recente-cidade-time" style="margin:0;font-size:12px;font-weight:400;color:#6b7280;">São Paulo - SP • há 2 minutos</h3></div><svg onclick="fechar_vendas_recentes(this)" role="button" tabindex="0" aria-label="Fechar aviso" style="margin-left:12px;width:20px;height:20px;flex:0 0 20px;cursor:pointer;color:#6b7280;" viewBox="0 -960 960 960" fill="currentColor"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"></path></svg></div></div>`;
-const RECENT_SALE_HOME_SCRIPT = `<script>window.fechar_vendas_recentes=function(el){var root=el&&el.closest?el.closest('[data-venda-recente="true"]'):null;if(root)root.remove();};</script>`;
 const PRODUCT_LOADING_SCRIPT = `<script>(function(){function removeLoader(){var old=document.getElementById('product-navigation-loader');if(old)old.remove()}window.__showProductLoader=function(){if(document.getElementById('product-navigation-loader'))return;var style=document.getElementById('product-navigation-loader-style');if(!style){style=document.createElement('style');style.id='product-navigation-loader-style';style.textContent='@keyframes product-loader-spin{to{transform:rotate(360deg)}}';document.head.appendChild(style)}var overlay=document.createElement('div');overlay.id='product-navigation-loader';overlay.setAttribute('role','status');overlay.setAttribute('aria-label','Carregando produto');overlay.style.cssText='position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;background:#fff;';var spinner=document.createElement('span');spinner.style.cssText='display:block;width:56px;height:56px;border:4px solid #3483fa;border-right-color:transparent;border-radius:50%;animation:product-loader-spin .75s linear infinite;';overlay.appendChild(spinner);document.body.appendChild(overlay)};window.addEventListener('pageshow',removeLoader)})();</script>`;
 function buildHomepageTrackingScript() {
   const item = {
@@ -97,7 +95,6 @@ const relatedSection = buildRelatedSection();
 const optimizedHtml = html
   .replace(/seg\. 24 de agosto/g, "qui. 27 de agosto")
   .replace(/<span class="text-\[#00a650\] font-bold">⚡FULL<\/span>/g, FULL_LOGO_HTML)
-  .replace("</header>", `</header>${RECENT_SALE_HOME_HTML}`)
   .replace(
     /<h1 class="mt-2 text-base font-normal text-black\/90 leading-snug break-words">([\s\S]*?)<\/h1>/,
     '<span id="titulo-do-produto" style="margin-top:8px;display:block;line-height:1.375;overflow-wrap:anywhere;font-family:proximanovaregular;font-size:16px;font-weight:400;color:rgba(0,0,0,.9);">$1</span>',
@@ -120,7 +117,7 @@ const pageHtmlWithRelated =
 
 const homepageTrackingScript = buildHomepageTrackingScript();
 const relatedFallbackScript = buildRelatedFallbackScript();
-const injectedTail = `${RECENT_SALE_HOME_SCRIPT}${PRODUCT_LOADING_SCRIPT}${homepageTrackingScript}${relatedFallbackScript}${SELLER_MODAL_HTML}${SELLER_MODAL_SCRIPT}`;
+const injectedTail = `${PRODUCT_LOADING_SCRIPT}${homepageTrackingScript}${relatedFallbackScript}${SELLER_MODAL_HTML}${SELLER_MODAL_SCRIPT}`;
 const pageHtml = pageHtmlWithRelated.includes("</body>")
   ? pageHtmlWithRelated.replace("</body>", `${injectedTail}</body>`)
   : `${pageHtmlWithRelated}${injectedTail}`;
