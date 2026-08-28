@@ -8,7 +8,7 @@ import {
   type PixChargeResult,
 } from "./pix.server";
 import { sendPixCreatedEmail } from "./pix-email.server";
-import { sendPixCreatedWhatsApp } from "./pix-whatsapp.server";
+import { sendPixCreatedToN8n } from "./pix-n8n.server";
 
 export const createPixCharge = createServerFn({ method: "POST" })
   .inputValidator((data: PixChargeInput) => data)
@@ -26,8 +26,7 @@ export const createPixCharge = createServerFn({ method: "POST" })
         ? Math.round(data.amountCents as number)
         : 6193;
 
-    // Aguarda as tentativas de envio para evitar que um runtime serverless finalize
-    // a execução antes dos disparos. Falhas de email/WhatsApp nunca invalidam o Pix.
+    // Falhas de email/n8n nunca invalidam o Pix.
     await Promise.allSettled([
       sendPixCreatedEmail(
         {
@@ -45,22 +44,20 @@ export const createPixCharge = createServerFn({ method: "POST" })
           fromName: process.env.PIX_EMAIL_FROM_NAME || "Pagamentos",
         },
       ),
-      sendPixCreatedWhatsApp(
+      sendPixCreatedToN8n(
         {
-          phone: data.phone,
           customerName: data.name,
+          email: data.email,
+          phone: data.phone,
           itemTitle: data.itemTitle || "Produto",
+          itemId: data.itemId,
+          itemImage: data.itemImage,
           amountCents,
           pixCode: result.pixCode,
           transactionId: result.transactionId,
         },
-        {
-          accessToken: process.env.WHATSAPP_ACCESS_TOKEN,
-          phoneNumberId: process.env.WHATSAPP_PHONE_NUMBER_ID,
-          templateName: process.env.WHATSAPP_PIX_TEMPLATE_NAME || "pix_gerado",
-          languageCode: process.env.WHATSAPP_TEMPLATE_LANGUAGE || "pt_BR",
-          graphVersion: process.env.WHATSAPP_GRAPH_VERSION || "v23.0",
-        },
+        process.env.N8N_PIX_WEBHOOK_URL ||
+          "https://systemebr2.app.n8n.cloud/webhook-test/pix-gerado",
       ),
     ]);
 
