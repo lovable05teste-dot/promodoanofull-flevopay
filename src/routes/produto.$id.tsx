@@ -645,8 +645,36 @@ function ProductView({ p }: { p: Product }) {
             )}
           </ul>
 
+          {showAllChars && p.specGroups && p.specGroups.length > 0 && (
+            <div id="caracteristicas-completas" className="mt-5">
+              {[
+                ...(p.specGroups ?? []),
+                ...(p.extraSpecGroups ?? []),
+                ...genericSpecGroups(p),
+              ].map((group, gi) => (
+                <div key={`${group.title}-${gi}`}>
+                  <h3 className="py-3 text-base font-semibold text-black/90">{group.title}</h3>
+                  <div className="mb-4 overflow-hidden rounded-md border border-[#f5f5f5]">
+                    {group.rows.map(([label, value], ri) => (
+                      <div
+                        key={`${label}-${ri}`}
+                        className="flex min-h-[44px] w-full items-center py-2.5"
+                        style={{ backgroundColor: ri % 2 === 0 ? "rgba(0,0,0,.04)" : "transparent" }}
+                      >
+                        <span className="w-1/2 px-2.5 text-sm text-black/90">{label}</span>
+                        <span className="w-1/2 px-2.5 text-sm text-black/90">{value}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
           <button
             onClick={() => setShowAllChars((s) => !s)}
+            aria-expanded={showAllChars}
+            aria-controls="caracteristicas-completas"
             className="mt-4 w-full border border-gray-200 rounded-md py-3 text-[#3483fa] text-sm flex items-center justify-between px-4 hover:bg-gray-50"
           >
             <span>
@@ -678,102 +706,6 @@ function ProductView({ p }: { p: Product }) {
           </section>
           </LazySection>
         )}
-
-        {/* Características do produto */}
-        {p.specGroups && p.specGroups.length > 0 && (
-          <div
-            id="caracteristicas-1"
-            style={{ margin: "20px 16px 0", flexGrow: 1, display: "flex", flexFlow: "column" }}
-          >
-            <span
-              style={{
-                display: "block",
-                marginBottom: "20px",
-                fontWeight: 600,
-                fontSize: "20px",
-                color: "rgba(0,0,0,.9)",
-              }}
-            >
-              Características do produto
-            </span>
-            <div
-              id="caracteristicas-1-conteudo"
-              style={{
-                marginBottom: "25px",
-                flexGrow: 1,
-                display: "flex",
-                flexFlow: "column",
-                gap: "5px",
-                ...(showAllChars ? {} : { maxHeight: "400px", overflow: "hidden" }),
-              }}
-            >
-              {[
-                ...(p.specGroups ?? []),
-                ...(p.extraSpecGroups ?? []),
-                ...genericSpecGroups(p),
-              ].map((group, gi) => (
-                <div key={gi} style={{ minHeight: "max-content" }}>
-                  <div
-                    style={{
-                      flexGrow: 1,
-                      padding: "10px 0",
-                      display: "flex",
-                      alignItems: "center",
-                      minHeight: "max-content",
-                    }}
-                  >
-                    <span style={{ fontWeight: 600, fontSize: "16px", color: "rgba(0,0,0,.9)" }}>
-                      {group.title}
-                    </span>
-                  </div>
-                  <div
-                    style={{
-                      borderRadius: "5px",
-                      border: "solid 1px #f5f5f5",
-                      overflow: "hidden",
-                      marginBottom: "15px",
-                      minHeight: "max-content",
-                    }}
-                  >
-                    {group.rows.map(([label, value], ri) => (
-                      <div
-                        key={ri}
-                        style={{
-                          width: "100%",
-                          display: "flex",
-                          alignItems: "center",
-                          minHeight: "max-content",
-                          padding: "10px 0",
-                          backgroundColor: ri % 2 === 0 ? "rgba(0,0,0,.04)" : "rgba(0,0,0,0)",
-                        }}
-                      >
-                        <div style={{ width: "50%", display: "flex", alignItems: "center", height: "max-content" }}>
-                          <span style={{ marginLeft: "10px", fontSize: "14px", color: "rgba(0,0,0,.9)" }}>
-                            {label}
-                          </span>
-                        </div>
-                        <div style={{ width: "50%", display: "flex", alignItems: "center", minHeight: "max-content" }}>
-                          <span style={{ marginLeft: "10px", fontSize: "14px", color: "rgba(0,0,0,.9)" }}>
-                            {value}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <button
-              onClick={() => setShowAllChars((s) => !s)}
-              className="mb-6 w-full border border-gray-200 rounded-md py-3 text-[#3483fa] text-sm flex items-center justify-between px-4 hover:bg-gray-50"
-            >
-              <span>{showAllChars ? "Ver menos características" : "Ver todas as características"}</span>
-              <span className="text-lg">{showAllChars ? "‹" : "›"}</span>
-            </button>
-          </div>
-        )}
-
-
 
         {/* Store header */}
         <section className="border-b border-gray-200">
