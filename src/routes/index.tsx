@@ -95,6 +95,11 @@ const actualPaymentMethodsSection = `<section class="px-4 md:px-8 py-6 border-t 
 const relatedSection = buildRelatedSection();
 const optimizedHtml = html
   .replace(/seg\. 24 de agosto/g, "qui. 27 de agosto")
+  .replace(/\+5mil vendidos/g, "+100 mil vendidos")
+  .replace(
+    "1º em Casa, Móveis e Decoração",
+    '1º em <span id="categoria-do-produto">Casa, Móveis e Decoração</span>',
+  )
   .replace(/<span class="text-\[#00a650\] font-bold">⚡FULL<\/span>/g, FULL_LOGO_HTML)
   .replace('<p class="flex gap-2"><span>🏅</span><span class="text-gray-700">12 meses de garantia de fábrica.</span></p>', WARRANTY_HTML)
   .replace(
