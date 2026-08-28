@@ -660,23 +660,89 @@ function ProductView({ p }: { p: Product }) {
           </ul>
 
           {showAllChars && p.specGroups && p.specGroups.length > 0 && (
-            <div id="caracteristicas-completas" className="mt-5">
+            <div
+              id="caracteristicas-completas"
+              style={{
+                marginTop: 20,
+                marginBottom: 25,
+                flexGrow: 1,
+                display: "flex",
+                flexFlow: "column",
+                gap: 5,
+              }}
+            >
+              <span
+                style={{
+                  display: "block",
+                  marginBottom: 20,
+                  fontFamily: "proximanovasemibold",
+                  fontSize: 20,
+                  color: "rgba(0,0,0,.9)",
+                }}
+              >
+                Características do produto
+              </span>
               {[
                 ...(p.specGroups ?? []),
                 ...(p.extraSpecGroups ?? []),
                 ...genericSpecGroups(p),
               ].map((group, gi) => (
                 <div key={`${group.title}-${gi}`}>
-                  <h3 className="py-3 text-base font-semibold text-black/90">{group.title}</h3>
-                  <div className="mb-4 overflow-hidden rounded-md border border-[#f5f5f5]">
+                  <div style={{ flexGrow: 1, padding: "10px 0", display: "flex", alignItems: "center" }}>
+                    <span
+                      style={{
+                        fontFamily: "proximanovasemibold",
+                        fontSize: 16,
+                        color: "rgba(0,0,0,.9)",
+                      }}
+                    >
+                      {group.title}
+                    </span>
+                  </div>
+                  <div
+                    style={{
+                      borderRadius: 5,
+                      border: "solid 1px #f5f5f5",
+                      overflow: "hidden",
+                      marginBottom: 15,
+                    }}
+                  >
                     {group.rows.map(([label, value], ri) => (
                       <div
                         key={`${label}-${ri}`}
-                        className="flex min-h-[44px] w-full items-center py-2.5"
-                        style={{ backgroundColor: ri % 2 === 0 ? "rgba(0,0,0,.04)" : "transparent" }}
+                        style={{
+                          width: "100%",
+                          display: "flex",
+                          alignItems: "center",
+                          minHeight: "max-content",
+                          padding: "10px 0",
+                          backgroundColor: ri % 2 === 0 ? "rgba(0,0,0,.04)" : "rgba(0,0,0,0)",
+                        }}
                       >
-                        <span className="w-1/2 px-2.5 text-sm text-black/90">{label}</span>
-                        <span className="w-1/2 px-2.5 text-sm text-black/90">{value}</span>
+                        <div style={{ width: "50%", display: "flex", alignItems: "center" }}>
+                          <span
+                            style={{
+                              marginLeft: 10,
+                              fontFamily: "proximanovaregular",
+                              fontSize: 14,
+                              color: "rgba(0,0,0,.9)",
+                            }}
+                          >
+                            {label}
+                          </span>
+                        </div>
+                        <div style={{ width: "50%", display: "flex", alignItems: "center" }}>
+                          <span
+                            style={{
+                              marginLeft: 10,
+                              fontFamily: "proximanovaregular",
+                              fontSize: 14,
+                              color: "rgba(0,0,0,.9)",
+                            }}
+                          >
+                            {value}
+                          </span>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -690,6 +756,7 @@ function ProductView({ p }: { p: Product }) {
             aria-expanded={showAllChars}
             aria-controls="caracteristicas-completas"
             className="mt-4 w-full border border-gray-200 rounded-md py-3 text-[#3483fa] text-sm flex items-center justify-between px-4 hover:bg-gray-50"
+            style={{ fontFamily: "proximanovaregular", fontSize: 14 }}
           >
             <span>
               {showAllChars ? "Ver menos características" : "Conferir todas as características"}
