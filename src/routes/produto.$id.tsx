@@ -549,7 +549,7 @@ function ProductView({ p }: { p: Product }) {
             </span>
           </div>
           <p className="mt-2 text-sm text-[#00a650] font-semibold">
-            Chegará até qui. 27 de agosto
+            Chegará até ter. 1 de setembro
           </p>
 
           <p className="mt-5 font-bold text-base text-black/90">Estoque disponível</p>
@@ -1447,7 +1447,7 @@ function RelatedCard({ p, onNavigate }: { p: Product; onNavigate: () => void }) 
         em até 12x de R$ {installmentValue(p.newPrice)}
       </div>
       <div className="mt-1 text-[12px] font-semibold leading-[18px] text-[#00a650]">
-        Chegará até qui. 27 de agosto
+        Chegará até ter. 1 de setembro
       </div>
       <div className="mt-1 line-clamp-3 min-h-[48px] text-[12px] font-normal leading-4 text-[#555]">
         {p.title}

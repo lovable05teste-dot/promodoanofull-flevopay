@@ -181,7 +181,7 @@ function RevisaoPage() {
                       FULL
                     </span>
                   </div>
-                  <div className="text-[13px] text-gray-800 mt-1">Quinta-feira, 27 de agosto</div>
+                  <div className="text-[13px] text-gray-800 mt-1">Terça-feira, 1 de setembro</div>
                   <div className="text-[14px] text-gray-900 mt-1 font-medium leading-snug">{item.title}</div>
                   {(item.color || item.voltage || item.extra) && (
                     <div className="text-[12px] text-gray-500 mt-1">
