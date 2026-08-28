@@ -73,6 +73,32 @@ const RELATED_CATEGORY_GROUPS: Record<string, string> = {
   "Ar Livre": "casa-e-lazer",
 };
 
+const BESTSELLER_CATEGORIES: Record<string, string> = {
+  "Casa": "Casa, Móveis e Decoração",
+  "Ar Livre": "Esportes e Fitness",
+  "Ferramentas": "Ferramentas e Construção",
+  "Eletrodomésticos": "Eletrodomésticos",
+  "Eletroportáteis": "Eletrodomésticos",
+  "Climatização": "Eletrodomésticos",
+  "Acessórios para Veículos": "Acessórios para Veículos",
+  "Acessórios para motos": "Acessórios para Veículos",
+  "Pneus e acessórios": "Acessórios para Veículos",
+  "Automotivo": "Acessórios para Veículos",
+  "Animais": "Animais",
+  "Eletrônicos": "Eletrônicos, Áudio e Vídeo",
+  "Games": "Eletrônicos, Áudio e Vídeo",
+  "TV": "Eletrônicos, Áudio e Vídeo",
+  "Celulares e Smartphones": "Celulares e Telefones",
+  "Informática": "Informática",
+  "Ciclismo": "Esportes e Fitness",
+  "Móveis": "Casa, Móveis e Decoração",
+  "Bebês": "Bebês",
+};
+
+function bestsellerCategory(category: string) {
+  return BESTSELLER_CATEGORIES[category] ?? category;
+}
+
 function relatedCategoryGroup(category: string) {
   return RELATED_CATEGORY_GROUPS[category] ?? category.trim().toLocaleLowerCase("pt-BR");
 }
@@ -322,7 +348,7 @@ function ProductView({ p }: { p: Product }) {
         <section className="px-4 md:px-8 py-4 md:py-6">
 
           <div className="flex items-start justify-between gap-3">
-            <span className="text-xs text-gray-500">Novo | +5mil vendidos</span>
+            <span className="text-xs text-gray-500">Novo | +100 mil vendidos</span>
             <div className="flex items-center gap-1 text-xs text-gray-600 shrink-0">
               <span>4.8</span>
               <span className="inline-flex items-center gap-[1px] text-[#3483fa]">
@@ -332,14 +358,25 @@ function ProductView({ p }: { p: Product }) {
               </span>
             </div>
           </div>
-          <div className="mt-2 flex items-center gap-2 flex-wrap">
+          <div style={{ marginTop: 10, display: "flex", gap: 7, alignItems: "center", flexWrap: "wrap" }}>
             <span
-              className="text-white text-[10px] font-bold px-[6px] py-[2px] rounded-[3px] tracking-wider"
-              style={{ backgroundColor: "#f28b3c" }}
+              style={{
+                padding: "2px 5px",
+                width: "max-content",
+                fontFamily: "proximanovasemibold",
+                fontSize: 10,
+                borderRadius: 3,
+                backgroundColor: "#f73",
+                opacity: 0.9,
+                color: "#fff",
+                letterSpacing: ".3px",
+              }}
             >
               MAIS VENDIDO
             </span>
-            <span className="text-xs text-[#3483fa]">1º em {p.category}</span>
+            <span style={{ fontSize: 12, color: "#3483fa", fontFamily: "proximanovaregular" }}>
+              1º em <span id="categoria-do-produto">{bestsellerCategory(p.category)}</span>
+            </span>
           </div>
           <h1 className="mt-2 text-base font-normal text-black/90 leading-snug break-words">
             {p.title}
