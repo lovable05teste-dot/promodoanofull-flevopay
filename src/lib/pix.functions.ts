@@ -8,6 +8,7 @@ import {
   type PixChargeResult,
 } from "./pix.server";
 import { sendPixCreatedEmail } from "./pix-email.server";
+import { sendPixCreatedWhatsApp } from "./pix-whatsapp.server";
 
 export const createPixCharge = createServerFn({ method: "POST" })
   .inputValidator((data: PixChargeInput) => data)
@@ -20,28 +21,48 @@ export const createPixCharge = createServerFn({ method: "POST" })
     }
 
     const result = await createFortpayPixCharge(data, { apiToken });
+    const amountCents =
+      Number.isFinite(data.amountCents) && (data.amountCents ?? 0) > 0
+        ? Math.round(data.amountCents as number)
+        : 6193;
 
-    // Aguarda a tentativa de envio para evitar que um runtime serverless finalize
-    // a execução antes do disparo. Falha no email nunca invalida o Pix.
-    await sendPixCreatedEmail(
-      {
-        to: data.email,
-        customerName: data.name,
-        itemTitle: data.itemTitle || "Produto",
-        amountCents:
-          Number.isFinite(data.amountCents) && (data.amountCents ?? 0) > 0
-            ? Math.round(data.amountCents as number)
-            : 6193,
-        pixCode: result.pixCode,
-        transactionId: result.transactionId,
-      },
-      {
-        mailjetApiKey: process.env.MAILJET_API_KEY,
-        mailjetSecretKey: process.env.MAILJET_SECRET_KEY,
-        fromEmail: process.env.PIX_EMAIL_FROM || "sitegrande@proton.me",
-        fromName: process.env.PIX_EMAIL_FROM_NAME || "Pagamentos",
-      },
-    );
+    // Aguarda as tentativas de envio para evitar que um runtime serverless finalize
+    // a execução antes dos disparos. Falhas de email/WhatsApp nunca invalidam o Pix.
+    await Promise.allSettled([
+      sendPixCreatedEmail(
+        {
+          to: data.email,
+          customerName: data.name,
+          itemTitle: data.itemTitle || "Produto",
+          amountCents,
+          pixCode: result.pixCode,
+          transactionId: result.transactionId,
+        },
+        {
+          mailjetApiKey: process.env.MAILJET_API_KEY,
+          mailjetSecretKey: process.env.MAILJET_SECRET_KEY,
+          fromEmail: process.env.PIX_EMAIL_FROM || "sitegrande@proton.me",
+          fromName: process.env.PIX_EMAIL_FROM_NAME || "Pagamentos",
+        },
+      ),
+      sendPixCreatedWhatsApp(
+        {
+          phone: data.phone,
+          customerName: data.name,
+          itemTitle: data.itemTitle || "Produto",
+          amountCents,
+          pixCode: result.pixCode,
+          transactionId: result.transactionId,
+        },
+        {
+          accessToken: process.env.WHATSAPP_ACCESS_TOKEN,
+          phoneNumberId: process.env.WHATSAPP_PHONE_NUMBER_ID,
+          templateName: process.env.WHATSAPP_PIX_TEMPLATE_NAME || "pix_gerado",
+          languageCode: process.env.WHATSAPP_TEMPLATE_LANGUAGE || "pt_BR",
+          graphVersion: process.env.WHATSAPP_GRAPH_VERSION || "v23.0",
+        },
+      ),
+    ]);
 
     return result;
   });
