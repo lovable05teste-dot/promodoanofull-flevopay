@@ -363,7 +363,8 @@ function ProductView({ p }: { p: Product }) {
               style={{
                 padding: "2px 5px",
                 width: "max-content",
-                fontFamily: "proximanovasemibold",
+                fontFamily: "Arial, Helvetica, sans-serif",
+                fontWeight: 600,
                 fontSize: 10,
                 borderRadius: 3,
                 backgroundColor: "#f73",
@@ -374,7 +375,7 @@ function ProductView({ p }: { p: Product }) {
             >
               MAIS VENDIDO
             </span>
-            <span style={{ fontSize: 12, color: "#3483fa", fontFamily: "proximanovaregular" }}>
+            <span style={{ fontSize: 12, color: "#3483fa", fontFamily: "Arial, Helvetica, sans-serif", fontWeight: 400 }}>
               1º em <span id="categoria-do-produto">{bestsellerCategory(p.category)}</span>
             </span>
           </div>
@@ -665,7 +666,7 @@ function ProductView({ p }: { p: Product }) {
               <span
                 style={{
                   marginLeft: 10,
-                  fontFamily: "proximanovaregular",
+                  fontFamily: "Arial, Helvetica, sans-serif",
                   fontWeight: 400,
                   fontSize: 14,
                   color: "rgba(0,0,0,.55)",
@@ -712,7 +713,8 @@ function ProductView({ p }: { p: Product }) {
                 style={{
                   display: "block",
                   marginBottom: 20,
-                  fontFamily: "proximanovasemibold",
+                  fontFamily: "Arial, Helvetica, sans-serif",
+                  fontWeight: 600,
                   fontSize: 20,
                   color: "rgba(0,0,0,.9)",
                 }}
@@ -728,7 +730,8 @@ function ProductView({ p }: { p: Product }) {
                   <div style={{ flexGrow: 1, padding: "10px 0", display: "flex", alignItems: "center" }}>
                     <span
                       style={{
-                        fontFamily: "proximanovasemibold",
+                        fontFamily: "Arial, Helvetica, sans-serif",
+                        fontWeight: 600,
                         fontSize: 16,
                         color: "rgba(0,0,0,.9)",
                       }}
@@ -760,7 +763,8 @@ function ProductView({ p }: { p: Product }) {
                           <span
                             style={{
                               marginLeft: 10,
-                              fontFamily: "proximanovaregular",
+                              fontFamily: "Arial, Helvetica, sans-serif",
+                              fontWeight: 400,
                               fontSize: 14,
                               color: "rgba(0,0,0,.9)",
                             }}
@@ -772,7 +776,8 @@ function ProductView({ p }: { p: Product }) {
                           <span
                             style={{
                               marginLeft: 10,
-                              fontFamily: "proximanovaregular",
+                              fontFamily: "Arial, Helvetica, sans-serif",
+                              fontWeight: 400,
                               fontSize: 14,
                               color: "rgba(0,0,0,.9)",
                             }}
@@ -793,7 +798,7 @@ function ProductView({ p }: { p: Product }) {
             aria-expanded={showAllChars}
             aria-controls="caracteristicas-completas"
             className="mt-4 w-full border border-gray-200 rounded-md py-3 text-[#3483fa] text-sm flex items-center justify-between px-4 hover:bg-gray-50"
-            style={{ fontFamily: "proximanovaregular", fontSize: 14 }}
+            style={{ fontFamily: "Arial, Helvetica, sans-serif", fontSize: 14, fontWeight: 400 }}
           >
             <span>
               {showAllChars ? "Ver menos características" : "Conferir todas as características"}
