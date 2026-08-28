@@ -63,7 +63,6 @@ function PixPage() {
     name?: string;
   }>({});
   const started = useRef(false);
-  const icProxyRef = useRef<HTMLAnchorElement>(null);
   const receiptSectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -81,13 +80,12 @@ function PixPage() {
         const amountCents = Math.round(
           Number(String(priceText).replace(/\./g, "").replace(",", ".")) * 100
         );
-        const icResult = await trackStoredInitiateCheckout({
+        await trackStoredInitiateCheckout({
           id: String(product?.id || "6549324"),
           name: product?.title || "Jogo De Panelas Indução Antiaderente Cerâmica 10 Peças PPG PFOA Free Baunilha",
           value: priceText,
           numItems: 1,
         });
-        if (icResult.sent && !icResult.deduplicated) icProxyRef.current?.click();
         captureUtms();
         const utm = getUtmQuery();
         const doc = String(customer.cpf || customer.document || "").replace(/\D+/g, "");
@@ -194,10 +192,7 @@ function PixPage() {
 
   if (!pixCode && !error) {
     return (
-      <>
-        <a ref={icProxyRef} href="/checkout" className="link_interno hidden" tabIndex={-1} aria-hidden="true" onClick={(event) => event.preventDefault()} />
-        <PixLoadingScreen />
-      </>
+      <PixLoadingScreen />
     );
   }
 

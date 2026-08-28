@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { SiteFooter } from "@/components/SiteFooter";
 import { PixLoadingScreen } from "@/components/PixLoadingScreen";
 import { trackStoredInitiateCheckout } from "@/lib/tracking";
@@ -53,7 +53,6 @@ function Field({
 
 function EnderecoPage() {
   const navigate = useNavigate();
-  const icProxyRef = useRef<HTMLAnchorElement>(null);
   const [erro, setErro] = useState("");
   const [isNavigating, setIsNavigating] = useState(false);
   const [form, setForm] = useState({
@@ -86,8 +85,6 @@ function EnderecoPage() {
       name: "Jogo De Panelas Indução Antiaderente Cerâmica 10 Peças PPG PFOA Free Baunilha",
       value: "61,93",
       numItems: 1,
-    }).then((result) => {
-      if (result.sent && !result.deduplicated) icProxyRef.current?.click();
     });
   }, []);
 
@@ -122,14 +119,6 @@ function EnderecoPage() {
 
   return (
     <div className="min-h-screen bg-[#ededed] py-4 sm:py-6" style={{ fontFamily: "'Proxima Nova', -apple-system, Roboto, Arial, sans-serif" }}>
-      <a
-        ref={icProxyRef}
-        href="/checkout"
-        className="link_interno hidden"
-        tabIndex={-1}
-        aria-hidden="true"
-        onClick={(event) => event.preventDefault()}
-      />
       <div className="mx-auto w-full max-w-[720px] px-3 sm:px-4">
         <h1 className="text-[20px] sm:text-[22px] font-semibold text-gray-900 mb-3 sm:mb-4">Entrega da sua compra</h1>
 

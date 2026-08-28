@@ -116,7 +116,9 @@ function saveEventOnCheckoutProduct(contentIds: string[], eventId: string, track
         ...(trackedAt ? { icTrackedAt: trackedAt } : {}),
       }),
     );
-  } catch {}
+  } catch {
+    // Storage pode estar bloqueado; o envio do evento continua em memória.
+  }
 }
 
 function recentStoredEvent(contentIds: string[]): { eventId: string; trackedAt: number } | null {
@@ -131,9 +133,7 @@ function recentStoredEvent(contentIds: string[]): { eventId: string; trackedAt: 
 function pendingStoredEventId(contentIds: string[]): string | undefined {
   const stored = readCheckoutProduct();
   if (!stored || !sameContentIds(storedContentIds(stored), contentIds)) return undefined;
-  return typeof stored.icEventId === "string" && stored.icEventId
-    ? stored.icEventId
-    : undefined;
+  return typeof stored.icEventId === "string" && stored.icEventId ? stored.icEventId : undefined;
 }
 
 function recordDebugEvent(event: MetaEvent) {
@@ -154,7 +154,34 @@ function recordDebugEvent(event: MetaEvent) {
     const stored = raw ? (JSON.parse(raw) as MetaEvent[]) : [];
     stored.push(event);
     sessionStorage.setItem("tracking_ic_debug", JSON.stringify(stored.slice(-20)));
-  } catch {}
+  } catch {
+    // O diagnóstico é auxiliar e não deve bloquear o checkout.
+  }
+}
+
+/**
+ * O pixel oficial da UTMify observa links internos que apontam para o checkout.
+ * O clique sintético mantém esse sinal no mesmo ponto em que o Meta IC é enviado,
+ * sem depender de cada página possuir sua própria âncora escondida.
+ */
+function signalUtmifyInitiateCheckout(): boolean {
+  if (!document.body) return false;
+  try {
+    const proxy = document.createElement("a");
+    proxy.href = "/checkout";
+    proxy.className = "link_interno";
+    proxy.dataset.utmifyIcProxy = "true";
+    proxy.hidden = true;
+    proxy.tabIndex = -1;
+    proxy.setAttribute("aria-hidden", "true");
+    proxy.addEventListener("click", (event) => event.preventDefault());
+    document.body.appendChild(proxy);
+    proxy.click();
+    window.setTimeout(() => proxy.remove(), 0);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -193,7 +220,9 @@ function installMetaIcContext(eventId: string, params: MetaEvent["params"]): boo
     };
     try {
       Object.assign(wrapped, original);
-    } catch {}
+    } catch {
+      // Algumas implementações de fbq não expõem propriedades copiáveis.
+    }
     target.__icFbqOriginal = original;
     target.fbq = wrapped;
   }
@@ -263,6 +292,9 @@ export function trackInitiateCheckout(
 
     const ready = await waitForPixel();
     if (!ready) {
+      // Mesmo quando o fbq ainda não apareceu, deixa a UTMify observar a ação.
+      // A próxima etapa do funil tentará novamente porque não marcamos icTrackedAt.
+      signalUtmifyInitiateCheckout();
       recordDebugEvent({
         event_name: "InitiateCheckout",
         event_id: eventId,
@@ -275,12 +307,15 @@ export function trackInitiateCheckout(
 
     try {
       installMetaIcContext(eventId, params);
-      trackingWindow().fbq?.(
-        "track",
-        "InitiateCheckout",
-        params,
-        { eventID: eventId },
-      );
+      signalUtmifyInitiateCheckout();
+
+      // A UTMify pode chamar fbq ao processar o link. Damos um intervalo curto
+      // para essa chamada chegar; se não chegar, fazemos o envio Meta explícito.
+      await new Promise<void>((resolve) => window.setTimeout(resolve, 180));
+      const context = trackingWindow().__icMetaContext;
+      if (!context?.forwarded) {
+        trackingWindow().fbq?.("track", "InitiateCheckout", params, { eventID: eventId });
+      }
       const trackedAt = Date.now();
       saveEventOnCheckoutProduct(contentIds, eventId, trackedAt);
       recordDebugEvent({

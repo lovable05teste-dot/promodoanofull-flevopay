@@ -6,16 +6,16 @@
 - Template dinâmico (`/produto/$id`): usado por todos os produtos ativos do catálogo.
 - Checkout interno: `/endereco` → `/entrega` → `/pagamento` → `/revisao` → `/pix`.
 - Carrinho persistente: `/carrinho`, com produtos, variações e quantidades salvos no `localStorage`.
-- Catálogo: 19 produtos ativos, todos com ID, nome e preço válidos.
+- Catálogo: 28 produtos ativos, todos com ID, nome e preço válidos.
 - Pixel: um único carregador oficial da UTMify. Não existe implementação própria de Meta Conversions API neste repositório.
 
 ## Falhas encontradas
 
-1. O IC dependia do reconhecimento automático de texto/URL da UTMify. Isso não garantia `content_ids`, `content_name`, `value`, `currency` e `num_items` para cada produto.
-2. A página principal usava um link invisível (proxy) para tentar provocar o reconhecimento automático. O clique original e o proxy podiam ser interpretados como dois inícios de checkout.
-3. O template dinâmico apenas esperava o `fbq` carregar e repetia o clique no link; ele não enviava os dados comerciais explicitamente.
-4. O botão “Confirmar a compra” e o link de retorno contendo “pagamento” podiam ser reconhecidos novamente pelo detector automático, criando ICs fora do início real do checkout.
-5. Acesso direto ou refresh nas etapas de checkout não tinha fallback antes da geração do PIX.
+1. O link interno usado para sinalizar o IC à UTMify só era acionado depois que `fbq` confirmava o envio. Se o Meta demorasse para carregar, nem o Meta nem a UTMify recebiam o sinal.
+2. Produto, carrinho e página principal tinham implementações separadas. O template dinâmico repetia o clique e segurava a navegação por 8 segundos, criando risco de duplicidade e comportamento diferente entre páginas.
+3. Os links ocultos existiam em `/endereco` e `/pix`, mas dependiam do sucesso do evento anterior; portanto não funcionavam como fallback real.
+4. A página de revisão seguia para o PIX sem tentar o IC. A única proteção restante ficava na página do PIX.
+5. O carregador oficial da UTMify também era inserido pela página principal, além do root. Havia uma trava, mas eram dois pontos de bootstrap sujeitos a divergência.
 
 ## Correção aplicada
 
@@ -38,14 +38,16 @@ fbq("track", "InitiateCheckout", {
 - Cada tentativa recebe um `eventID` único.
 - `eventID` e horário ficam no `checkout_product` para impedir outro IC durante 30 minutos nas etapas seguintes.
 - Cliques repetidos reutilizam a mesma promessa/evento enquanto o rastreamento está em andamento.
-- `/endereco` e `/pix` têm fallback. O fallback de `/pix` roda antes da chamada da FortPay e da geração do QR Code.
+- `/endereco`, `/revisao` e `/pix` têm fallback. O fallback de `/pix` roda antes da chamada da FlevoPay e da geração do QR Code.
 - Os botões finais são protegidos do detector automático para não criarem outro IC.
-- A UTMify continua recebendo o clique de início do checkout, mas a segunda chamada `fbq` automática é interceptada. Assim, o Meta recebe somente o evento explícito, com os parâmetros comerciais completos e o mesmo `eventID`.
+- O sinal da UTMify passou a ser gerado dentro do rastreador compartilhado. Se a UTMify chamar `fbq`, o interceptor completa os parâmetros e mantém o `eventID`; caso não chame, o rastreador envia o Meta IC explicitamente após 180 ms.
+- O replay de clique e a espera fixa de 8 segundos foram removidos. A navegação só aguarda a tentativa real de rastreamento.
+- O carregador oficial da UTMify existe em um único ponto, no root da aplicação.
 - No carrinho, o IC usa todos os IDs únicos, o valor total e a soma das quantidades. O produto permanece salvo ao trocar de página ou fechar e reabrir o navegador, até ser removido pela lixeira.
 
 ## Conversions API
 
-Não foi encontrada chamada à Graph API da Meta, token da Meta, Pixel ID da Meta para CAPI ou endpoint server-side de `InitiateCheckout`. A integração server-side existente é somente a API de pagamento FortPay. Por isso:
+Não foi encontrada chamada à Graph API da Meta, token da Meta, Pixel ID da Meta para CAPI ou endpoint server-side de `InitiateCheckout`. A integração server-side existente é somente a API de pagamento FlevoPay. Por isso:
 
 - não há hoje um segundo evento CAPI para deduplicar;
 - não há envio server-side de email, telefone, IP ou user agent à Meta;
@@ -65,6 +67,14 @@ Os IDs abaixo estão desativados porque chegaram sem imagens válidas. Os dados 
 Nenhum ajuste manual de IC é necessário ao reativá-los: eles usarão o mesmo template dinâmico.
 
 ## Checklist no navegador
+
+Antes do teste manual, rode a auditoria automática:
+
+```bash
+npm run test:ic
+```
+
+Ela valida IDs/preços dos 28 produtos ativos, os seis parâmetros obrigatórios, o carregador único, os pontos de fallback e a ausência de replay/proxy duplicado.
 
 1. Abra uma janela anônima e instale/ative o Meta Pixel Helper.
 2. Abra o site com UTMs de teste.

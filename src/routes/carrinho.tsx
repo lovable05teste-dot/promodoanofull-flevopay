@@ -13,7 +13,7 @@ import {
   type CartItem,
 } from "@/lib/cart";
 import { ALL_PRODUCTS } from "@/lib/products";
-import { metaPixelIsReady, trackInitiateCheckout } from "@/lib/tracking";
+import { trackInitiateCheckout } from "@/lib/tracking";
 import { withUtms } from "@/lib/utm";
 
 export const Route = createFileRoute("/carrinho")({
@@ -54,26 +54,15 @@ function CarrinhoPage() {
 
   function continuePurchase(event: ReactMouseEvent<HTMLAnchorElement>) {
     const link = event.currentTarget;
-    if (link.dataset.icReplay === "1") {
-      delete link.dataset.icReplay;
-      return;
-    }
-
     event.preventDefault();
+    event.stopPropagation();
+    event.nativeEvent.stopImmediatePropagation();
     if (isNavigating || !items.length) {
-      event.stopPropagation();
-      event.nativeEvent.stopImmediatePropagation();
       return;
     }
 
     const summary = saveCartAsCheckout(items);
     if (!summary) return;
-    const pixelWasReady = metaPixelIsReady();
-    if (!pixelWasReady) {
-      event.stopPropagation();
-      event.nativeEvent.stopImmediatePropagation();
-    }
-
     setIsNavigating(true);
     const href = link.href;
     void trackInitiateCheckout({
@@ -81,19 +70,7 @@ function CarrinhoPage() {
       name: summary.title,
       value: summary.price,
       numItems: summary.quantity,
-    }).then((result) => {
-      if (!pixelWasReady) {
-        if (result.sent && link.isConnected) {
-          link.dataset.icReplay = "1";
-          link.click();
-          window.setTimeout(() => window.location.assign(href), 8000);
-        } else {
-          window.location.assign(href);
-        }
-      } else {
-        window.setTimeout(() => window.location.assign(href), 8000);
-      }
-    });
+    }).finally(() => window.location.assign(href));
   }
 
   return (

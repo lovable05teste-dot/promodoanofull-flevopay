@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type MouseEvent as ReactMouseEvent } from "react";
 import { SiteFooter } from "@/components/SiteFooter";
 import { PixLoadingScreen } from "@/components/PixLoadingScreen";
+import { trackStoredInitiateCheckout } from "@/lib/tracking";
 
 export const Route = createFileRoute("/revisao")({
   head: () => ({
@@ -99,6 +100,12 @@ function RevisaoPage() {
     if (isGeneratingPix) return;
     setIsGeneratingPix(true);
     try {
+      await trackStoredInitiateCheckout({
+        id: "6549324",
+        name: product.title,
+        value: product.price,
+        numItems: product.quantity || 1,
+      });
       await navigate({ to: "/pix" });
     } catch {
       setIsGeneratingPix(false);

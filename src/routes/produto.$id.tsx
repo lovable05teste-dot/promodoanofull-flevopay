@@ -7,7 +7,7 @@ const VARIANT_IMAGE_OVERRIDES: Record<string, Record<string, string>> = {
   "1497000015": { Azul: furadeiraAzul, Verde: furadeiraVerde },
 };
 
-import { metaPixelIsReady, trackInitiateCheckout } from "@/lib/tracking";
+import { trackInitiateCheckout } from "@/lib/tracking";
 import { addCartItem } from "@/lib/cart";
 import { withUtms } from "@/lib/utm";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
@@ -240,24 +240,14 @@ function ProductView({ p }: { p: Product }) {
 
   function beginCheckout(event: ReactMouseEvent<HTMLAnchorElement>) {
     const link = event.currentTarget;
-    if (link.dataset.icReplay === "1") {
-      delete link.dataset.icReplay;
-      return;
-    }
-
     event.preventDefault();
+    event.stopPropagation();
+    event.nativeEvent.stopImmediatePropagation();
     if (isNavigatingProduct) {
-      event.stopPropagation();
-      event.nativeEvent.stopImmediatePropagation();
       return;
     }
 
     saveCheckoutProduct();
-    const pixelWasReady = metaPixelIsReady();
-    if (!pixelWasReady) {
-      event.stopPropagation();
-      event.nativeEvent.stopImmediatePropagation();
-    }
     setIsNavigatingProduct(true);
     const href = link.href;
     void trackInitiateCheckout({
@@ -265,19 +255,7 @@ function ProductView({ p }: { p: Product }) {
       name: p.title,
       value: newPrice,
       numItems: 1,
-    }).then((result) => {
-      if (!pixelWasReady) {
-        if (result.sent && link.isConnected) {
-          link.dataset.icReplay = "1";
-          link.click();
-          window.setTimeout(() => window.location.assign(href), 8000);
-        } else {
-          window.location.assign(href);
-        }
-      } else {
-        window.setTimeout(() => window.location.assign(href), 8000);
-      }
-    });
+    }).finally(() => window.location.assign(href));
   }
 
   function addProductToCart(event: ReactMouseEvent<HTMLButtonElement>) {
