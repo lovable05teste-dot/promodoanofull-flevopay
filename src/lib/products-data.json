@@ -3275,5 +3275,158 @@
     "reviewImagesOnly": false,
     "category": "Eletrônicos",
     "features": ["Tela de 50 polegadas", "Resolução 4K", "Painel LED"]
+  },
+  {
+    "id": "4229000039",
+    "title": "Motosserra Sabre Tekna 18 Sn E Corrente Oregon 54,5cc",
+    "oldPrice": "422,90",
+    "newPrice": "128,89",
+    "colors": ["Cinza/Laranja", "Laranja", "Laranja-escuro"],
+    "activeColor": "Cinza/Laranja",
+    "compactColorSelector": true,
+    "colorVariants": [
+      {
+        "name": "Cinza/Laranja",
+        "image": "https://i.imgur.com/TynMbWd.jpg",
+        "carousel": [
+          "https://i.imgur.com/TynMbWd.jpg",
+          "https://i.imgur.com/6dOh0AQ.jpg",
+          "https://i.imgur.com/YEYOJNn.jpg",
+          "https://i.imgur.com/3YChi2f.jpg"
+        ]
+      },
+      {
+        "name": "Laranja",
+        "image": "https://i.imgur.com/d48tjMV.jpg",
+        "carousel": [
+          "https://i.imgur.com/d48tjMV.jpg",
+          "https://i.imgur.com/DLMFhZl.jpg",
+          "https://i.imgur.com/THgksSE.jpg",
+          "https://i.imgur.com/dJKeh8Z.jpg"
+        ]
+      },
+      {
+        "name": "Laranja-escuro",
+        "image": "https://i.imgur.com/VmRkrXj.jpg",
+        "carousel": [
+          "https://i.imgur.com/VmRkrXj.jpg",
+          "https://i.imgur.com/YjRaGx2.jpg",
+          "https://i.imgur.com/oPrc5jY.jpg",
+          "https://i.imgur.com/8Dfc8Xi.jpg",
+          "https://i.imgur.com/COE4uzI.jpg",
+          "https://i.imgur.com/6qmKSkw.jpg",
+          "https://i.imgur.com/e4ZF4WN.jpg",
+          "https://i.imgur.com/J5b1y0C.jpg",
+          "https://i.imgur.com/iW1wRO0.jpg",
+          "https://i.imgur.com/xvLdo9Q.jpg",
+          "https://i.imgur.com/OMJpRYi.jpg"
+        ]
+      }
+    ],
+    "voltage": null,
+    "carousel": [
+      "https://i.imgur.com/TynMbWd.jpg",
+      "https://i.imgur.com/6dOh0AQ.jpg",
+      "https://i.imgur.com/YEYOJNn.jpg",
+      "https://i.imgur.com/3YChi2f.jpg"
+    ],
+    "photos": [
+      "https://i.imgur.com/TynMbWd.jpg",
+      "https://i.imgur.com/6dOh0AQ.jpg",
+      "https://i.imgur.com/YEYOJNn.jpg",
+      "https://i.imgur.com/3YChi2f.jpg"
+    ],
+    "reviews": [
+      ["https://i.imgur.com/HHuq0ll.jpg"],
+      ["https://i.imgur.com/k4qiL71.jpg", "https://i.imgur.com/AtJe6oW.jpg", "https://i.imgur.com/0qgb3Pk.jpg", "https://i.imgur.com/ezh9C1Q.jpg", "https://i.imgur.com/msCiBT4.jpg"],
+      ["https://i.imgur.com/bz8Hu2S.jpg", "https://i.imgur.com/E7vXy09.jpg", "https://i.imgur.com/X0HeUOh.jpg", "https://i.imgur.com/6B8JP3n.jpg", "https://i.imgur.com/HSTLHMa.jpg", "https://i.imgur.com/qeeptN7.jpg"],
+      ["https://i.imgur.com/xyTS4YQ.jpg", "https://i.imgur.com/St7YdRT.jpg", "https://i.imgur.com/Uqh208Z.jpg"],
+      ["https://i.imgur.com/Y2Dz3Pp.jpg", "https://i.imgur.com/cq2MeyB.jpg"]
+    ],
+    "reviewImagesOnly": false,
+    "category": "Ferramentas",
+    "features": ["Motor de 54,5 cc", "Sabre de 18 polegadas", "Corrente Oregon", "Três opções de cor"]
+  },
+  {
+    "id": "1689000040",
+    "title": "Lavadora Lava Jato Portátil Pressão 2 Baterias + Maleta",
+    "oldPrice": "168,90",
+    "newPrice": "79,90",
+    "colors": ["Preto"],
+    "activeColor": "Preto",
+    "voltage": null,
+    "carousel": [
+      "https://i.imgur.com/W81UV50.jpg",
+      "https://i.imgur.com/x9qxa7a.jpg",
+      "https://i.imgur.com/bPDPcaH.jpg",
+      "https://i.imgur.com/ZIpAHxq.jpg",
+      "https://i.imgur.com/0mXoFZp.jpg",
+      "https://i.imgur.com/O8t87tu.jpg",
+      "https://i.imgur.com/jb4uFkh.jpg",
+      "https://i.imgur.com/ZaeXyIi.jpg"
+    ],
+    "photos": [
+      "https://i.imgur.com/W81UV50.jpg",
+      "https://i.imgur.com/x9qxa7a.jpg",
+      "https://i.imgur.com/bPDPcaH.jpg",
+      "https://i.imgur.com/ZIpAHxq.jpg",
+      "https://i.imgur.com/0mXoFZp.jpg",
+      "https://i.imgur.com/O8t87tu.jpg",
+      "https://i.imgur.com/jb4uFkh.jpg",
+      "https://i.imgur.com/ZaeXyIi.jpg"
+    ],
+    "reviews": [
+      ["https://i.imgur.com/BW0K4Xe.jpg", "https://i.imgur.com/bDInm2B.jpg"],
+      ["https://i.imgur.com/G0s33jO.jpg", "https://i.imgur.com/5uMWI1q.jpg", "https://i.imgur.com/UsXiqh6.jpg"],
+      ["https://i.imgur.com/RvelHj9.jpg"],
+      ["https://i.imgur.com/6HI8lTP.jpg", "https://i.imgur.com/TAZPlJn.jpg"],
+      ["https://i.imgur.com/QEmls6d.jpg"],
+      ["https://i.imgur.com/5EwVZnZ.jpg", "https://i.imgur.com/Xuxp1dY.jpg", "https://i.imgur.com/M0GFJEN.jpg"]
+    ],
+    "reviewImagesOnly": false,
+    "category": "Ferramentas",
+    "features": ["Lavadora portátil", "Inclui duas baterias", "Acompanha maleta", "Cor preta"]
+  },
+  {
+    "id": "3879000041",
+    "title": "Roçadeira Knakasaki 75cc 3,5hp Gasolina 2 Tempos Profissional Multifuncional",
+    "oldPrice": "387,90",
+    "newPrice": "122,72",
+    "colors": null,
+    "voltage": null,
+    "carousel": [
+      "https://i.imgur.com/sKuRney.jpg",
+      "https://i.imgur.com/kgvcREO.jpg",
+      "https://i.imgur.com/pI8oXEU.jpg",
+      "https://i.imgur.com/Wfx3mrH.jpg",
+      "https://i.imgur.com/6dkAcQV.jpg",
+      "https://i.imgur.com/GGIDIvB.jpg",
+      "https://i.imgur.com/T8NgmV5.jpg",
+      "https://i.imgur.com/EyDGzzN.jpg",
+      "https://i.imgur.com/Ht3gBd1.jpg",
+      "https://i.imgur.com/48p7spJ.jpg"
+    ],
+    "photos": [
+      "https://i.imgur.com/sKuRney.jpg",
+      "https://i.imgur.com/kgvcREO.jpg",
+      "https://i.imgur.com/pI8oXEU.jpg",
+      "https://i.imgur.com/Wfx3mrH.jpg",
+      "https://i.imgur.com/6dkAcQV.jpg",
+      "https://i.imgur.com/GGIDIvB.jpg",
+      "https://i.imgur.com/T8NgmV5.jpg",
+      "https://i.imgur.com/EyDGzzN.jpg",
+      "https://i.imgur.com/Ht3gBd1.jpg",
+      "https://i.imgur.com/48p7spJ.jpg"
+    ],
+    "reviews": [
+      ["https://i.imgur.com/ynmrxpL.jpg"],
+      ["https://i.imgur.com/K0wEPzd.jpg", "https://i.imgur.com/YywEZ65.jpg", "https://i.imgur.com/ykfgb0L.jpg"],
+      ["https://i.imgur.com/uzsfpOe.jpg", "https://i.imgur.com/DOA6iRV.jpg", "https://i.imgur.com/XCbWBkE.jpg"],
+      ["https://i.imgur.com/eopKIO4.jpg"],
+      ["https://i.imgur.com/qipjfyD.jpg", "https://i.imgur.com/6Fl1NQh.jpg"]
+    ],
+    "reviewImagesOnly": false,
+    "category": "Ferramentas",
+    "features": ["Motor de 75 cc", "Potência de 3,5 hp", "Motor a gasolina de 2 tempos", "Uso profissional multifuncional"]
   }
 ]
