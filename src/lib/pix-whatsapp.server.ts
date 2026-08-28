@@ -1,3 +1,4 @@
+import QRCode from "qrcode";
 import { normalizePhone } from "./pix.server";
 
 type PixWhatsAppInput = {
@@ -15,6 +16,7 @@ type PixWhatsAppConfig = {
   templateName?: string;
   languageCode?: string;
   graphVersion?: string;
+  includeQrHeader?: boolean;
 };
 
 type WhatsAppSendResult = {
@@ -48,15 +50,69 @@ function safeErrorMessage(value: unknown) {
   return "Erro desconhecido ao enviar WhatsApp.";
 }
 
+async function uploadPixQrCode(args: {
+  accessToken: string;
+  phoneNumberId: string;
+  graphVersion: string;
+  pixCode: string;
+  transactionId: string;
+}) {
+  const png = await QRCode.toBuffer(args.pixCode, {
+    type: "png",
+    width: 640,
+    margin: 2,
+    errorCorrectionLevel: "M",
+  });
+
+  const form = new FormData();
+  form.set("messaging_product", "whatsapp");
+  form.set("type", "image/png");
+  form.set(
+    "file",
+    new Blob([png], { type: "image/png" }),
+    `pix-${args.transactionId.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 80) || "qrcode"}.png`,
+  );
+
+  const response = await fetch(
+    `https://graph.facebook.com/${encodeURIComponent(args.graphVersion)}/${encodeURIComponent(args.phoneNumberId)}/media`,
+    {
+      method: "POST",
+      headers: { Authorization: `Bearer ${args.accessToken}` },
+      body: form,
+    },
+  );
+
+  const raw = await response.text();
+  let json: unknown = null;
+  try {
+    json = raw ? JSON.parse(raw) : null;
+  } catch {
+    json = null;
+  }
+
+  if (!response.ok) {
+    throw new Error(json ? safeErrorMessage(json) : `Falha ao enviar QR (${response.status}).`);
+  }
+
+  const id =
+    json && typeof json === "object" && typeof (json as Record<string, unknown>).id === "string"
+      ? String((json as Record<string, unknown>).id)
+      : "";
+  if (!id) throw new Error("WhatsApp não retornou o ID da mídia do QR Code.");
+  return id;
+}
+
 /**
  * Envia uma mensagem transacional pelo WhatsApp Cloud API usando template aprovado.
  *
- * Template esperado (corpo), nesta ordem:
- *  {{1}} nome do cliente
- *  {{2}} nome do produto
- *  {{3}} valor formatado
- *  {{4}} Pix copia e cola
- *  {{5}} id da transação
+ * Template esperado:
+ *  - cabeçalho IMAGE (quando includeQrHeader=true)
+ *  - corpo com:
+ *    {{1}} nome do cliente
+ *    {{2}} nome do produto
+ *    {{3}} valor formatado
+ *    {{4}} Pix copia e cola
+ *    {{5}} id da transação
  *
  * Se as credenciais não estiverem configuradas, a função apenas ignora o envio.
  * Falhas no WhatsApp nunca invalidam a geração do Pix.
@@ -70,6 +126,7 @@ export async function sendPixCreatedWhatsApp(
   const templateName = config.templateName?.trim() || "pix_gerado";
   const languageCode = config.languageCode?.trim() || "pt_BR";
   const graphVersion = config.graphVersion?.trim() || "v23.0";
+  const includeQrHeader = config.includeQrHeader !== false;
 
   if (!accessToken || !phoneNumberId) {
     return { sent: false, skipped: true };
@@ -81,9 +138,36 @@ export async function sendPixCreatedWhatsApp(
   }
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 12000);
+  const timeout = setTimeout(() => controller.abort(), 20000);
 
   try {
+    const components: Array<Record<string, unknown>> = [];
+
+    if (includeQrHeader) {
+      const mediaId = await uploadPixQrCode({
+        accessToken,
+        phoneNumberId,
+        graphVersion,
+        pixCode: input.pixCode,
+        transactionId: input.transactionId,
+      });
+      components.push({
+        type: "header",
+        parameters: [{ type: "image", image: { id: mediaId } }],
+      });
+    }
+
+    components.push({
+      type: "body",
+      parameters: [
+        { type: "text", text: input.customerName.trim().slice(0, 120) },
+        { type: "text", text: input.itemTitle.trim().slice(0, 180) },
+        { type: "text", text: formatCurrency(input.amountCents) },
+        { type: "text", text: input.pixCode.trim() },
+        { type: "text", text: input.transactionId.trim().slice(0, 180) },
+      ],
+    });
+
     const response = await fetch(
       `https://graph.facebook.com/${encodeURIComponent(graphVersion)}/${encodeURIComponent(phoneNumberId)}/messages`,
       {
@@ -100,18 +184,7 @@ export async function sendPixCreatedWhatsApp(
           template: {
             name: templateName,
             language: { code: languageCode },
-            components: [
-              {
-                type: "body",
-                parameters: [
-                  { type: "text", text: input.customerName.trim().slice(0, 120) },
-                  { type: "text", text: input.itemTitle.trim().slice(0, 180) },
-                  { type: "text", text: formatCurrency(input.amountCents) },
-                  { type: "text", text: input.pixCode.trim() },
-                  { type: "text", text: input.transactionId.trim().slice(0, 180) },
-                ],
-              },
-            ],
+            components,
           },
         }),
         signal: controller.signal,
