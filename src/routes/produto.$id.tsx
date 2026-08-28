@@ -617,12 +617,26 @@ function ProductView({ p }: { p: Product }) {
                 <span className="text-gray-700">Receba o produto que está esperando ou devolvemos o dinheiro.</span>
               </span>
             </p>
-            <p className="flex gap-2">
-              <span style={{ marginTop: 2, fontSize: 14, color: "rgba(0,0,0,.55)" }}>🏅</span>
-              <span style={{ fontWeight: 400, fontSize: 14, color: "rgba(0,0,0,.55)" }}>
+            <div style={{ marginTop: 20, flexGrow: 1, display: "flex", alignItems: "center" }}>
+              <img
+                src="https://i.imgur.com/Jg9yNW9.png"
+                alt=""
+                loading="lazy"
+                decoding="async"
+                style={{ height: 16 }}
+              />
+              <span
+                style={{
+                  marginLeft: 10,
+                  fontFamily: "proximanovaregular",
+                  fontWeight: 400,
+                  fontSize: 14,
+                  color: "rgba(0,0,0,.55)",
+                }}
+              >
                 12 meses de garantia de fábrica.
               </span>
-            </p>
+            </div>
           </div>
         </section>
 
