@@ -89,18 +89,6 @@ function PagamentoPage() {
   const price = useCheckoutPrice();
   const navigate = useNavigate();
   const [isNavigating, setIsNavigating] = useState(false);
-  const [showCardOptions, setShowCardOptions] = useState(false);
-
-  // Cartão é processado exclusivamente pelo checkout hospedado do provedor.
-  // Não coletar nem armazenar número, validade ou CVV neste site.
-  const cardCheckoutUrl = import.meta.env.VITE_CARD_CHECKOUT_URL?.trim() || "";
-  const cardCheckoutAvailable = (() => {
-    try {
-      return new URL(cardCheckoutUrl).protocol === "https:";
-    } catch {
-      return false;
-    }
-  })();
 
   const selectPix = async () => {
     if (isNavigating) return;
@@ -139,49 +127,16 @@ function PagamentoPage() {
 
             <button
               type="button"
-              onClick={() => setShowCardOptions((current) => !current)}
-              aria-expanded={showCardOptions}
-              aria-controls="card-payment-options"
-              className="mt-2 flex w-full items-center rounded-md border border-gray-200 px-3 sm:px-4 py-3 sm:py-4 hover:bg-gray-50 text-left"
+              onClick={() => { void navigate({ to: "/cartao" }); }}
+              className="mt-2 flex w-full items-center rounded-md border border-gray-200 px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-gray-50"
             >
               <CreditCardIcon />
               <div className="flex-1 min-w-0">
                 <div className="text-[15px] font-semibold text-gray-900">Cartão de crédito</div>
-                <div className="text-[13px] text-gray-600">Ver opções de pagamento seguro</div>
+                <div className="text-[13px] text-gray-600">Ver etapas de pagamento</div>
               </div>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" className="shrink-0"><polyline points={showCardOptions ? "6 9 12 15 18 9" : "9 18 15 12 9 6"}/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" className="shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
-
-            {showCardOptions && (
-              <div id="card-payment-options" className="mt-3 rounded-md border border-gray-200 bg-[#fafafa] p-4 sm:p-5">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-14 shrink-0 items-center justify-center rounded-md bg-[#5f7b93] text-white">
-                    <svg width="28" height="22" viewBox="0 0 28 22" fill="none" aria-hidden="true">
-                      <rect x="1" y="2" width="26" height="18" rx="3" stroke="currentColor" strokeWidth="1.5"/>
-                      <path d="M1 7.5h26" stroke="currentColor" strokeWidth="2"/>
-                      <path d="M5 15h7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                    </svg>
-                  </div>
-                  <div>
-                    <div className="text-[15px] font-semibold text-gray-900">Pagar com cartão</div>
-                    <p className="text-[13px] text-gray-600">Os dados do cartão são informados diretamente ao provedor de pagamentos.</p>
-                  </div>
-                </div>
-                {cardCheckoutAvailable ? (
-                  <a
-                    href={cardCheckoutUrl}
-                    rel="noopener noreferrer"
-                    className="mt-4 flex w-full items-center justify-center rounded-md bg-[#3483fa] px-4 py-3 text-[15px] font-semibold text-white hover:bg-[#2968c8]"
-                  >
-                    Continuar para pagamento seguro
-                  </a>
-                ) : (
-                  <div className="mt-4 rounded-md border border-gray-200 bg-white px-4 py-3 text-[13px] text-gray-700" role="status">
-                    Pagamento com cartão temporariamente indisponível. Se preferir, utilize Pix.
-                  </div>
-                )}
-              </div>
-            )}
           </section>
         </div>
       </div>
