@@ -56,6 +56,35 @@ function PixIcon() {
   );
 }
 
+function CreditCardIcon() {
+  return (
+    <div
+      className="shrink-0"
+      style={{
+        marginRight: 20,
+        minWidth: 48,
+        maxWidth: 48,
+        minHeight: 48,
+        maxHeight: 48,
+        borderRadius: "50%",
+        border: "solid 1px #eeeeee",
+        backgroundColor: "#ffffff",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <img
+        aria-hidden="true"
+        alt=""
+        src="https://http2.mlstatic.com/frontend-assets/buyingflow-sonic-frontend/svg/bf_v6_credito_noborde.svg"
+        data-testid="new_credit_card"
+        style={{ maxWidth: 26, maxHeight: 26 }}
+      />
+    </div>
+  );
+}
+
 function PagamentoPage() {
   const price = useCheckoutPrice();
   const navigate = useNavigate();
@@ -92,6 +121,20 @@ function PagamentoPage() {
               <div className="flex-1 min-w-0">
                 <div className="text-[15px] font-semibold text-gray-900">Pix</div>
                 <div className="text-[13px] text-gray-600">Aprovação imediata</div>
+              </div>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" className="shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+
+            <button
+              type="button"
+              disabled
+              aria-label="Cartão de crédito indisponível no momento"
+              className="mt-2 flex w-full items-center rounded-md border border-gray-200 px-3 sm:px-4 py-3 sm:py-4 text-left opacity-70 cursor-not-allowed"
+            >
+              <CreditCardIcon />
+              <div className="flex-1 min-w-0">
+                <div className="text-[15px] font-semibold text-gray-900">Cartão de crédito</div>
+                <div className="text-[13px] text-gray-600">Indisponível no momento</div>
               </div>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2" className="shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
