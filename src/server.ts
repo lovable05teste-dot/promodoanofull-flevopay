@@ -2,7 +2,7 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
-import { listFunnelEvents, recordPublicIc, storageConfigured } from "./lib/funnel-events.server";
+import { listFunnelEvents, recordPublicIc, recordPublicCustomer, storageConfigured } from "./lib/funnel-events.server";
 import {
   adminIsConfigured,
   adminSessionToken,
@@ -67,6 +67,15 @@ async function handleReceiptApi(request: Request): Promise<Response | null> {
       : status === "disabled"
         ? json({ ok: false, message: "Armazenamento de eventos indisponível." }, 503)
         : json({ ok: true }, 202);
+  }
+
+  if (url.pathname === "/api/tracking/customer" && request.method === "POST") {
+    const origin = request.headers.get("origin");
+    if (origin && origin !== url.origin) return json({ ok: false }, 403);
+    const status = await recordPublicCustomer(request);
+    return status === "invalid" ? json({ ok: false }, 400)
+      : status === "disabled" ? json({ ok: false }, 503)
+      : json({ ok: true }, 202);
   }
 
   if (url.pathname === "/api/admin/funnel" && request.method === "GET") {
