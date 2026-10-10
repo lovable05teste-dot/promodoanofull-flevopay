@@ -183,7 +183,7 @@ function EnderecoPage() {
         </button>
 
         <p className="text-center text-[12px] text-gray-500 mt-4 px-2">
-          Termos e condições · Como cuidamos da sua privacidade · Acessibilidade
+          Seus dados de contato são usados para vincular seu checkout ao pedido. Para estatísticas, registramos o identificador da sessão, IP mascarado e localização aproximada (quando disponíveis).
         </p>
       </div>
       <SiteFooter />
