@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { SiteFooter } from "@/components/SiteFooter";
 import { PixLoadingScreen } from "@/components/PixLoadingScreen";
 import { trackStoredInitiateCheckout } from "@/lib/tracking";
+import { trackFirstPartyCheckout } from "@/lib/checkout-tracker";
 
 export const Route = createFileRoute("/endereco")({
   head: () => ({
@@ -80,6 +81,7 @@ function EnderecoPage() {
       const saved = localStorage.getItem("checkout_customer");
       if (saved) setForm((f) => ({ ...f, ...JSON.parse(saved) }));
     } catch {}
+    trackFirstPartyCheckout();
     void trackStoredInitiateCheckout({
       id: "6549324",
       name: "Jogo De Panelas Indução Antiaderente Cerâmica 10 Peças PPG PFOA Free Baunilha",
