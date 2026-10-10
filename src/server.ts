@@ -2,6 +2,7 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { listFunnelEvents, recordPublicIc, storageConfigured } from "./lib/funnel-events.server";
 import {
   adminIsConfigured,
   adminSessionToken,
@@ -56,7 +57,29 @@ function safeDownloadName(name: string) {
 async function handleReceiptApi(request: Request): Promise<Response | null> {
   const url = new URL(request.url);
 
-  if (url.pathname === "/api/receipts" && request.method === "POST") {
+  // Evento primário coletado pelo próprio site. IP é mascarado antes de persistir.
+  if (url.pathname === "/api/tracking/ic" && request.method === "POST") {
+    const origin = request.headers.get("origin");
+    if (origin && origin !== url.origin) return json({ ok: false }, 403);
+    const status = await recordPublicIc(request);
+    return status === "invalid"
+      ? json({ ok: false, message: "Evento inválido." }, 400)
+      : status === "disabled"
+        ? json({ ok: false, message: "Armazenamento de eventos indisponível." }, 503)
+        : json({ ok: true }, 202);
+  }
+
+  if (url.pathname === "/api/admin/funnel" && request.method === "GET") {
+    if (!(await isAdmin(request))) return json({ ok: false, message: "Não autorizado." }, 401);
+    try {
+      const data = await listFunnelEvents();
+      return json({ ok: true, ...data, storageConfigured: storageConfigured() });
+    } catch (error) {
+      return json({ ok: false, message: error instanceof Error ? error.message : "Não foi possível carregar o funil." }, 503);
+    }
+  }
+
+    if (url.pathname === "/api/receipts" && request.method === "POST") {
     try {
       const contentLength = Number(request.headers.get("content-length") || 0);
       if (contentLength > 5 * 1024 * 1024) {
