@@ -7,6 +7,7 @@ import QRCode from "qrcode";
 import { SiteFooter } from "@/components/SiteFooter";
 import { PixLoadingScreen } from "@/components/PixLoadingScreen";
 import { trackStoredInitiateCheckout } from "@/lib/tracking";
+import { getCheckoutSessionId } from "@/lib/checkout-tracker";
 
 export const Route = createFileRoute("/pix")({
   head: () => ({
@@ -96,6 +97,7 @@ function PixPage() {
         }
         const result = await createCharge({
           data: {
+            sessionId: getCheckoutSessionId(),
             name: customer.name || "Cliente",
             document: doc,
             email: customer.email || "",
@@ -134,7 +136,7 @@ function PixPage() {
     const interval = setInterval(async () => {
       if (stopped) return;
       try {
-        const s = await fetchStatus({ data: { transactionId } });
+        const s = await fetchStatus({ data: { transactionId, sessionId: getCheckoutSessionId() } });
         if (s.status === "COMPLETED") {
           stopped = true;
           clearInterval(interval);
