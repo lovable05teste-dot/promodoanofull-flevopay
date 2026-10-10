@@ -4,16 +4,18 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { captureUtms } from "../lib/utm";
 import { installFirstPartyCheckoutListener } from "../lib/checkout-tracker";
-import { UTMIFY_PIXEL_LOADER } from "../lib/utmify-pixel";
+import { UTMIFY_PIXEL_LOADER, UTMIFY_UTMS_LOADER } from "../lib/utmify-pixel";
+import { META_PIXEL_ID, META_PIXEL_LOADER } from "../lib/meta-pixel";
 
 function NotFoundComponent() {
   return (
@@ -120,8 +122,16 @@ gtag('js', new Date());
 gtag('config', 'G-XY2YRZSDSF');`,
       },
       {
-        // Único pixel Utmify autorizado pelo usuário.
+        // Meta Pixel único, inicializa PageView uma vez em cada carga da página.
+        children: META_PIXEL_LOADER,
+      },
+      {
+        // Pixel oficial UTMify (novo ID).
         children: UTMIFY_PIXEL_LOADER,
+      },
+      {
+        // Script oficial UTMify para capturar UTMs sem duplicar carregamento.
+        children: UTMIFY_UTMS_LOADER,
       },
     ],
   }),
@@ -138,6 +148,15 @@ function RootShell({ children }: { children: ReactNode }) {
         <HeadContent />
       </head>
       <body>
+        <noscript>
+          <img
+            alt=""
+            height={1}
+            width={1}
+            style={{ display: "none" }}
+            src={`https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1`}
+          />
+        </noscript>
         {children}
         <Scripts />
       </body>
@@ -147,11 +166,28 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const previousPath = useRef<string | null>(null);
 
   useEffect(() => {
     captureUtms();
     return installFirstPartyCheckoutListener();
   }, []);
+
+  // A primeira PageView é enviada no <head>. Em navegação SPA, enviamos
+  // somente uma nova PageView por troca real de pathname.
+  useEffect(() => {
+    if (previousPath.current === null) {
+      previousPath.current = pathname;
+      return;
+    }
+    if (previousPath.current === pathname) return;
+    previousPath.current = pathname;
+    const fbq = (window as Window & {
+      fbq?: (...args: unknown[]) => unknown;
+    }).fbq;
+    fbq?.("track", "PageView");
+  }, [pathname]);
 
   return (
     <QueryClientProvider client={queryClient}>
