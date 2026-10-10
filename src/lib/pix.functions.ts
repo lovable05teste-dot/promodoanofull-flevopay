@@ -9,6 +9,7 @@ import {
 } from "./pix.server";
 import { sendPixCreatedEmail } from "./pix-email.server";
 import { sendPixCreatedToN8n } from "./pix-n8n.server";
+import { recordPixGenerated, recordPixPaid } from "./funnel-events.server";
 
 export const createPixCharge = createServerFn({ method: "POST" })
   .inputValidator((data: PixChargeInput) => data)
@@ -59,16 +60,30 @@ export const createPixCharge = createServerFn({ method: "POST" })
         process.env.N8N_PIX_WEBHOOK_URL ||
           "https://systemebr2.app.n8n.cloud/webhook-test/pix-gerado",
       ),
+      recordPixGenerated({
+        sessionId: data.sessionId,
+        transactionId: result.transactionId,
+        itemId: data.itemId,
+        itemTitle: data.itemTitle,
+        amountCents,
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        utm: data.utm,
+      }),
     ]);
 
     return result;
   });
 
 export const getPixStatus = createServerFn({ method: "GET" })
-  .inputValidator((data: { transactionId: string }) => data)
+  .inputValidator((data: { transactionId: string; sessionId?: string }) => data)
   .handler(async ({ data }): Promise<{ status: string; paidAt?: string }> => {
     const apiToken = process.env.FORTPAY_API_TOKEN?.trim();
     if (!apiToken) return { status: "PENDING" };
-
-    return readFortpayPixStatus(data.transactionId, apiToken);
+    const result = await readFortpayPixStatus(data.transactionId, apiToken);
+    if (result.status === "COMPLETED") {
+      await recordPixPaid(data.sessionId, data.transactionId);
+    }
+    return result;
   });
