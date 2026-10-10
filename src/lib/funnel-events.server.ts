@@ -131,7 +131,7 @@ export async function recordPublicCustomer(request: Request): Promise<"recorded"
   const sessionId = safeSession(data.sessionId);
   const name = text(data.name, 100);
   const email = text(data.email, 120);
-  if (!sessionId || name.length < 3 || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) return "invalid";
+  if (!sessionId || name.length < 3 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "invalid";
   const value = Number(data.amountCents);
   const ok = await saveFunnelEvent({
     type: "CustomerIdentified", sessionId, productId: text(data.productId, 80),
