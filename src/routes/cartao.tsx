@@ -4,8 +4,8 @@ import { useState } from "react";
 export const Route = createFileRoute("/cartao")({
   head: () => ({
     meta: [
-      { title: "Cartão de crédito — Prévia visual" },
-      { name: "description", content: "Demonstração visual do pagamento por cartão. Nenhum dado de cartão é solicitado." },
+      { title: "Cartão de crédito" },
+      { name: "description", content: "Informações sobre a opção de pagamento com cartão." },
     ],
   }),
   component: CardPreviewPage,
@@ -43,7 +43,7 @@ function ExampleField({ label, placeholder, narrow = false }: { label: string; p
   return (
     <div className={narrow ? "min-w-0 flex-1" : "w-full"}>
       <div className="mb-3 text-[18px] text-[#323232] sm:text-[20px]">{label}</div>
-      <div className="flex min-h-[65px] w-full items-center rounded-[19px] border border-[#bec1ef] bg-white px-5 text-[20px] text-[#777a85] sm:text-[22px]" aria-label={label + ": campo de demonstração"}>
+      <div className="flex min-h-[65px] w-full items-center rounded-[19px] border border-[#bec1ef] bg-white px-5 text-[20px] text-[#777a85] sm:text-[22px]" aria-label={label + ": campo indisponível até ativação do pagamento"}>
         {placeholder}
       </div>
     </div>
@@ -87,22 +87,21 @@ function CardPreviewPage() {
 
       <main className="mx-auto w-full max-w-[580px] flex-1 px-4 pb-32 pt-3 sm:px-6">
         <div className="mb-3 flex items-center justify-between gap-3 text-[12px] text-[#737373]">
-          <span className="rounded-full border border-[#dadada] px-3 py-1 font-medium">PRÉVIA VISUAL · SEM COBRANÇA</span>
+          <span className="rounded-full border border-[#dadada] px-3 py-1 font-medium">CARTÃO EM CONFIGURAÇÃO</span>
           <span>{finished ? "Concluído" : "Etapa " + (step + 1) + " de 4"}</span>
         </div>
         <CardMockup />
 
         {finished ? (
           <section className="rounded-[18px] border border-[#dedede] bg-white p-6 text-center">
-            <div className="text-xl font-semibold text-[#303030]">Demonstração concluída</div>
+            <div className="text-xl font-semibold text-[#303030]">Pagamento com cartão ainda indisponível</div>
             <p className="mt-3 text-[15px] leading-relaxed text-[#666]">
-              Esta é apenas uma prévia do formulário. O pagamento por cartão ainda não está ativo.
-              Os dados reais devem ser preenchidos no checkout seguro da Cakto quando ele estiver integrado.
+              Estamos preparando esta opção. Para pagar com cartão, os dados deverão ser inseridos diretamente no checkout seguro da Cakto após a integração.
             </p>
           </section>
         ) : (
           <section>
-            <h2 className="mb-4 text-[15px] text-[#686868]">Prévia da etapa: {labels[step]}</h2>
+            <h2 className="mb-4 text-[15px] text-[#686868]">{labels[step]}</h2>
             {step === 0 && <ExampleField label="Número do cartão" placeholder="0000 0000 0000 0000" />}
             {step === 1 && <ExampleField label="Nome do titular" placeholder="Ex.: MARIA LOPES" />}
             {step === 2 && (
@@ -117,17 +116,17 @@ function CardPreviewPage() {
               </div>
             )}
             <p className="mt-4 text-[13px] leading-relaxed text-[#777]">
-              Campos ilustrativos, sem entrada de dados. A integração com a Cakto será adicionada posteriormente.
+              O pagamento com cartão ainda não está ativo. Os campos acima não recebem dados. A integração será feita com o checkout seguro da Cakto.
             </p>
           </section>
         )}
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-10 border-t border-[#e0e0e0] bg-[#f6f6f6] px-6 py-5" aria-label="Etapas da demonstração">
+      <nav className="fixed bottom-0 left-0 right-0 z-10 border-t border-[#e0e0e0] bg-[#f6f6f6] px-6 py-5" aria-label="Etapas do pagamento com cartão">
         <div className="mx-auto flex max-w-[580px] items-center justify-between">
           <button type="button" onClick={back} className="rounded-lg px-3 py-2 text-[18px] font-medium text-[#557cdb]">Anterior</button>
           <button type="button" onClick={next} className="rounded-lg px-3 py-2 text-[18px] font-medium text-[#386fe8]">
-            {finished ? "Recomeçar" : step === 3 ? "Concluir prévia" : "Próximo"}
+            {finished ? "Recomeçar" : step === 3 ? "Concluir etapas" : "Próximo"}
           </button>
         </div>
       </nav>
