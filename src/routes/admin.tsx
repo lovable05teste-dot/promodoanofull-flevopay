@@ -14,7 +14,7 @@ export const Route = createFileRoute("/admin")({
 type Receipt = { name: string; uploadedAt: string; size: number; contentType: string };
 type FunnelEvent = {
   id: string;
-  type: "InitiateCheckout" | "PixGenerated" | "PixPaid";
+  type: "InitiateCheckout" | "CustomerIdentified" | "PixGenerated" | "PixPaid";
   at: string;
   sessionId: string;
   productId: string;
@@ -138,8 +138,12 @@ function AdminPage() {
       latestPix.set(event.sessionId, latestPix.get(event.sessionId) || event);
     }
     const uniquePix = pix.filter(e => !e.transactionId || latestPix.get(e.sessionId)?.id === e.id);
+    const identified = new Map<string, FunnelEvent>();
+    for (const e of events.filter(e => e.type === "CustomerIdentified")) {
+      if (!identified.has(e.sessionId)) identified.set(e.sessionId, e);
+    }
     const icUnique = ic.filter((e, index, all) => all.findIndex(x => x.sessionId === e.sessionId) === index);
-    const rows = icUnique.map(event => ({ event, buyer: latestPix.get(event.sessionId) }));
+    const rows = icUnique.map(event => ({ event, buyer: latestPix.get(event.sessionId) || identified.get(event.sessionId) }));
     return { ic: icUnique, pix: uniquePix, paidIds, rows, latestPix };
   }, [events]);
   const searchValue = search.trim().toLowerCase();
@@ -195,7 +199,7 @@ function AdminPage() {
             </div>
             <div className="mt-7 grid gap-5 lg:grid-cols-2">
               <section className="rounded-2xl border border-slate-200 bg-white p-6">
-                <SectionTitle title="Últimos checkouts" desc="O nome fica visível se o visitante gerar um Pix na mesma sessão." />
+                <SectionTitle title="Últimos checkouts" desc="O nome aparece após o envio do formulário ou a geração do Pix." />
                 {report.rows.length === 0 ? <Empty message="Nenhum início de checkout registrado ainda." /> : report.rows.slice(0, 6).map(({ event, buyer }) => <div key={event.id} className="flex items-center justify-between gap-4 border-t border-slate-100 py-3 text-sm">
                   <div className="min-w-0"><div className="truncate font-semibold">{buyer?.customer?.name || "Visitante ainda não identificado"}</div><div className="truncate text-slate-500">{event.productName} · {location(event)}</div></div><span className="shrink-0 text-xs text-slate-500">{date(event.at)}</span>
                 </div>)}
@@ -210,7 +214,7 @@ function AdminPage() {
           </>}
           {(tab === "ic" || tab === "pix") && <>
             <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
-              <SectionTitle title={tab === "ic" ? "Quem iniciou o checkout" : "Pix e clientes"} desc={tab === "ic" ? "IP mascarado e localização aproximada. Quem não gerou Pix pode permanecer anônimo." : "Dados registrados após a criação real de uma cobrança."} />
+              <SectionTitle title={tab === "ic" ? "Quem iniciou o checkout" : "Pix e clientes"} desc={tab === "ic" ? "IP mascarado e localização aproximada. Quem ainda não enviou dados pode permanecer anônimo." : "Dados registrados após a criação real de uma cobrança."} />
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar cliente, produto ou campanha" aria-label="Pesquisar eventos" className="w-full max-w-sm rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500" />
             </div>
             {tab === "ic" ? <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
@@ -221,7 +225,7 @@ function AdminPage() {
                   <td className="p-4"><strong>{buyer?.customer?.name || "Não identificado"}</strong>{buyer?.customer?.email && <div className="text-xs text-slate-500">{buyer.customer.email}</div>}</td>
                   <td className="p-4">{event.productName}<div className="text-xs text-slate-500">{brl(event.amountCents)}</div></td>
                   <td className="p-4">{source(event)}</td><td className="p-4">{event.location?.maskedIp || "Não disponível"}</td><td className="p-4">{location(event)}</td>
-                  <td className="p-4 font-medium">{buyer ? "Pix gerado" : "IC iniciado"}</td>
+                  <td className="p-4 font-medium">{buyer?.type === "PixGenerated" ? "Pix gerado" : buyer ? "Dados preenchidos" : "IC iniciado"}</td>
                 </tr>)}</tbody>
               </table>}
             </div> : <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
