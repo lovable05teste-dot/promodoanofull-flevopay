@@ -5,7 +5,7 @@
  */
 export type FunnelEvent = {
   id: string;
-  type: "InitiateCheckout" | "PixGenerated" | "PixPaid";
+  type: "InitiateCheckout" | "CustomerIdentified" | "PixGenerated" | "PixPaid";
   at: string;
   sessionId: string;
   productId: string;
@@ -102,7 +102,9 @@ export async function recordPublicIc(request: Request): Promise<"recorded" | "di
   let data: Record<string, unknown>;
   try {
     if (Number(request.headers.get("content-length") || 0) > 4096) return "invalid";
-    data = await request.json() as Record<string, unknown>;
+    const raw = await request.json();
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) return "invalid";
+    data = raw as Record<string, unknown>;
   } catch { return "invalid"; }
   const sessionId = safeSession(data.sessionId);
   if (!sessionId) return "invalid";
@@ -114,6 +116,28 @@ export async function recordPublicIc(request: Request): Promise<"recorded" | "di
     amountCents: Number.isFinite(price) ? Math.min(Math.max(Math.round(price), 0), 100000000) : 0,
     traffic: trafficParams(data.traffic),
     location: requestLocation(request),
+  });
+  return ok ? "recorded" : "disabled";
+}
+/** Registra apenas contato enviado no checkout, sem CPF nem endereço. */
+export async function recordPublicCustomer(request: Request): Promise<"recorded" | "disabled" | "invalid"> {
+  let data: Record<string, unknown>;
+  try {
+    if (Number(request.headers.get("content-length") || 0) > 4096) return "invalid";
+    const raw = await request.json();
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) return "invalid";
+    data = raw as Record<string, unknown>;
+  } catch { return "invalid"; }
+  const sessionId = safeSession(data.sessionId);
+  const name = text(data.name, 100);
+  const email = text(data.email, 120);
+  if (!sessionId || name.length < 3 || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) return "invalid";
+  const value = Number(data.amountCents);
+  const ok = await saveFunnelEvent({
+    type: "CustomerIdentified", sessionId, productId: text(data.productId, 80),
+    productName: text(data.productName, 160),
+    amountCents: Number.isFinite(value) ? Math.min(Math.max(Math.round(value), 0), 100000000) : 0,
+    customer: { name, email, phone: "" },
   });
   return ok ? "recorded" : "disabled";
 }
@@ -166,7 +190,7 @@ export async function listFunnelEvents(): Promise<{ events: FunnelEvent[]; limit
         const response = await fetch(blob.url, { headers: blobHeaders(key) });
         if (!response.ok) return;
         const event = await response.json() as FunnelEvent;
-        if (event && ["InitiateCheckout", "PixGenerated", "PixPaid"].includes(event.type)) results.push(event);
+        if (event && ["InitiateCheckout", "CustomerIdentified", "PixGenerated", "PixPaid"].includes(event.type)) results.push(event);
       } catch {}
     }));
   }
