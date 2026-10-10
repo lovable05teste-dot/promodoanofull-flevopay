@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { SiteFooter } from "@/components/SiteFooter";
 import { PixLoadingScreen } from "@/components/PixLoadingScreen";
 import { trackStoredInitiateCheckout } from "@/lib/tracking";
-import { trackFirstPartyCheckout } from "@/lib/checkout-tracker";
+import { trackFirstPartyCheckout, trackCheckoutCustomer } from "@/lib/checkout-tracker";
 
 export const Route = createFileRoute("/endereco")({
   head: () => ({
@@ -105,6 +105,8 @@ function EnderecoPage() {
       return;
     }
     setErro("");
+    // Liga o IC à pessoa quando ela envia seu contato; não transmite CPF/endereço para analytics.
+    trackCheckoutCustomer({ name: form.name, email: form.email });
     try {
       localStorage.setItem("checkout_customer", JSON.stringify({ ...form, cpf, phone }));
     } catch {}
