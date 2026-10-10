@@ -109,6 +109,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     scripts: [
       {
+        src: "https://www.googletagmanager.com/gtag/js?id=G-XY2YRZSDSF",
+        async: true,
+      },
+      {
+        // Google Analytics 4 (Google tag) - instalado no layout global.
+        children: `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-XY2YRZSDSF');`,
+      },
+      {
         // Único pixel Utmify autorizado pelo usuário.
         children: UTMIFY_PIXEL_LOADER,
       },
