@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type MouseEvent as ReactMouseEvent } from "react";
 import { SiteFooter } from "@/components/SiteFooter";
+import { DeliveryDate } from "@/components/DeliveryDate";
 import { PixLoadingScreen } from "@/components/PixLoadingScreen";
 import { trackStoredInitiateCheckout } from "@/lib/tracking";
 
@@ -181,7 +182,7 @@ function RevisaoPage() {
                       FULL
                     </span>
                   </div>
-                  <div className="text-[13px] text-gray-800 mt-1">Terça-feira, 1 de setembro</div>
+                  <div className="text-[13px] text-gray-800 mt-1"><DeliveryDate prefix="" /></div>
                   <div className="text-[14px] text-gray-900 mt-1 font-medium leading-snug">{item.title}</div>
                   {(item.color || item.voltage || item.extra) && (
                     <div className="text-[12px] text-gray-500 mt-1">
