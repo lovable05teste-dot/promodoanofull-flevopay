@@ -158,7 +158,7 @@ export function genericSpecGroups(p: Product): { title: string; rows: [string, s
       title: "Envio e entrega",
       rows: [
         ["Tipo de envio", "Mercado Envios FULL"],
-        ["Prazo estimado", "1 a 5 dias úteis"],
+        ["Prazo estimado", "2 dias corridos"],
         ["Frete grátis", "Acima de R$ 19"],
         ["Rastreamento", "Sim, pelo aplicativo"],
         ["Origem", "Nacional"],
