@@ -14,6 +14,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent } from "react";
 import { getProduct, ALL_PRODUCTS, longDescription, genericSpecGroups, type Product } from "../lib/products";
 import { SiteFooter } from "@/components/SiteFooter";
+import { DeliveryDate } from "@/components/DeliveryDate";
 import { LazySection } from "@/components/LazySection";
 import { PixLoadingScreen } from "@/components/PixLoadingScreen";
 import { REVIEWS_BY_PRODUCT } from "@/lib/reviews";
@@ -549,7 +550,7 @@ function ProductView({ p }: { p: Product }) {
             </span>
           </div>
           <p className="mt-2 text-sm text-[#00a650] font-semibold">
-            Chegará até ter. 1 de setembro
+            <DeliveryDate />
           </p>
 
           <p className="mt-5 font-bold text-base text-black/90">Estoque disponível</p>
@@ -675,7 +676,7 @@ function ProductView({ p }: { p: Product }) {
             )}
           </ul>
 
-          {showAllChars && p.specGroups && p.specGroups.length > 0 && (
+          {showAllChars && (
             <div
               id="caracteristicas-completas"
               style={{
@@ -702,7 +703,16 @@ function ProductView({ p }: { p: Product }) {
               {[
                 ...(p.specGroups ?? []),
                 ...(p.extraSpecGroups ?? []),
-                ...genericSpecGroups(p),
+                ...(p.specGroups?.length || p.extraSpecGroups?.length
+                  ? genericSpecGroups(p)
+                  : [{
+                      title: "Informações deste produto",
+                      rows: [
+                        ["Código", p.id],
+                        ["Categoria", p.category],
+                        ...(p.features ?? []).map((feature): [string, string] => ["Característica", feature]),
+                      ] as [string, string][],
+                    }]),
               ].map((group, gi) => (
                 <div key={`${group.title}-${gi}`}>
                   <div style={{ flexGrow: 1, padding: "10px 0", display: "flex", alignItems: "center" }}>
@@ -1447,7 +1457,7 @@ function RelatedCard({ p, onNavigate }: { p: Product; onNavigate: () => void }) 
         em até 12x de R$ {installmentValue(p.newPrice)}
       </div>
       <div className="mt-1 text-[12px] font-semibold leading-[18px] text-[#00a650]">
-        Chegará até ter. 1 de setembro
+        <DeliveryDate />
       </div>
       <div className="mt-1 line-clamp-3 min-h-[48px] text-[12px] font-normal leading-4 text-[#555]">
         {p.title}
