@@ -61,6 +61,22 @@ export function trackFirstPartyCheckout() {
     body: JSON.stringify({ sessionId, ...productInfo(), traffic }),
   }).catch(() => {});
 }
+/** Associa nome/e-mail ao IC quando a pessoa envia o formulário de entrega. */
+export function trackCheckoutCustomer(customer: { name: string; email: string }) {
+  if (typeof window === "undefined") return;
+  const name = (customer.name || "").trim();
+  const email = (customer.email || "").trim();
+  if (name.length < 3 || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) return;
+  void fetch("/api/tracking/customer", {
+    method: "POST",
+    credentials: "same-origin",
+    keepalive: true,
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      sessionId: getCheckoutSessionId(), name, email, ...productInfo(),
+    }),
+  }).catch(() => {});
+}
 export function installFirstPartyCheckoutListener() {
   if (typeof window === "undefined") return () => {};
   const onClick = (event: MouseEvent) => {
