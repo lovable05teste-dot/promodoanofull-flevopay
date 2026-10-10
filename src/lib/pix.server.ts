@@ -3,6 +3,7 @@ const FORTPAY_PRODUCT_HASH = "txi2kwhf0r";
 const FORTPAY_OFFER_HASH = "o9ybnwoyun";
 
 export type PixChargeInput = {
+  sessionId?: string;
   name: string;
   document: string;
   email: string;
