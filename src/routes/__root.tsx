@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { captureUtms } from "../lib/utm";
+import { installFirstPartyCheckoutListener } from "../lib/checkout-tracker";
 import { UTMIFY_PIXEL_LOADER } from "../lib/utmify-pixel";
 
 function NotFoundComponent() {
@@ -138,6 +139,7 @@ function RootComponent() {
 
   useEffect(() => {
     captureUtms();
+    return installFirstPartyCheckoutListener();
   }, []);
 
   return (
