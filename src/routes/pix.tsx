@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { createPixCharge, getPixStatus } from "@/lib/pix.functions";
+import { getCheckoutSessionId } from "@/lib/checkout-tracker";
 import { captureUtms, getUtmQuery } from "@/lib/utm";
 import QRCode from "qrcode";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -96,6 +97,7 @@ function PixPage() {
         }
         const result = await createCharge({
           data: {
+            sessionId: getCheckoutSessionId(),
             name: customer.name || "Cliente",
             document: doc,
             email: customer.email || "",

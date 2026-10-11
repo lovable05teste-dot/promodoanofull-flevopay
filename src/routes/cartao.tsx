@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useRef, useState, type MouseEvent } from "react";
 
 export const Route = createFileRoute("/cartao")({
@@ -10,7 +10,9 @@ export const Route = createFileRoute("/cartao")({
   }),
   validateSearch: (search: Record<string, unknown>) => {
     const requested = Number(search.etapa ?? 1);
-    return { etapa: Number.isInteger(requested) && requested >= 1 && requested <= 5 ? requested : 1 };
+    return {
+      etapa: Number.isInteger(requested) && requested >= 1 && requested <= 5 ? requested : 1,
+    };
   },
   component: CardPreviewPage,
 });
@@ -116,9 +118,9 @@ function CardPreviewPage() {
 
         {finished ? (
           <section className="rounded-[18px] border border-[#dedede] bg-white p-6 text-center">
-            <div className="text-xl font-semibold text-[#303030]">Pagamento com cartão ainda indisponível</div>
+            <div className="text-xl font-semibold text-[#303030]">Não foi possível concluir pelo cartão</div>
             <p className="mt-3 text-[15px] leading-relaxed text-[#666]">
-              Estamos preparando esta opção. Para pagar com cartão, os dados deverão ser inseridos diretamente no checkout seguro da Cakto após a integração.
+              O pagamento com cartão ainda não está habilitado. Nenhum dado do cartão foi enviado ou salvo. Você pode concluir o pedido pelo Pix.
             </p>
           </section>
         ) : (
@@ -147,9 +149,15 @@ function CardPreviewPage() {
       <nav className="fixed bottom-0 left-0 right-0 z-10 border-t border-[#e0e0e0] bg-[#f6f6f6] px-6 py-5" aria-label="Etapas do pagamento com cartão">
         <div className="mx-auto flex max-w-[580px] items-center justify-between">
           <a href={previousHref} onClick={back} className="rounded-lg px-3 py-2 text-[18px] font-medium text-[#557cdb]">Anterior</a>
-          <button type="button" onClick={next} className="rounded-lg px-3 py-2 text-[18px] font-medium text-[#386fe8]">
-            {finished ? "Recomeçar" : step === 3 ? "Concluir etapas" : "Próximo"}
-          </button>
+          {finished ? (
+            <Link to="/pix" className="rounded-lg bg-[#3483fa] px-5 py-3 text-[16px] font-semibold text-white">
+              Ir para o Pix
+            </Link>
+          ) : (
+            <button type="button" onClick={next} className="rounded-lg px-3 py-2 text-[18px] font-medium text-[#386fe8]">
+              {step === 3 ? "Concluir etapas" : "Próximo"}
+            </button>
+          )}
         </div>
       </nav>
     </div>

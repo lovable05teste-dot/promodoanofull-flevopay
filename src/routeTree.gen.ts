@@ -9,44 +9,21 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as RevisaoRouteImport } from './routes/revisao'
-import { Route as PixRouteImport } from './routes/pix'
-import { Route as PagamentoRouteImport } from './routes/pagamento'
-import { Route as EntregaRouteImport } from './routes/entrega'
-import { Route as EnderecoRouteImport } from './routes/endereco'
-import { Route as CarrinhoRouteImport } from './routes/carrinho'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as CarrinhoRouteImport } from './routes/carrinho'
+import { Route as CartaoRouteImport } from './routes/cartao'
+import { Route as EmailDiagnosticoRouteImport } from './routes/email-diagnostico'
+import { Route as EnderecoRouteImport } from './routes/endereco'
+import { Route as EntregaRouteImport } from './routes/entrega'
+import { Route as PagamentoRouteImport } from './routes/pagamento'
+import { Route as PixRouteImport } from './routes/pix'
+import { Route as RevisaoRouteImport } from './routes/revisao'
 import { Route as ProdutoIdRouteImport } from './routes/produto.$id'
 
-const RevisaoRoute = RevisaoRouteImport.update({
-  id: '/revisao',
-  path: '/revisao',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PixRoute = PixRouteImport.update({
-  id: '/pix',
-  path: '/pix',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PagamentoRoute = PagamentoRouteImport.update({
-  id: '/pagamento',
-  path: '/pagamento',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EntregaRoute = EntregaRouteImport.update({
-  id: '/entrega',
-  path: '/entrega',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EnderecoRoute = EnderecoRouteImport.update({
-  id: '/endereco',
-  path: '/endereco',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CarrinhoRoute = CarrinhoRouteImport.update({
-  id: '/carrinho',
-  path: '/carrinho',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -54,9 +31,44 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const CarrinhoRoute = CarrinhoRouteImport.update({
+  id: '/carrinho',
+  path: '/carrinho',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CartaoRoute = CartaoRouteImport.update({
+  id: '/cartao',
+  path: '/cartao',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmailDiagnosticoRoute = EmailDiagnosticoRouteImport.update({
+  id: '/email-diagnostico',
+  path: '/email-diagnostico',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EnderecoRoute = EnderecoRouteImport.update({
+  id: '/endereco',
+  path: '/endereco',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EntregaRoute = EntregaRouteImport.update({
+  id: '/entrega',
+  path: '/entrega',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PagamentoRoute = PagamentoRouteImport.update({
+  id: '/pagamento',
+  path: '/pagamento',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PixRoute = PixRouteImport.update({
+  id: '/pix',
+  path: '/pix',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RevisaoRoute = RevisaoRouteImport.update({
+  id: '/revisao',
+  path: '/revisao',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProdutoIdRoute = ProdutoIdRouteImport.update({
@@ -69,6 +81,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/carrinho': typeof CarrinhoRoute
+  '/cartao': typeof CartaoRoute
+  '/email-diagnostico': typeof EmailDiagnosticoRoute
   '/endereco': typeof EnderecoRoute
   '/entrega': typeof EntregaRoute
   '/pagamento': typeof PagamentoRoute
@@ -80,6 +94,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/carrinho': typeof CarrinhoRoute
+  '/cartao': typeof CartaoRoute
+  '/email-diagnostico': typeof EmailDiagnosticoRoute
   '/endereco': typeof EnderecoRoute
   '/entrega': typeof EntregaRoute
   '/pagamento': typeof PagamentoRoute
@@ -92,6 +108,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/carrinho': typeof CarrinhoRoute
+  '/cartao': typeof CartaoRoute
+  '/email-diagnostico': typeof EmailDiagnosticoRoute
   '/endereco': typeof EnderecoRoute
   '/entrega': typeof EntregaRoute
   '/pagamento': typeof PagamentoRoute
@@ -105,6 +123,8 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/carrinho'
+    | '/cartao'
+    | '/email-diagnostico'
     | '/endereco'
     | '/entrega'
     | '/pagamento'
@@ -116,6 +136,8 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/carrinho'
+    | '/cartao'
+    | '/email-diagnostico'
     | '/endereco'
     | '/entrega'
     | '/pagamento'
@@ -127,6 +149,8 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/carrinho'
+    | '/cartao'
+    | '/email-diagnostico'
     | '/endereco'
     | '/entrega'
     | '/pagamento'
@@ -139,6 +163,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   CarrinhoRoute: typeof CarrinhoRoute
+  CartaoRoute: typeof CartaoRoute
+  EmailDiagnosticoRoute: typeof EmailDiagnosticoRoute
   EnderecoRoute: typeof EnderecoRoute
   EntregaRoute: typeof EntregaRoute
   PagamentoRoute: typeof PagamentoRoute
@@ -149,46 +175,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/revisao': {
-      id: '/revisao'
-      path: '/revisao'
-      fullPath: '/revisao'
-      preLoaderRoute: typeof RevisaoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pix': {
-      id: '/pix'
-      path: '/pix'
-      fullPath: '/pix'
-      preLoaderRoute: typeof PixRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pagamento': {
-      id: '/pagamento'
-      path: '/pagamento'
-      fullPath: '/pagamento'
-      preLoaderRoute: typeof PagamentoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/entrega': {
-      id: '/entrega'
-      path: '/entrega'
-      fullPath: '/entrega'
-      preLoaderRoute: typeof EntregaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/endereco': {
-      id: '/endereco'
-      path: '/endereco'
-      fullPath: '/endereco'
-      preLoaderRoute: typeof EnderecoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/carrinho': {
-      id: '/carrinho'
-      path: '/carrinho'
-      fullPath: '/carrinho'
-      preLoaderRoute: typeof CarrinhoRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -198,11 +189,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/carrinho': {
+      id: '/carrinho'
+      path: '/carrinho'
+      fullPath: '/carrinho'
+      preLoaderRoute: typeof CarrinhoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cartao': {
+      id: '/cartao'
+      path: '/cartao'
+      fullPath: '/cartao'
+      preLoaderRoute: typeof CartaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/email-diagnostico': {
+      id: '/email-diagnostico'
+      path: '/email-diagnostico'
+      fullPath: '/email-diagnostico'
+      preLoaderRoute: typeof EmailDiagnosticoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/endereco': {
+      id: '/endereco'
+      path: '/endereco'
+      fullPath: '/endereco'
+      preLoaderRoute: typeof EnderecoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/entrega': {
+      id: '/entrega'
+      path: '/entrega'
+      fullPath: '/entrega'
+      preLoaderRoute: typeof EntregaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pagamento': {
+      id: '/pagamento'
+      path: '/pagamento'
+      fullPath: '/pagamento'
+      preLoaderRoute: typeof PagamentoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pix': {
+      id: '/pix'
+      path: '/pix'
+      fullPath: '/pix'
+      preLoaderRoute: typeof PixRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/revisao': {
+      id: '/revisao'
+      path: '/revisao'
+      fullPath: '/revisao'
+      preLoaderRoute: typeof RevisaoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/produto/$id': {
@@ -219,6 +259,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   CarrinhoRoute: CarrinhoRoute,
+  CartaoRoute: CartaoRoute,
+  EmailDiagnosticoRoute: EmailDiagnosticoRoute,
   EnderecoRoute: EnderecoRoute,
   EntregaRoute: EntregaRoute,
   PagamentoRoute: PagamentoRoute,

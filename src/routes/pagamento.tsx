@@ -127,7 +127,7 @@ function PagamentoPage() {
 
             <button
               type="button"
-              onClick={() => { void navigate({ to: "/cartao" }); }}
+              onClick={() => { void navigate({ to: "/cartao", search: { etapa: 1 } }); }}
               className="mt-2 flex w-full items-center rounded-md border border-gray-200 px-3 sm:px-4 py-3 sm:py-4 text-left hover:bg-gray-50"
             >
               <CreditCardIcon />

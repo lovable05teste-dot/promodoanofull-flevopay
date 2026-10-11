@@ -9,6 +9,7 @@ import {
 } from "./pix.server";
 import { sendPixCreatedEmail } from "./pix-email.server";
 import { sendPixCreatedToN8n } from "./pix-n8n.server";
+import { recordPixGenerated } from "./funnel-events.server";
 
 export const createPixCharge = createServerFn({ method: "POST" })
   .inputValidator((data: PixChargeInput) => data)
@@ -26,8 +27,19 @@ export const createPixCharge = createServerFn({ method: "POST" })
         ? Math.round(data.amountCents as number)
         : 6193;
 
-    // Falhas de email/n8n nunca invalidam o Pix.
+    // Falhas de notificações ou analytics nunca invalidam o Pix.
     await Promise.allSettled([
+      recordPixGenerated({
+        sessionId: data.sessionId,
+        transactionId: result.transactionId,
+        itemId: data.itemId,
+        itemTitle: data.itemTitle,
+        amountCents,
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        utm: data.utm,
+      }),
       sendPixCreatedEmail(
         {
           to: data.email,
