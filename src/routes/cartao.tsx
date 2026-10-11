@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useRef, useState, type MouseEvent } from "react";
 
 export const Route = createFileRoute("/cartao")({
   head: () => ({
@@ -42,28 +43,66 @@ function CardMockup() {
   );
 }
 
-function ExampleField({ label, placeholder, narrow = false }: { label: string; placeholder: string; narrow?: boolean }) {
+type CardFields = { number: string; holder: string; expiry: string; cvv: string; document: string };
+const emptyFields: CardFields = { number: "", holder: "", expiry: "", cvv: "", document: "" };
+
+function CardField({ label, placeholder, value, onChange, numeric = false, secret = false, maxLength, minLength, narrow = false }: {
+  label: string; placeholder: string; value: string; onChange: (value: string) => void;
+  numeric?: boolean; secret?: boolean; maxLength?: number; minLength?: number; narrow?: boolean;
+}) {
   return (
-    <div className={narrow ? "min-w-0 flex-1" : "w-full"}>
-      <div className="mb-3 text-[18px] text-[#323232] sm:text-[20px]">{label}</div>
-      <div className="flex min-h-[65px] w-full items-center rounded-[19px] border border-[#bec1ef] bg-white px-5 text-[20px] text-[#777a85] sm:text-[22px]" aria-label={label + ": campo indisponível até ativação do pagamento"}>
-        {placeholder}
-      </div>
-    </div>
+    <label className={narrow ? "block min-w-0 flex-1" : "block w-full"}>
+      <span className="mb-3 block text-[18px] text-[#323232] sm:text-[20px]">{label}</span>
+      <input
+        type={secret ? "password" : "text"}
+        inputMode={numeric ? "numeric" : "text"}
+        autoComplete="off"
+        required
+        minLength={minLength}
+        maxLength={maxLength}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        placeholder={placeholder}
+        className="min-h-[65px] w-full rounded-[19px] border border-[#bec1ef] bg-white px-5 text-[20px] text-[#323232] outline-none focus:border-[#386fe8] focus:ring-2 focus:ring-[#386fe8]/20 sm:text-[22px]"
+      />
+    </label>
   );
 }
 
 function CardPreviewPage() {
   const { etapa } = Route.useSearch();
-  const step = etapa - 1;
-  const finished = etapa === 5;
-  const previousHref = etapa === 1 ? "/pagamento" : "/cartao?etapa=" + (etapa - 1);
-  const nextHref = "/cartao?etapa=" + (finished ? 1 : etapa + 1);
+  const [step, setStep] = useState(Math.min(etapa - 1, 3));
+  const [finished, setFinished] = useState(false);
+  const [fields, setFields] = useState<CardFields>({ ...emptyFields });
+  const formRef = useRef<HTMLFormElement>(null);
+  const update = (key: keyof CardFields, value: string) => setFields((current) => ({ ...current, [key]: value }));
+  const previousHref = step === 0 ? "/pagamento" : "/cartao?etapa=" + step;
+  const back = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (finished || step > 0) {
+      event.preventDefault();
+      if (finished) setFinished(false);
+      else setStep((current) => current - 1);
+    }
+  };
+  const next = () => {
+    if (finished) {
+      setFields({ ...emptyFields });
+      setFinished(false);
+      setStep(0);
+      return;
+    }
+    if (!formRef.current?.reportValidity()) return;
+    if (step < 3) setStep((current) => current + 1);
+    else {
+      setFields({ ...emptyFields });
+      setFinished(true);
+    }
+  };
 
   return (
     <div className="flex min-h-screen flex-col bg-[#f6f6f6]" style={{ fontFamily: "'Proxima Nova', -apple-system, Roboto, Arial, sans-serif" }}>
       <header className="flex min-h-[80px] items-center gap-3 bg-[#ffe600] px-4 py-4 shadow-[0_1px_2px_rgba(0,0,0,.10)] sm:px-7">
-        <a href={previousHref} className="flex h-10 w-10 shrink-0 items-center justify-center text-[#1d1d1d]" aria-label="Voltar">
+        <a href={previousHref} onClick={back} className="flex h-10 w-10 shrink-0 items-center justify-center text-[#1d1d1d]" aria-label="Voltar">
           <svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
         </a>
         <h1 className="text-[18px] leading-snug font-medium text-[#242424] sm:text-[21px]">Novo cartão de crédito ou pré-pago</h1>
@@ -83,34 +122,34 @@ function CardPreviewPage() {
             </p>
           </section>
         ) : (
-          <section>
+          <form ref={formRef} onSubmit={(event) => { event.preventDefault(); next(); }}>
             <h2 className="mb-4 text-[15px] text-[#686868]">{labels[step]}</h2>
-            {step === 0 && <ExampleField label="Número do cartão" placeholder="0000 0000 0000 0000" />}
-            {step === 1 && <ExampleField label="Nome do titular" placeholder="Ex.: MARIA LOPES" />}
+            {step === 0 && <CardField label="Número do cartão" placeholder="0000 0000 0000 0000" value={fields.number} numeric minLength={13} maxLength={23} onChange={(value) => update("number", value.replace(/\D/g, "").slice(0, 19).replace(/(.{4})/g, "$1 ").trim())} />}
+            {step === 1 && <CardField label="Nome do titular" placeholder="Ex.: MARIA LOPES" value={fields.holder} minLength={3} maxLength={80} onChange={(value) => update("holder", value)} />}
             {step === 2 && (
               <div className="flex gap-3">
-                <ExampleField label="Vencimento" placeholder="MM/AA" narrow />
-                <ExampleField label="Código de segurança" placeholder="•••" narrow />
+                <CardField label="Vencimento" placeholder="MM/AA" value={fields.expiry} numeric minLength={5} maxLength={5} narrow onChange={(value) => update("expiry", value.replace(/\D/g, "").slice(0, 4).replace(/^(\d{2})(\d)/, "$1/$2"))} />
+                <CardField label="Código de segurança" placeholder="•••" value={fields.cvv} numeric secret minLength={3} maxLength={4} narrow onChange={(value) => update("cvv", value.replace(/\D/g, "").slice(0, 4))} />
               </div>
             )}
             {step === 3 && (
               <div>
-                <ExampleField label="Documento do titular" placeholder="CPF   000.000.000-00" />
+                <CardField label="Documento do titular" placeholder="CPF   000.000.000-00" value={fields.document} numeric minLength={11} maxLength={11} onChange={(value) => update("document", value.replace(/\D/g, "").slice(0, 11))} />
               </div>
             )}
             <p className="mt-4 text-[13px] leading-relaxed text-[#777]">
-              O pagamento com cartão ainda não está ativo. Os campos acima não recebem dados. A integração será feita com o checkout seguro da Cakto.
+              Os dados permanecem apenas nesta página e são apagados ao concluir ou recarregar. Nenhuma cobrança será realizada enquanto o pagamento não estiver integrado.
             </p>
-          </section>
+          </form>
         )}
       </main>
 
       <nav className="fixed bottom-0 left-0 right-0 z-10 border-t border-[#e0e0e0] bg-[#f6f6f6] px-6 py-5" aria-label="Etapas do pagamento com cartão">
         <div className="mx-auto flex max-w-[580px] items-center justify-between">
-          <a href={previousHref} className="rounded-lg px-3 py-2 text-[18px] font-medium text-[#557cdb]">Anterior</a>
-          <a href={nextHref} className="rounded-lg px-3 py-2 text-[18px] font-medium text-[#386fe8]">
+          <a href={previousHref} onClick={back} className="rounded-lg px-3 py-2 text-[18px] font-medium text-[#557cdb]">Anterior</a>
+          <button type="button" onClick={next} className="rounded-lg px-3 py-2 text-[18px] font-medium text-[#386fe8]">
             {finished ? "Recomeçar" : step === 3 ? "Concluir etapas" : "Próximo"}
-          </a>
+          </button>
         </div>
       </nav>
     </div>
