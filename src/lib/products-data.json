@@ -1901,7 +1901,12 @@
       "https://i.imgur.com/i5FD92Q.jpg",
       "https://i.imgur.com/gXTUXxK.jpg"
     ],
-    "reviews": [],
+    "reviews": [
+      ["https://i.imgur.com/8bJWihd.jpg"],
+      ["https://i.imgur.com/s3jKwi4.jpg"],
+      ["https://i.imgur.com/dJ2U5P9.jpg"],
+      ["https://i.imgur.com/7pwps3Y.jpg", "https://i.imgur.com/cqhy2oV.jpg"]
+    ],
     "hideReviews": false,
     "category": "Eletrônicos",
     "features": [
