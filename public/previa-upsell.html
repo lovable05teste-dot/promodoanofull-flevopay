@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Prévia do upsell</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#ededed;font-family:-apple-system,Roboto,Arial,sans-serif;color:#111827}main{max-width:720px;margin:24px auto;padding:0 16px}.preview{text-align:center;font-size:12px;color:#6b7280;margin-bottom:16px}.card{background:#fff;border-radius:8px;padding:24px;margin-bottom:16px}.confirmation{text-align:center}.icon{display:grid;place-items:center;margin:auto;width:64px;height:64px;border:2px solid #00a650;border-radius:50%;color:#00a650;font-size:30px}.confirmation small{display:block;color:#6b7280;margin-top:12px}h1{font-size:22px;margin:8px 0 0}.offer{border:1px solid #dbeafe;background:#f8fbff;padding:16px;border-radius:8px}.label{font-size:13px;font-weight:600;text-transform:uppercase;color:#3483fa;letter-spacing:.5px}h2{font-size:20px;line-height:1.25;margin:8px 0 12px}p{font-size:14px;line-height:1.6;color:#374151}.small{font-size:12px;color:#6b7280}button{width:100%;padding:16px;margin-top:16px;border:0;border-radius:6px;background:#3483fa;color:#fff;font-size:16px;font-weight:600;cursor:pointer}button:hover{background:#2968c8}.secondary{background:white;color:#374151;border:1px solid #d1d5db;margin-top:12px}.secondary:hover{background:#f9fafb}#result{text-align:center;margin:16px 0 0;color:#3483fa}button:focus-visible{outline:3px solid #111827;outline-offset:3px}@media(max-width:640px){main{margin:16px auto;padding:0 12px}.card{padding:16px}h1{font-size:19px}}
+</style>
+</head>
+<body>
+<main>
+<div class="preview">PRÉVIA DO UPSELL · PAGAMENTO SIMULADO · SEM COBRANÇA</div>
+<section class="card confirmation"><div class="icon" aria-hidden="true">✓</div><small>Pagamento confirmado! (simulação)</small><h1>Compra concluída com sucesso.</h1></section>
+<section class="card">
+<div class="offer">
+<div class="label">Proteção opcional</div>
+<h2>Quer adicionar o Seguro Logístico?</h2>
+<p>Por R$ 29,90, você pode adicionar uma proteção opcional para acompanhar a entrega do seu pedido e receber suporte em caso de problemas logísticos.</p>
+<p class="small">A compra principal já foi confirmada. Esta proteção não é obrigatória.</p>
+</div>
+<button type="button" data-choice="accepted">Adicionar proteção por R$ 29,90</button>
+<button type="button" class="secondary" data-choice="declined">Não, obrigado. Continuar sem proteção</button>
+<p id="result" role="status" aria-live="polite"></p>
+</section>
+</main>
+<script>
+document.querySelectorAll('[data-choice]').forEach(button=>button.addEventListener('click',()=>{document.getElementById('result').textContent=button.dataset.choice==='accepted'?'Prévia: proteção selecionada. Nenhuma cobrança realizada.':'Prévia: continuar sem proteção.'}));
+</script>
+</body>
+</html>
