@@ -48,6 +48,7 @@ function PixPage() {
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string>("");
   const [paid, setPaid] = useState(false);
+  const [upsellChoice, setUpsellChoice] = useState<"accepted" | "declined" | null>(null);
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [receiptSending, setReceiptSending] = useState(false);
   const [receiptMessage, setReceiptMessage] = useState("");
@@ -208,6 +209,35 @@ function PixPage() {
             {paid ? <>Compra concluída com sucesso.</> : <>Pague R$ {priceStr} via Pix<br />para concluir sua compra</>}
           </h1>
         </section>
+
+        {paid && !upsellChoice && (
+          <section className="bg-white rounded-lg p-4 sm:p-6 text-left">
+            <div className="rounded-lg border border-[#dbeafe] bg-[#f8fbff] p-4">
+              <div className="text-[13px] font-semibold uppercase tracking-wide text-[#3483fa]">Proteção opcional</div>
+              <h2 className="mt-2 text-[20px] font-semibold leading-tight text-gray-900">Quer adicionar o Seguro Logístico?</h2>
+              <p className="mt-3 text-[14px] leading-relaxed text-gray-700">
+                Por R$ 29,90, você pode adicionar uma proteção opcional para acompanhar a entrega do seu pedido e receber suporte em caso de problemas logísticos.
+              </p>
+              <p className="mt-2 text-[12px] text-gray-500">A compra principal já foi confirmada. Esta proteção não é obrigatória.</p>
+            </div>
+            <button type="button" onClick={() => setUpsellChoice("accepted")} className="mt-4 block w-full rounded-md bg-[#3483fa] py-4 text-[16px] font-semibold text-white transition-colors hover:bg-[#2968c8]">
+              Adicionar proteção por R$ 29,90
+            </button>
+            <button type="button" onClick={() => setUpsellChoice("declined")} className="mt-3 block w-full rounded-md border border-gray-300 py-4 text-[16px] font-semibold text-gray-700 transition-colors hover:bg-gray-50">
+              Não, obrigado. Continuar sem proteção
+            </button>
+          </section>
+        )}
+
+        {paid && upsellChoice && (
+          <section className="bg-white rounded-lg p-4 sm:p-6 text-center">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-green-700" aria-hidden="true">✓</div>
+            <h2 className="mt-3 text-[18px] font-semibold text-gray-900">{upsellChoice === "accepted" ? "Proteção selecionada" : "Pedido confirmado"}</h2>
+            <p className="mt-2 text-[14px] leading-relaxed text-gray-600">
+              {upsellChoice === "accepted" ? "A proteção foi adicionada à sua solicitação. Aguarde as instruções para concluir este pagamento adicional." : "Seguiremos com seu pedido sem a proteção adicional."}
+            </p>
+          </section>
+        )}
 
         {!paid && (
           <section className="bg-white rounded-lg p-4 sm:p-6">
