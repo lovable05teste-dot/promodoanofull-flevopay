@@ -1,5 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/cartao")({
   head: () => ({
@@ -8,6 +7,10 @@ export const Route = createFileRoute("/cartao")({
       { name: "description", content: "Informações sobre a opção de pagamento com cartão." },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>) => {
+    const requested = Number(search.etapa ?? 1);
+    return { etapa: Number.isInteger(requested) && requested >= 1 && requested <= 5 ? requested : 1 };
+  },
   component: CardPreviewPage,
 });
 
@@ -51,43 +54,23 @@ function ExampleField({ label, placeholder, narrow = false }: { label: string; p
 }
 
 function CardPreviewPage() {
-  const navigate = useNavigate();
-  const [step, setStep] = useState(0);
-  const [finished, setFinished] = useState(false);
-
-  const back = () => {
-    if (finished) {
-      setFinished(false);
-      setStep(3);
-    } else if (step > 0) {
-      setStep((value) => value - 1);
-    } else {
-      void navigate({ to: "/pagamento" });
-    }
-  };
-  const next = () => {
-    if (finished) {
-      setFinished(false);
-      setStep(0);
-    } else if (step < labels.length - 1) {
-      setStep((value) => value + 1);
-    } else {
-      setFinished(true);
-    }
-  };
+  const { etapa } = Route.useSearch();
+  const step = etapa - 1;
+  const finished = etapa === 5;
+  const previousHref = etapa === 1 ? "/pagamento" : "/cartao?etapa=" + (etapa - 1);
+  const nextHref = "/cartao?etapa=" + (finished ? 1 : etapa + 1);
 
   return (
     <div className="flex min-h-screen flex-col bg-[#f6f6f6]" style={{ fontFamily: "'Proxima Nova', -apple-system, Roboto, Arial, sans-serif" }}>
       <header className="flex min-h-[80px] items-center gap-3 bg-[#ffe600] px-4 py-4 shadow-[0_1px_2px_rgba(0,0,0,.10)] sm:px-7">
-        <button type="button" onClick={back} className="flex h-10 w-10 shrink-0 items-center justify-center text-[#1d1d1d]" aria-label="Voltar">
+        <a href={previousHref} className="flex h-10 w-10 shrink-0 items-center justify-center text-[#1d1d1d]" aria-label="Voltar">
           <svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
-        </button>
+        </a>
         <h1 className="text-[18px] leading-snug font-medium text-[#242424] sm:text-[21px]">Novo cartão de crédito ou pré-pago</h1>
       </header>
 
       <main className="mx-auto w-full max-w-[580px] flex-1 px-4 pb-32 pt-3 sm:px-6">
         <div className="mb-3 flex items-center justify-between gap-3 text-[12px] text-[#737373]">
-          <span className="rounded-full border border-[#dadada] px-3 py-1 font-medium">CARTÃO EM CONFIGURAÇÃO</span>
           <span>{finished ? "Concluído" : "Etapa " + (step + 1) + " de 4"}</span>
         </div>
         <CardMockup />
@@ -124,10 +107,10 @@ function CardPreviewPage() {
 
       <nav className="fixed bottom-0 left-0 right-0 z-10 border-t border-[#e0e0e0] bg-[#f6f6f6] px-6 py-5" aria-label="Etapas do pagamento com cartão">
         <div className="mx-auto flex max-w-[580px] items-center justify-between">
-          <button type="button" onClick={back} className="rounded-lg px-3 py-2 text-[18px] font-medium text-[#557cdb]">Anterior</button>
-          <button type="button" onClick={next} className="rounded-lg px-3 py-2 text-[18px] font-medium text-[#386fe8]">
+          <a href={previousHref} className="rounded-lg px-3 py-2 text-[18px] font-medium text-[#557cdb]">Anterior</a>
+          <a href={nextHref} className="rounded-lg px-3 py-2 text-[18px] font-medium text-[#386fe8]">
             {finished ? "Recomeçar" : step === 3 ? "Concluir etapas" : "Próximo"}
-          </button>
+          </a>
         </div>
       </nav>
     </div>
