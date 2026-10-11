@@ -193,7 +193,7 @@ function AdminPage() {
           {tab === "resumo" && <>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <Stat title="Inícios de checkout" value={funnelMessage ? "—" : String(report.ic.length)} caption="Cliques registrados pelo próprio site" />
-              <Stat title="Pix gerados" value={funnelMessage ? "—" : String(report.pix.length)} caption="Cobranças criadas na FortPay" />
+              <Stat title="Pix gerados" value={funnelMessage ? "—" : String(report.pix.length)} caption="Cobranças criadas na Invictus Pay" />
               <Stat title="Pix confirmados" value={funnelMessage ? "—" : String(approved.length)} caption="Confirmações observadas na consulta de status" />
               <Stat title="Valor de Pix gerados" value={funnelMessage ? "—" : brl(report.pix.reduce((s, e) => s + e.amountCents, 0))} caption="Não é faturamento recebido" />
             </div>

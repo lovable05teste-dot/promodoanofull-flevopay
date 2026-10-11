@@ -1,6 +1,4 @@
-const FORTPAY_BASE_URL = "https://api.fortpayplataforma.com.br/api/public/v1";
-const FORTPAY_PRODUCT_HASH = "txi2kwhf0r";
-const FORTPAY_OFFER_HASH = "o9ybnwoyun";
+const INVICTUS_BASE_URL = "https://api.invictuspayv2.com.br/api/v1";
 
 export type PixChargeInput = {
   sessionId?: string;
@@ -33,28 +31,15 @@ export function normalizePhone(value: string) {
   return phone;
 }
 
-function buildTracking(utm?: string): Record<string, string> {
-  const params = new URLSearchParams((utm || "").replace(/^\?/, ""));
-  const tracking: Record<string, string> = {};
-  for (const key of [
-    "utm_source",
-    "utm_medium",
-    "utm_campaign",
-    "utm_content",
-    "utm_term",
-    "src",
-    "sck",
-  ]) {
-    const value = params.get(key)?.trim();
-    if (value) tracking[key] = value;
-  }
-  if (!tracking.utm_source && tracking.src) tracking.utm_source = tracking.src;
-  if (!tracking.src && tracking.utm_source) tracking.src = tracking.utm_source;
-  return tracking;
-}
-
 function isRecord(value: unknown): value is JsonRecord {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function transactionRecord(value: unknown): JsonRecord | undefined {
+  const envelope = isRecord(value) && isRecord(value.data) ? value.data : value;
+  const transaction = isRecord(envelope) && isRecord(envelope.transaction)
+    ? envelope.transaction : envelope;
+  return isRecord(transaction) ? transaction : undefined;
 }
 
 function findStringByKeys(value: unknown, keys: string[]): string | undefined {
@@ -81,6 +66,11 @@ function findStringByKeys(value: unknown, keys: string[]): string | undefined {
 
 function findPixCode(value: unknown) {
   return findStringByKeys(value, [
+    "qrCode",
+    "qrcode",
+    "pixCode",
+    "copyPaste",
+    "brcode",
     "qr_code",
     "pix_code",
     "pix_qr_code",
@@ -100,14 +90,11 @@ function safeGatewayMessage(raw: string) {
   }
 }
 
-async function fortpayFetch(path: string, init: RequestInit & { apiToken: string }) {
-  const { apiToken, ...rest } = init;
+async function invictusFetch(path: string, init: RequestInit & { apiKey: string }) {
+  const { apiKey, ...rest } = init;
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 15000);
-  const url = new URL(`${FORTPAY_BASE_URL}${path}`);
-  // A FortPay exige o token como query parameter em todos os endpoints,
-  // inclusive no POST de criação da transação.
-  url.searchParams.set("api_token", apiToken);
+  const url = new URL(`${INVICTUS_BASE_URL}${path}`);
   try {
     return await fetch(url, {
       ...rest,
@@ -115,22 +102,23 @@ async function fortpayFetch(path: string, init: RequestInit & { apiToken: string
         "Content-Type": "application/json",
         Accept: "application/json",
         ...(rest.headers || {}),
+        "X-Api-Key": apiKey,
       },
       signal: controller.signal,
     });
   } catch (error) {
     if (error instanceof Error && error.name === "AbortError") {
-      throw new Error("A FortPay demorou para responder. Tente gerar o Pix novamente.");
+      throw new Error("A Invictus Pay demorou para responder. Tente gerar o Pix novamente.");
     }
-    throw new Error("Não foi possível conectar à FortPay. Tente novamente.");
+    throw new Error("Não foi possível conectar à Invictus Pay. Tente novamente.");
   } finally {
     clearTimeout(timeout);
   }
 }
 
-export async function createFortpayPixCharge(
+export async function createInvictusPixCharge(
   input: PixChargeInput,
-  config: { apiToken: string },
+  config: { apiKey: string; postbackUrl?: string },
 ): Promise<PixChargeResult> {
   const name = (input.name || "").trim();
   const document = onlyDigits(input.document);
@@ -146,42 +134,32 @@ export async function createFortpayPixCharge(
     throw new Error("Telefone inválido. Informe DDD + número.");
   }
 
-  const amount =
-    Number.isFinite(input.amountCents) && (input.amountCents ?? 0) > 0
-      ? Math.round(input.amountCents as number)
-      : 6193;
+  const amount = input.amountCents ?? 6193;
+  if (!Number.isSafeInteger(amount) || amount <= 0) {
+    throw new Error("Valor do pagamento inválido. Informe um valor inteiro em centavos.");
+  }
 
-  const title = (input.itemTitle || "Produto").slice(0, 120);
+  const title = (input.itemTitle || "Produto").trim().slice(0, 120) || "Produto";
   const payload: JsonRecord = {
     amount,
-    offer_hash: FORTPAY_OFFER_HASH,
-    payment_method: "pix",
-    expire_in_days: 1,
-    transaction_origin: "api",
-    customer: {
-      name,
-      email,
-      document,
-      phone_number: phone,
-    },
-    cart: [
-      {
-        product_hash: FORTPAY_PRODUCT_HASH,
-        price: amount,
-        quantity: 1,
-        operation_type: 1,
-        tangible: true,
-        title,
-        ...(input.itemImage?.startsWith("https://") ? { cover: input.itemImage } : {}),
-      },
-    ],
+    paymentMethod: "pix",
+    customer: { name, email, document, phone },
+    items: [{
+      description: title,
+      quantity: 1,
+      amount,
+      ...(input.itemId ? { externalRef: input.itemId } : {}),
+    }],
+    pix: { expirationInSeconds: 1800 },
   };
+  if (config.postbackUrl) {
+    const url = new URL(config.postbackUrl);
+    if (url.protocol !== "https:") throw new Error("O postback da Invictus Pay deve usar HTTPS.");
+    payload.postbackUrl = url.toString();
+  }
 
-  const tracking = buildTracking(input.utm);
-  if (Object.keys(tracking).length) payload.tracking = tracking;
-
-  const response = await fortpayFetch("/transactions", {
-    apiToken: config.apiToken,
+  const response = await invictusFetch("/transactions", {
+    apiKey: config.apiKey,
     method: "POST",
     body: JSON.stringify(payload),
   });
@@ -189,7 +167,7 @@ export async function createFortpayPixCharge(
 
   if (!response.ok) {
     throw new Error(
-      `A FortPay recusou a geração do Pix (${response.status})${safeGatewayMessage(raw)}`,
+      `A Invictus Pay recusou a geração do Pix (${response.status})${safeGatewayMessage(raw)}`,
     );
   }
 
@@ -197,18 +175,18 @@ export async function createFortpayPixCharge(
   try {
     json = JSON.parse(raw);
   } catch {
-    throw new Error("A FortPay retornou uma resposta inválida.");
+    throw new Error("A Invictus Pay retornou uma resposta inválida.");
   }
 
   const pixCode = findPixCode(json);
-  const transactionId = findStringByKeys(json, [
-    "transaction_hash",
-    "transaction_id",
-    "hash",
-    "id",
-  ]);
+  // Read the transaction envelope before nested customer/item IDs.
+  const transaction = transactionRecord(json);
+  const transactionId = isRecord(transaction)
+    ? findStringByKeys({ id: transaction.id, transactionId: transaction.transactionId,
+        transaction_id: transaction.transaction_id }, ["id", "transactionId", "transaction_id"])
+    : undefined;
   if (!pixCode || !transactionId) {
-    throw new Error("A FortPay não retornou o código Pix completo.");
+    throw new Error("A Invictus Pay não retornou o código Pix completo.");
   }
 
   return {
@@ -218,21 +196,25 @@ export async function createFortpayPixCharge(
   };
 }
 
-export async function readFortpayPixStatus(transactionId: string, apiToken: string) {
+export async function readInvictusPixStatus(transactionId: string, apiKey: string) {
   try {
     const path = `/transactions/${encodeURIComponent(transactionId)}`;
-    const response = await fortpayFetch(path, {
-      apiToken,
+    const response = await invictusFetch(path, {
+      apiKey,
       method: "GET",
     });
     if (!response.ok) return { status: "PENDING" };
 
     const json = (await response.json()) as JsonRecord;
-    const rawStatus = String(findStringByKeys(json, ["status"]) || "pending").toLowerCase();
+    const rawStatus = String(transactionRecord(json)?.status || "pending").toLowerCase();
     const status =
-      rawStatus === "approved" || rawStatus === "paid" || rawStatus === "completed"
+      rawStatus === "paid"
         ? "COMPLETED"
-        : rawStatus === "refunded" ||
+        : rawStatus === "refused" ||
+            rawStatus === "expired" ||
+            rawStatus === "in_dispute" ||
+            rawStatus === "pre_chargeback" ||
+            rawStatus === "refunded" ||
             rawStatus === "chargeback" ||
             rawStatus === "failed" ||
             rawStatus === "cancelled" ||
