@@ -1,0 +1,616 @@
+{
+  "offers": {
+    "silicone-kit": {
+      "id": "acc-silicone-kit",
+      "title": "Kit de utensílios de silicone",
+      "priceCents": 4990,
+      "image": "/img/upsells/silicone-kit.webp",
+      "description": "Utensílios para preparar e servir suas refeições."
+    },
+    "pan-rest": {
+      "id": "acc-pan-rest",
+      "title": "Descanso de panela em silicone",
+      "priceCents": 1990,
+      "image": "/img/upsells/pan-rest.webp",
+      "description": "Apoio para as panelas na bancada."
+    },
+    "oven-glove": {
+      "id": "acc-oven-glove",
+      "title": "Par de luvas térmicas de cozinha",
+      "priceCents": 2990,
+      "image": "/img/upsells/oven-glove.webp",
+      "description": "Para manusear assadeiras e recipientes quentes."
+    },
+    "bbq-tong": {
+      "id": "acc-bbq-tong",
+      "title": "Pegador para churrasco",
+      "priceCents": 2990,
+      "image": "/img/upsells/bbq-tong.webp",
+      "description": "Ajuda a virar e servir os alimentos na churrasqueira."
+    },
+    "bbq-brush": {
+      "id": "acc-bbq-brush",
+      "title": "Pincel culinário de silicone",
+      "priceCents": 1990,
+      "image": "/img/upsells/bbq-brush.webp",
+      "description": "Para aplicar temperos e molhos."
+    },
+    "cooler-bag": {
+      "id": "acc-cooler-bag",
+      "title": "Bolsa térmica portátil",
+      "priceCents": 4990,
+      "image": "/img/upsells/cooler-bag.webp",
+      "description": "Leve bebidas e lanches nos passeios."
+    },
+    "beach-umbrella": {
+      "id": "acc-beach-umbrella",
+      "title": "Guarda-sol de praia",
+      "priceCents": 6990,
+      "image": "/img/upsells/beach-umbrella.webp",
+      "description": "Complete seu conjunto para praia e camping."
+    },
+    "waterproof-pouch": {
+      "id": "acc-waterproof-pouch",
+      "title": "Bolsa estanque para celular",
+      "priceCents": 1990,
+      "image": "/img/upsells/waterproof-pouch.webp",
+      "description": "Proteção adicional nos passeios com água e areia."
+    },
+    "safety-glasses": {
+      "id": "acc-safety-glasses",
+      "title": "Óculos de proteção",
+      "priceCents": 1990,
+      "image": "/img/upsells/safety-glasses.webp",
+      "description": "Complemento para seus trabalhos com ferramentas."
+    },
+    "work-gloves": {
+      "id": "acc-work-gloves",
+      "title": "Par de luvas de trabalho",
+      "priceCents": 2490,
+      "image": "/img/upsells/work-gloves.webp",
+      "description": "Para o manuseio de ferramentas e materiais."
+    },
+    "tool-belt": {
+      "id": "acc-tool-belt",
+      "title": "Cinto porta-ferramentas",
+      "priceCents": 3990,
+      "image": "/img/upsells/tool-belt.webp",
+      "description": "Mantenha suas ferramentas à mão durante o trabalho."
+    },
+    "microfiber": {
+      "id": "acc-microfiber",
+      "title": "Kit de panos de microfibra",
+      "priceCents": 1990,
+      "image": "/img/upsells/microfiber.webp",
+      "description": "Para limpeza e acabamento no dia a dia."
+    },
+    "spray-bottle": {
+      "id": "acc-spray-bottle",
+      "title": "Borrifador de limpeza",
+      "priceCents": 1490,
+      "image": "/img/upsells/spray-bottle.webp",
+      "description": "Facilita a aplicação de produtos de limpeza."
+    },
+    "floor-cloths": {
+      "id": "acc-floor-cloths",
+      "title": "Kit de panos para piso",
+      "priceCents": 1990,
+      "image": "/img/upsells/floor-cloths.webp",
+      "description": "Complete sua rotina de limpeza da casa."
+    },
+    "airfryer-mold": {
+      "id": "acc-airfryer-mold",
+      "title": "Forma de silicone para air fryer",
+      "priceCents": 2990,
+      "image": "/img/upsells/airfryer-mold.webp",
+      "description": "Para variar o preparo de alimentos na fritadeira."
+    },
+    "food-containers": {
+      "id": "acc-food-containers",
+      "title": "Kit de potes para alimentos",
+      "priceCents": 4990,
+      "image": "/img/upsells/food-containers.webp",
+      "description": "Organize alimentos e refeições na geladeira ou freezer."
+    },
+    "thermometer": {
+      "id": "acc-thermometer",
+      "title": "Termômetro para geladeira e freezer",
+      "priceCents": 2990,
+      "image": "/img/upsells/thermometer.webp",
+      "description": "Acompanhe a temperatura interna do seu equipamento."
+    },
+    "ice-tray": {
+      "id": "acc-ice-tray",
+      "title": "Kit de formas de gelo",
+      "priceCents": 1990,
+      "image": "/img/upsells/ice-tray.webp",
+      "description": "Mais praticidade para preparar bebidas geladas."
+    },
+    "coffee-capsules": {
+      "id": "acc-coffee-capsules",
+      "title": "Caixa com 10 cápsulas Três Corações",
+      "priceCents": 2990,
+      "image": "/img/upsells/coffee-capsules.webp",
+      "description": "Cápsulas do sistema Três Corações para sua cafeteira."
+    },
+    "coffee-cups": {
+      "id": "acc-coffee-cups",
+      "title": "Par de xícaras de café",
+      "priceCents": 3990,
+      "image": "/img/upsells/coffee-cups.webp",
+      "description": "Para servir suas bebidas favoritas."
+    },
+    "capsule-holder": {
+      "id": "acc-capsule-holder",
+      "title": "Organizador de cápsulas de café",
+      "priceCents": 3990,
+      "image": "/img/upsells/capsule-holder.webp",
+      "description": "Deixe suas cápsulas organizadas e acessíveis."
+    },
+    "baking-pan": {
+      "id": "acc-baking-pan",
+      "title": "Assadeira para forno",
+      "priceCents": 4990,
+      "image": "/img/upsells/baking-pan.webp",
+      "description": "Complemento para assados e receitas no forno."
+    },
+    "kitchen-timer": {
+      "id": "acc-kitchen-timer",
+      "title": "Timer digital de cozinha",
+      "priceCents": 2990,
+      "image": "/img/upsells/kitchen-timer.webp",
+      "description": "Acompanhe o tempo de preparo das receitas."
+    },
+    "multimeter": {
+      "id": "acc-multimeter",
+      "title": "Multímetro digital",
+      "priceCents": 4990,
+      "image": "/img/upsells/multimeter.webp",
+      "description": "Instrumento adicional para suas verificações elétricas."
+    },
+    "terminal-brush": {
+      "id": "acc-terminal-brush",
+      "title": "Escova para terminais de bateria",
+      "priceCents": 1990,
+      "image": "/img/upsells/terminal-brush.webp",
+      "description": "Para a limpeza dos terminais da bateria."
+    },
+    "terminal-cover": {
+      "id": "acc-terminal-cover",
+      "title": "Protetores para terminais de bateria",
+      "priceCents": 1990,
+      "image": "/img/upsells/terminal-cover.webp",
+      "description": "Complemente o acabamento dos terminais."
+    },
+    "boombox-bag": {
+      "id": "acc-boombox-bag",
+      "title": "Bolsa de transporte para Boombox 4",
+      "priceCents": 6990,
+      "image": "/img/upsells/boombox-bag.webp",
+      "description": "Para transportar e guardar sua caixa de som."
+    },
+    "redmi-case": {
+      "id": "acc-redmi-case",
+      "title": "Capa para Redmi 15C",
+      "priceCents": 1990,
+      "image": "/img/upsells/redmi-case.webp",
+      "description": "Capa compatível com o modelo Redmi 15C."
+    },
+    "redmi-film": {
+      "id": "acc-redmi-film",
+      "title": "Película para Redmi 15C",
+      "priceCents": 1990,
+      "image": "/img/upsells/redmi-film.webp",
+      "description": "Película específica para o modelo Redmi 15C."
+    },
+    "usb-c": {
+      "id": "acc-usb-c",
+      "title": "Cabo USB-C",
+      "priceCents": 2990,
+      "image": "/img/upsells/usb-c.webp",
+      "description": "Um cabo adicional para o dia a dia."
+    },
+    "water-bottle": {
+      "id": "acc-water-bottle",
+      "title": "Garrafa para água 500 ml",
+      "priceCents": 2990,
+      "image": "/img/upsells/water-bottle.webp",
+      "description": "Leve sua água para o trabalho e passeios."
+    },
+    "bottle-brush": {
+      "id": "acc-bottle-brush",
+      "title": "Escova para garrafas",
+      "priceCents": 1990,
+      "image": "/img/upsells/bottle-brush.webp",
+      "description": "Facilita a limpeza interna de garrafas e recipientes."
+    },
+    "bike-lights": {
+      "id": "acc-bike-lights",
+      "title": "Kit de luzes para bicicleta",
+      "priceCents": 3990,
+      "image": "/img/upsells/bike-lights.webp",
+      "description": "Iluminação adicional para seus trajetos de bicicleta."
+    },
+    "bike-pump": {
+      "id": "acc-bike-pump",
+      "title": "Bomba portátil de bicicleta",
+      "priceCents": 3990,
+      "image": "/img/upsells/bike-pump.webp",
+      "description": "Para ajustar a pressão dos pneus da bicicleta."
+    },
+    "bike-lock": {
+      "id": "acc-bike-lock",
+      "title": "Cadeado para bicicleta",
+      "priceCents": 2990,
+      "image": "/img/upsells/bike-lock.webp",
+      "description": "Complemento para estacionar sua bicicleta."
+    },
+    "grinder-discs": {
+      "id": "acc-grinder-discs",
+      "title": "Kit de discos de corte 115 mm",
+      "priceCents": 2990,
+      "image": "/img/upsells/grinder-discs.webp",
+      "description": "Discos no diâmetro da esmerilhadeira anunciada."
+    },
+    "drawer-dividers": {
+      "id": "acc-drawer-dividers",
+      "title": "Kit de divisórias para gaveta",
+      "priceCents": 2990,
+      "image": "/img/upsells/drawer-dividers.webp",
+      "description": "Organize as peças dentro da sua cômoda."
+    },
+    "storage-box": {
+      "id": "acc-storage-box",
+      "title": "Caixas organizadoras de tecido",
+      "priceCents": 3990,
+      "image": "/img/upsells/storage-box.webp",
+      "description": "Separe roupas e acessórios nos seus móveis."
+    },
+    "furniture-felt": {
+      "id": "acc-furniture-felt",
+      "title": "Kit de feltros para móveis",
+      "priceCents": 1990,
+      "image": "/img/upsells/furniture-felt.webp",
+      "description": "Complemente o apoio dos móveis no piso."
+    },
+    "baby-rattle": {
+      "id": "acc-baby-rattle",
+      "title": "Chocalho para bebê",
+      "priceCents": 2990,
+      "image": "/img/upsells/baby-rattle.webp",
+      "description": "Um brinquedo adicional para a rotina do bebê."
+    },
+    "baby-bib": {
+      "id": "acc-baby-bib",
+      "title": "Babador de silicone",
+      "priceCents": 1990,
+      "image": "/img/upsells/baby-bib.webp",
+      "description": "Para acompanhar os momentos de alimentação."
+    },
+    "baby-cup": {
+      "id": "acc-baby-cup",
+      "title": "Copo infantil com alças",
+      "priceCents": 2990,
+      "image": "/img/upsells/baby-cup.webp",
+      "description": "Um complemento para a rotina de alimentação."
+    },
+    "drill-bits": {
+      "id": "acc-drill-bits",
+      "title": "Kit de brocas",
+      "priceCents": 3990,
+      "image": "/img/upsells/drill-bits.webp",
+      "description": "Complete seus trabalhos de perfuração."
+    },
+    "magnetic-bits": {
+      "id": "acc-magnetic-bits",
+      "title": "Jogo de bits com suporte magnético",
+      "priceCents": 2990,
+      "image": "/img/upsells/magnetic-bits.webp",
+      "description": "Mais opções de pontas para parafusar."
+    },
+    "balaclava": {
+      "id": "acc-balaclava",
+      "title": "Balaclava para motociclista",
+      "priceCents": 1990,
+      "image": "/img/upsells/balaclava.webp",
+      "description": "Complemento para usar junto ao capacete."
+    },
+    "motorcycle-gloves": {
+      "id": "acc-motorcycle-gloves",
+      "title": "Par de luvas para motociclista",
+      "priceCents": 3990,
+      "image": "/img/upsells/motorcycle-gloves.webp",
+      "description": "Complete seu conjunto para os trajetos de moto."
+    },
+    "visor-cleaner": {
+      "id": "acc-visor-cleaner",
+      "title": "Kit de limpeza para viseira",
+      "priceCents": 2990,
+      "image": "/img/upsells/visor-cleaner.webp",
+      "description": "Para a limpeza e manutenção da viseira."
+    },
+    "tire-gauge": {
+      "id": "acc-tire-gauge",
+      "title": "Medidor de pressão dos pneus",
+      "priceCents": 2990,
+      "image": "/img/upsells/tire-gauge.webp",
+      "description": "Acompanhe a pressão dos pneus do seu carro."
+    },
+    "valve-caps": {
+      "id": "acc-valve-caps",
+      "title": "Kit de tampas de válvula",
+      "priceCents": 990,
+      "image": "/img/upsells/valve-caps.webp",
+      "description": "Complemente o acabamento das válvulas dos pneus."
+    },
+    "tire-compressor": {
+      "id": "acc-tire-compressor",
+      "title": "Compressor portátil 12 V",
+      "priceCents": 6990,
+      "image": "/img/upsells/tire-compressor.webp",
+      "description": "Complemento para calibrar pneus com alimentação 12 V."
+    },
+    "car-shampoo": {
+      "id": "acc-car-shampoo",
+      "title": "Shampoo automotivo",
+      "priceCents": 2990,
+      "image": "/img/upsells/car-shampoo.webp",
+      "description": "Para a lavagem do veículo com sua lavadora."
+    },
+    "wash-brush": {
+      "id": "acc-wash-brush",
+      "title": "Escova manual de lavagem",
+      "priceCents": 2990,
+      "image": "/img/upsells/wash-brush.webp",
+      "description": "Ajuda na limpeza de superfícies e detalhes."
+    },
+    "ps4-controller": {
+      "id": "acc-ps4-controller",
+      "title": "Controle sem fio compatível com PS4",
+      "priceCents": 6990,
+      "image": "/img/upsells/ps4-controller.webp",
+      "description": "Um controle adicional compatível com o PS4."
+    },
+    "ps5-controller": {
+      "id": "acc-ps5-controller",
+      "title": "Controle DualSense para PS5",
+      "priceCents": 24990,
+      "image": "/img/upsells/ps5-controller.webp",
+      "description": "Um controle adicional para seu PlayStation 5."
+    },
+    "xbox-controller": {
+      "id": "acc-xbox-controller",
+      "title": "Controle sem fio Xbox Series",
+      "priceCents": 24990,
+      "image": "/img/upsells/xbox-controller.webp",
+      "description": "Um controle adicional para seu Xbox Series."
+    },
+    "gamer-headset": {
+      "id": "acc-gamer-headset",
+      "title": "Headset gamer com conexão 3,5 mm",
+      "priceCents": 6990,
+      "image": "/img/upsells/gamer-headset.webp",
+      "description": "Fone com microfone para conectar ao controle do console."
+    },
+    "thumb-grips": {
+      "id": "acc-thumb-grips",
+      "title": "Kit de capas para analógicos",
+      "priceCents": 1990,
+      "image": "/img/upsells/thumb-grips.webp",
+      "description": "Capas para os analógicos. Os controles não estão inclusos neste kit."
+    },
+    "cleaning-brush": {
+      "id": "acc-cleaning-brush",
+      "title": "Escova de limpeza",
+      "priceCents": 1990,
+      "image": "/img/upsells/cleaning-brush.webp",
+      "description": "Para a limpeza externa e das áreas acessíveis do aparelho."
+    },
+    "hdmi": {
+      "id": "acc-hdmi",
+      "title": "Cabo HDMI",
+      "priceCents": 2990,
+      "image": "/img/upsells/hdmi.webp",
+      "description": "Conecte seus aparelhos à televisão."
+    },
+    "tv-mount": {
+      "id": "acc-tv-mount",
+      "title": "Suporte para TV de 50 polegadas",
+      "priceCents": 6990,
+      "image": "/img/upsells/tv-mount.webp",
+      "description": "Complemento para instalar a TV conforme o padrão VESA."
+    },
+    "screen-cleaner": {
+      "id": "acc-screen-cleaner",
+      "title": "Kit de limpeza para telas",
+      "priceCents": 2990,
+      "image": "/img/upsells/screen-cleaner.webp",
+      "description": "Para cuidar da tela da sua televisão."
+    },
+    "face-shield": {
+      "id": "acc-face-shield",
+      "title": "Protetor facial",
+      "priceCents": 3990,
+      "image": "/img/upsells/face-shield.webp",
+      "description": "Complemento de proteção para trabalhos com ferramentas."
+    },
+    "ear-muffs": {
+      "id": "acc-ear-muffs",
+      "title": "Abafador de ruído",
+      "priceCents": 3990,
+      "image": "/img/upsells/ear-muffs.webp",
+      "description": "Complemento para os trabalhos com equipamentos ruidosos."
+    },
+    "trimmer-harness": {
+      "id": "acc-trimmer-harness",
+      "title": "Cinto de sustentação para roçadeira",
+      "priceCents": 4990,
+      "image": "/img/upsells/trimmer-harness.webp",
+      "description": "Auxilia no apoio da roçadeira durante o uso."
+    },
+    "bluetooth-earbuds": {
+      "id": "acc-bluetooth-earbuds",
+      "title": "Fone de ouvido Bluetooth",
+      "description": "Ouça suas músicas individualmente no celular.",
+      "priceCents": 6990,
+      "image": "/img/upsells/bluetooth-earbuds.webp"
+    }
+  },
+  "products": {
+    "6549324": [
+      "acc-silicone-kit",
+      "acc-pan-rest",
+      "acc-oven-glove"
+    ],
+    "1078300024": [
+      "acc-baking-pan",
+      "acc-oven-glove",
+      "acc-kitchen-timer"
+    ],
+    "1097400025": [
+      "acc-redmi-case",
+      "acc-redmi-film",
+      "acc-usb-c"
+    ],
+    "1187300013": [
+      "acc-microfiber",
+      "acc-spray-bottle",
+      "acc-floor-cloths"
+    ],
+    "1288200026": [
+      "acc-water-bottle",
+      "acc-bottle-brush",
+      "acc-microfiber"
+    ],
+    "1522920033": [
+      "acc-ps4-controller",
+      "acc-gamer-headset",
+      "acc-thumb-grips"
+    ],
+    "1660990037": [
+      "acc-food-containers",
+      "acc-thermometer",
+      "acc-ice-tray"
+    ],
+    "1689000040": [
+      "acc-car-shampoo",
+      "acc-wash-brush",
+      "acc-microfiber"
+    ],
+    "1896900035": [
+      "acc-xbox-controller",
+      "acc-gamer-headset",
+      "acc-thumb-grips"
+    ],
+    "2079000026": [
+      "acc-drill-bits",
+      "acc-magnetic-bits",
+      "acc-work-gloves"
+    ],
+    "3029100030": [
+      "acc-balaclava",
+      "acc-motorcycle-gloves",
+      "acc-visor-cleaner"
+    ],
+    "3078200025": [
+      "acc-baby-rattle",
+      "acc-baby-bib",
+      "acc-baby-cup"
+    ],
+    "3284920034": [
+      "acc-ps5-controller",
+      "acc-gamer-headset",
+      "acc-thumb-grips"
+    ],
+    "3345000017": [
+      "acc-coffee-capsules",
+      "acc-coffee-cups",
+      "acc-capsule-holder"
+    ],
+    "3879000041": [
+      "acc-face-shield",
+      "acc-ear-muffs",
+      "acc-trimmer-harness"
+    ],
+    "4229000039": [
+      "acc-face-shield",
+      "acc-ear-muffs",
+      "acc-work-gloves"
+    ],
+    "8198000010": [
+      "acc-bbq-tong",
+      "acc-bbq-brush",
+      "acc-oven-glove"
+    ],
+    "4986000011": [
+      "acc-cooler-bag",
+      "acc-beach-umbrella",
+      "acc-waterproof-pouch"
+    ],
+    "6193000012": [
+      "acc-safety-glasses",
+      "acc-work-gloves",
+      "acc-tool-belt"
+    ],
+    "9883000014": [
+      "acc-airfryer-mold",
+      "acc-bbq-tong",
+      "acc-oven-glove"
+    ],
+    "7712000016": [
+      "acc-food-containers",
+      "acc-thermometer",
+      "acc-ice-tray"
+    ],
+    "4407000020": [
+      "acc-baking-pan",
+      "acc-oven-glove",
+      "acc-kitchen-timer"
+    ],
+    "9163000021": [
+      "acc-multimeter",
+      "acc-terminal-brush",
+      "acc-terminal-cover"
+    ],
+    "9909000023": [
+      "acc-boombox-bag",
+      "acc-bluetooth-earbuds",
+      "acc-microfiber"
+    ],
+    "9218300153": [
+      "acc-bike-lights",
+      "acc-bike-pump",
+      "acc-bike-lock"
+    ],
+    "8501150023": [
+      "acc-grinder-discs",
+      "acc-safety-glasses",
+      "acc-work-gloves"
+    ],
+    "4569300024": [
+      "acc-drawer-dividers",
+      "acc-storage-box",
+      "acc-furniture-felt"
+    ],
+    "5289100031": [
+      "acc-tire-gauge",
+      "acc-valve-caps",
+      "acc-tire-compressor"
+    ],
+    "5218200032": [
+      "acc-car-shampoo",
+      "acc-wash-brush",
+      "acc-microfiber"
+    ],
+    "7329200036": [
+      "acc-cleaning-brush",
+      "acc-microfiber",
+      "acc-spray-bottle"
+    ],
+    "7999000038": [
+      "acc-hdmi",
+      "acc-tv-mount",
+      "acc-screen-cleaner"
+    ]
+  }
+}

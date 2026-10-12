@@ -1,3 +1,4 @@
+import { signUpsellContext } from "./upsell-token.server.ts";
 const FORTPAY_BASE_URL = "https://api.fortpayplataforma.com.br/api/public/v1";
 const FORTPAY_PRODUCT_HASH = "txi2kwhf0r";
 const FORTPAY_OFFER_HASH = "o9ybnwoyun";
@@ -26,6 +27,7 @@ export type PixChargeResult = {
   contentIds: string[];
   itemTitle: string;
   numItems: number;
+  upsellToken?: string;
 };
 
 type JsonRecord = Record<string, unknown>;
@@ -218,14 +220,17 @@ export async function createFortpayPixCharge(
     throw new Error("A FortPay não retornou o código Pix completo.");
   }
 
+  const contentIds = [...new Set((input.contentIds?.length ? input.contentIds : [input.itemId || "6549324"])
+    .map(String).map((id) => id.trim().slice(0, 80)).filter(Boolean))];
+  const expiresAt = Date.now() + 24 * 60 * 60 * 1000;
   return {
     pixCode,
     transactionId,
+    upsellToken: signUpsellContext({ transactionId, contentIds, expiresAt }, config.apiToken),
     createdAt: new Date().toISOString().slice(0, 19).replace("T", " "),
-    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    expiresAt: new Date(expiresAt).toISOString(),
     amountCents: amount,
-    contentIds: [...new Set((input.contentIds?.length ? input.contentIds : [input.itemId || "6549324"])
-      .map(String).map((id) => id.trim().slice(0, 80)).filter(Boolean))],
+    contentIds,
     itemTitle: title,
     numItems: Number.isFinite(input.numItems) ? Math.max(1, Math.round(input.numItems!)) : 1,
   };
