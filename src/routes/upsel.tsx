@@ -10,8 +10,8 @@ export const Route = createFileRoute('/upsel')({
     { name: 'robots', content: 'noindex,nofollow' },
   ] }),
   validateSearch: (search: Record<string, unknown>) => ({
-    produto: typeof search.produto === 'string' && getProduct(search.produto)
-      ? search.produto : '9909000023',
+    produto: getProduct(String(search.produto ?? ''))
+      ? String(search.produto) : '9909000023',
   }),
   component: UpsellPreviewPage,
 });

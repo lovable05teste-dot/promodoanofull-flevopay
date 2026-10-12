@@ -87,7 +87,8 @@ function UpsellCard({ offer, parent, preview = false }: { offer: UpsellOffer; pa
     creating.current = true;
     setLoading(true); setError('');
     try {
-      await trackInitiateCheckout({ id: offer.id, name: offer.title, value: offer.priceCents / 100, numItems: 1 });
+      // O pixel não deve atrasar a geração do Pix na mesma tela.
+      void trackInitiateCheckout({ id: offer.id, name: offer.title, value: offer.priceCents / 100, numItems: 1 }).catch(() => {});
       const customer = JSON.parse(localStorage.getItem('checkout_customer') || '{}');
       const result = await generate({ data: {
         parentToken: parent.upsellToken!, offerId: offer.id,
