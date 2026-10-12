@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "test:ic": "node scripts/verify-ic-tracking.mjs",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "test:purchase": "node scripts/verify-purchase.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

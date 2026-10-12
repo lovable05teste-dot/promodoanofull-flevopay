@@ -13,12 +13,19 @@ export type PixChargeInput = {
   itemTitle?: string;
   itemId?: string;
   itemImage?: string;
+  contentIds?: string[];
+  numItems?: number;
 };
 
 export type PixChargeResult = {
   pixCode: string;
   transactionId: string;
   createdAt: string;
+  expiresAt: string;
+  amountCents: number;
+  contentIds: string[];
+  itemTitle: string;
+  numItems: number;
 };
 
 type JsonRecord = Record<string, unknown>;
@@ -215,6 +222,12 @@ export async function createFortpayPixCharge(
     pixCode,
     transactionId,
     createdAt: new Date().toISOString().slice(0, 19).replace("T", " "),
+    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+    amountCents: amount,
+    contentIds: [...new Set((input.contentIds?.length ? input.contentIds : [input.itemId || "6549324"])
+      .map(String).map((id) => id.trim().slice(0, 80)).filter(Boolean))],
+    itemTitle: title,
+    numItems: Number.isFinite(input.numItems) ? Math.max(1, Math.round(input.numItems!)) : 1,
   };
 }
 
@@ -232,7 +245,9 @@ export async function readFortpayPixStatus(transactionId: string, apiToken: stri
     const status =
       rawStatus === "approved" || rawStatus === "paid" || rawStatus === "completed"
         ? "COMPLETED"
-        : rawStatus === "refunded" ||
+        : rawStatus === "expired" ||
+            rawStatus === "refused" ||
+            rawStatus === "refunded" ||
             rawStatus === "chargeback" ||
             rawStatus === "failed" ||
             rawStatus === "cancelled" ||

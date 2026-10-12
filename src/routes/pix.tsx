@@ -8,6 +8,9 @@ import QRCode from "qrcode";
 import { SiteFooter } from "@/components/SiteFooter";
 import { PixLoadingScreen } from "@/components/PixLoadingScreen";
 import { trackStoredInitiateCheckout } from "@/lib/tracking";
+import type { PixChargeResult } from "@/lib/pix.server";
+import { trackConfirmedPixPurchase } from "@/lib/purchase-tracking";
+import { pixCheckoutKey, readCachedPixCharge, saveCachedPixCharge, clearCachedPixCharge } from "@/lib/pix-session";
 
 export const Route = createFileRoute("/pix")({
   head: () => ({
@@ -45,6 +48,7 @@ function PixPage() {
   const [pixCode, setPixCode] = useState<string>("");
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
   const [transactionId, setTransactionId] = useState<string>("");
+  const [charge, setCharge] = useState<PixChargeResult | null>(null);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string>("");
   const [paid, setPaid] = useState(false);
@@ -95,7 +99,15 @@ function PixPage() {
           started.current = false;
           return;
         }
-        const result = await createCharge({
+        const contentIds = Array.isArray(product?.contentIds) && product.contentIds.length
+          ? product.contentIds.map(String) : [String(product?.id || "6549324")];
+        const numItems = Math.max(1, Math.round(Number(product?.quantity) || 1));
+        const checkoutKey = await pixCheckoutKey({
+          sessionId: getCheckoutSessionId(), contentIds,
+          amountCents: amountCents > 0 ? amountCents : 6193,
+          document: doc, email: String(customer.email || ""), numItems,
+        });
+        const result = readCachedPixCharge(checkoutKey) || await createCharge({
           data: {
             sessionId: getCheckoutSessionId(),
             name: customer.name || "Cliente",
@@ -107,8 +119,11 @@ function PixPage() {
             itemTitle: product?.title || "Produto",
             itemId: product?.id || "",
             itemImage: product?.image || "",
+            contentIds, numItems,
           },
         });
+        saveCachedPixCharge(checkoutKey, result);
+        setCharge(result);
         setPixCode(result.pixCode);
         QRCode.toDataURL(result.pixCode, { width: 260, margin: 1, errorCorrectionLevel: "L" })
           .then(setQrDataUrl)
@@ -131,29 +146,57 @@ function PixPage() {
   }, [pixCode, qrDataUrl]);
 
   useEffect(() => {
-    if (!transactionId) return;
+    if (!charge) return;
     let stopped = false;
-    const interval = setInterval(async () => {
-      if (stopped) return;
+    let checking = false;
+    let confirmed = false;
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    const check = async () => {
+      if (stopped || checking) return;
+      checking = true;
       try {
-        const s = await fetchStatus({ data: { transactionId } });
-        if (s.status === "COMPLETED") {
+        const status = confirmed ? "COMPLETED" :
+          (await fetchStatus({ data: { transactionId: charge.transactionId } })).status;
+        if (stopped) return;
+        if (status === "COMPLETED") {
+          confirmed = true;
+          setPaid(true);
+          // Snapshot da cobrança: não lê outro produto que tenha sido aberto depois.
+          const tracking = await trackConfirmedPixPurchase(status, charge);
+          if (tracking.sent) {
+            stopped = true;
+            clearInterval(interval);
+            clearTimeout(timeout);
+          }
+        } else if (["EXPIRED", "CANCELLED", "CANCELED", "FAILED", "REFUSED", "REFUNDED", "CHARGEBACK"].includes(status)) {
           stopped = true;
           clearInterval(interval);
-          setPaid(true);
+          clearTimeout(timeout);
+          clearCachedPixCharge(charge.transactionId);
+          setPixCode("");
+          setError("Esta cobrança não está disponível. Volte para a revisão do pedido e gere um novo Pix.");
         }
-      } catch {}
-    }, 5000);
-    const timeout = setTimeout(() => {
+      } catch {
+        // Falha temporária na consulta/pixel: tentar novamente, sem marcar compra.
+      } finally { checking = false; }
+    };
+    const interval = setInterval(() => { void check(); }, 5000);
+    timeout = setTimeout(() => {
       stopped = true;
       clearInterval(interval);
-    }, 15 * 60 * 1000);
+    }, Math.max(0, Date.parse(charge.expiresAt) - Date.now()));
+    const onReturn = () => { if (document.visibilityState === "visible") void check(); };
+    document.addEventListener("visibilitychange", onReturn);
+    window.addEventListener("focus", onReturn);
+    void check(); // inclui retorno do banco/reload, sem esperar o primeiro intervalo.
     return () => {
       stopped = true;
       clearInterval(interval);
       clearTimeout(timeout);
+      document.removeEventListener("visibilitychange", onReturn);
+      window.removeEventListener("focus", onReturn);
     };
-  }, [transactionId, fetchStatus]);
+  }, [charge, fetchStatus]);
 
   const copy = async () => {
     if (!pixCode) return;
