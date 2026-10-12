@@ -11,7 +11,7 @@ import type { PixChargeResult } from '@/lib/pix.server';
 
 const money = (cents: number) => (cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-function UpsellCard({ offer, parent }: { offer: UpsellOffer; parent: PixChargeResult }) {
+function UpsellCard({ offer, parent, preview = false }: { offer: UpsellOffer; parent: PixChargeResult; preview?: boolean }) {
   const generate = useServerFn(createUpsellPixCharge);
   const fetchStatus = useServerFn(getPixStatus);
   const cacheKey = `upsell_pix_${parent.transactionId}_${offer.id}`;
@@ -25,24 +25,25 @@ function UpsellCard({ offer, parent }: { offer: UpsellOffer; parent: PixChargeRe
   const [imageFailed, setImageFailed] = useState(false);
 
   useEffect(() => {
+    if (preview) return;
     try {
       const saved = JSON.parse(sessionStorage.getItem(cacheKey) || 'null');
       if (saved?.transactionId && saved?.pixCode && saved.amountCents === offer.priceCents &&
           saved.contentIds?.[0] === offer.id && Date.parse(saved.expiresAt) > Date.now()) setCharge(saved);
     } catch {}
-  }, [cacheKey, offer.id, offer.priceCents]);
+  }, [cacheKey, offer.id, offer.priceCents, preview]);
 
   useEffect(() => {
-    if (!charge) return;
+    if (preview || !charge) return;
     let active = true;
     void QRCode.toDataURL(charge.pixCode, { width: 240, margin: 1 }).then((url) => {
       if (active) setQr(url);
     }).catch(() => {});
     return () => { active = false; };
-  }, [charge]);
+  }, [charge, preview]);
 
   useEffect(() => {
-    if (!charge) return;
+    if (preview || !charge) return;
     let stopped = false;
     let checking = false;
     let confirmed = false;
@@ -75,9 +76,13 @@ function UpsellCard({ offer, parent }: { offer: UpsellOffer; parent: PixChargeRe
       document.removeEventListener('visibilitychange', onReturn);
       window.removeEventListener('focus', onReturn);
     };
-  }, [charge, fetchStatus, cacheKey]);
+  }, [charge, fetchStatus, cacheKey, preview]);
 
   const accept = async () => {
+    if (preview) {
+      setError('Esta é uma prévia. No checkout, este botão gera o Pix do complemento após a aprovação da compra principal.');
+      return;
+    }
     if (creating.current || loading || charge || paid) return;
     creating.current = true;
     setLoading(true); setError('');
@@ -98,7 +103,7 @@ function UpsellCard({ offer, parent }: { offer: UpsellOffer; parent: PixChargeRe
   };
 
   const copy = async () => {
-    if (!charge) return;
+    if (preview || !charge) return;
     try { await navigator.clipboard.writeText(charge.pixCode); setCopied(true); } catch { setError('Selecione o código abaixo e copie para pagar no app do banco.'); }
   };
 
@@ -127,17 +132,17 @@ function UpsellCard({ offer, parent }: { offer: UpsellOffer; parent: PixChargeRe
   </article>;
 }
 
-export function UpsellOffers({ parent }: { parent: PixChargeResult }) {
+export function UpsellOffers({ parent, preview = false }: { parent: PixChargeResult; preview?: boolean }) {
   const [dismissed, setDismissed] = useState(false);
   const offers = getUpsellsForProductIds(parent.contentIds);
-  if (dismissed || !parent.upsellToken || offers.length !== 3) return null;
+  if (dismissed || (!preview && !parent.upsellToken) || offers.length !== 3) return null;
   return <section className="space-y-3 sm:space-y-4" aria-label="Ofertas para complementar sua compra">
     <div className="rounded-lg bg-white p-4 text-center sm:p-6">
-      <p className="text-[13px] font-semibold text-[#00a650]">Sua compra principal está confirmada</p>
+      <p className="text-[13px] font-semibold text-[#00a650]">{preview ? 'Prévia das ofertas complementares' : 'Sua compra principal está confirmada'}</p>
       <h2 className="mt-2 text-[21px] font-semibold text-gray-900">Complete sua compra</h2>
       <p className="mt-2 text-[14px] leading-relaxed text-gray-600">Selecionamos 3 complementos para você. Escolha os que deseja adicionar.</p>
     </div>
-    {offers.map((offer) => <UpsellCard key={`${parent.transactionId}_${offer.id}`} offer={offer} parent={parent} />)}
+    {offers.map((offer) => <UpsellCard key={`${parent.transactionId}_${offer.id}`} offer={offer} parent={parent} preview={preview} />)}
     <button type="button" onClick={() => setDismissed(true)} className="block w-full rounded-lg bg-white px-4 py-4 text-center text-[14px] font-medium text-[#3483fa]">Não adicionar outros complementos</button>
   </section>;
 }
