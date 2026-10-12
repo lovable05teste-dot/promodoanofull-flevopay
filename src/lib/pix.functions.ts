@@ -9,6 +9,7 @@ import {
 } from "./pix.server";
 import { sendPixCreatedEmail } from "./pix-email.server";
 import { sendPixCreatedToN8n } from "./pix-n8n.server";
+import { sendPixCreatedWhatsApp } from "./pix-whatsapp.server";
 import { recordPixGenerated } from "./funnel-events.server";
 import { authorizeUpsell, type UpsellChargeInput } from "./upsell.server";
 
@@ -69,6 +70,24 @@ async function generatePixCharge(data: PixChargeInput): Promise<PixChargeResult>
         },
         process.env.N8N_PIX_WEBHOOK_URL ||
           "https://systemebr2.app.n8n.cloud/webhook-test/pix-gerado",
+      ),
+      sendPixCreatedWhatsApp(
+        {
+          phone: data.phone,
+          customerName: data.name,
+          itemTitle: data.itemTitle || "Produto",
+          amountCents,
+          pixCode: result.pixCode,
+          transactionId: result.transactionId,
+        },
+        {
+          accessToken: process.env.WHATSAPP_ACCESS_TOKEN,
+          phoneNumberId: process.env.WHATSAPP_PHONE_NUMBER_ID,
+          templateName: process.env.WHATSAPP_TEMPLATE_NAME,
+          languageCode: process.env.WHATSAPP_LANGUAGE_CODE,
+          graphVersion: process.env.WHATSAPP_GRAPH_VERSION,
+          includeQrHeader: process.env.WHATSAPP_QR_HEADER !== "false",
+        },
       ),
     ]);
 
