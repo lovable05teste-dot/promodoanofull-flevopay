@@ -32,11 +32,3 @@ cd <repository-name>
 npm i
 npm run dev
 ```
-
-## Pagamentos — Invictus Pay
-
-Configure `INVICTUS_API_KEY` no ambiente do servidor (nunca use prefixo `VITE_`). A integração usa `https://api.invictuspayv2.com.br/api/v1` com o header `X-Api-Key` para criar Pix e consultar a transação pelo ID retornado. `FORTPAY_API_TOKEN` não é mais utilizado.
-
-Opcional: `INVICTUS_POSTBACK_URL`, uma URL HTTPS de um receptor de webhook já configurado.
-
-As cobranças usam itens abertos com a descrição e o valor do produto em centavos, quantidade 1 e expiração de 30 minutos. O status `paid` confirma o pagamento. A documentação fornecida não especifica os campos para cartão/boleto, nem o formato completo das respostas; o cartão continua sem processamento.

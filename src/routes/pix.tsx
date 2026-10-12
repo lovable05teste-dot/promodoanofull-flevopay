@@ -147,7 +147,7 @@ function PixPage() {
     const timeout = setTimeout(() => {
       stopped = true;
       clearInterval(interval);
-    }, 30 * 60 * 1000);
+    }, 15 * 60 * 1000);
     return () => {
       stopped = true;
       clearInterval(interval);

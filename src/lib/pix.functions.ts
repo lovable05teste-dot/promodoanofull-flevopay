@@ -1,9 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
 
-// Gateway de pagamento: Invictus Pay.
+// Gateway de pagamento: FortPay.
 import {
-  createInvictusPixCharge,
-  readInvictusPixStatus,
+  createFortpayPixCharge,
+  readFortpayPixStatus,
   type PixChargeInput,
   type PixChargeResult,
 } from "./pix.server";
@@ -14,16 +14,14 @@ import { recordPixGenerated } from "./funnel-events.server";
 export const createPixCharge = createServerFn({ method: "POST" })
   .inputValidator((data: PixChargeInput) => data)
   .handler(async ({ data }): Promise<PixChargeResult> => {
-    const apiKey = process.env.INVICTUS_API_KEY?.trim();
-    if (!apiKey) {
+    const apiToken = process.env.FORTPAY_API_TOKEN?.trim();
+    if (!apiToken) {
       throw new Error(
-        "Invictus Pay não está configurada. Adicione INVICTUS_API_KEY nas variáveis de ambiente.",
+        "FortPay não está configurada. Adicione FORTPAY_API_TOKEN nas variáveis de ambiente.",
       );
     }
 
-    const result = await createInvictusPixCharge(data, {
-      apiKey, postbackUrl: process.env.INVICTUS_POSTBACK_URL?.trim(),
-    });
+    const result = await createFortpayPixCharge(data, { apiToken });
     const amountCents =
       Number.isFinite(data.amountCents) && (data.amountCents ?? 0) > 0
         ? Math.round(data.amountCents as number)
@@ -81,8 +79,8 @@ export const createPixCharge = createServerFn({ method: "POST" })
 export const getPixStatus = createServerFn({ method: "GET" })
   .inputValidator((data: { transactionId: string }) => data)
   .handler(async ({ data }): Promise<{ status: string; paidAt?: string }> => {
-    const apiKey = process.env.INVICTUS_API_KEY?.trim();
-    if (!apiKey) return { status: "PENDING" };
+    const apiToken = process.env.FORTPAY_API_TOKEN?.trim();
+    if (!apiToken) return { status: "PENDING" };
 
-    return readInvictusPixStatus(data.transactionId, apiKey);
+    return readFortpayPixStatus(data.transactionId, apiToken);
   });
