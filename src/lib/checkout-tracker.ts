@@ -21,16 +21,7 @@ export function getCheckoutSessionId() {
     return memorySession;
   }
 }
-function startNewCheckout() {
-  const id = createId();
-  memorySession = id;
-  try {
-    sessionStorage.setItem(SESSION_KEY, id);
-    sessionStorage.removeItem(IC_KEY);
-  } catch {}
-  return id;
-}
-function productInfo() {
+function productInfoFromStorage() {
   let p: Record<string, unknown> = {};
   try {
     p = JSON.parse(localStorage.getItem("checkout_product") || "{}") as Record<string, unknown>;
@@ -42,6 +33,36 @@ function productInfo() {
     productName: String(p.title || "Produto").slice(0, 160),
     amountCents: Number.isFinite(cents) ? cents : 0,
   };
+}
+function startNewCheckout() {
+  const id = createId();
+  memorySession = id;
+  try {
+    sessionStorage.setItem(SESSION_KEY, id);
+    sessionStorage.removeItem(IC_KEY);
+  } catch {}
+  return id;
+}
+function productInfo() {
+  return productInfoFromStorage();
+}
+export function trackFirstPartyPageView(path = window.location.pathname) {
+  if (typeof window === "undefined") return;
+  const sessionId = getCheckoutSessionId();
+  const traffic = getUtmQuery();
+  void fetch("/api/tracking/pageview", {
+    method: "POST",
+    credentials: "same-origin",
+    keepalive: true,
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      sessionId,
+      path,
+      traffic,
+      referrer: document.referrer,
+      ...productInfoFromStorage(),
+    }),
+  }).catch(() => {});
 }
 /** Marca o clique no botão do site; não confirma por si só o envio ao Meta. */
 export function trackFirstPartyCheckout() {

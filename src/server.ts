@@ -2,7 +2,13 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
-import { listFunnelEvents, recordPublicIc, recordPublicCustomer, storageConfigured } from "./lib/funnel-events.server";
+import {
+  listFunnelEvents,
+  recordPublicIc,
+  recordPublicCustomer,
+  recordPublicPageView,
+  storageConfigured,
+} from "./lib/funnel-events.server";
 import {
   adminIsConfigured,
   adminSessionToken,
@@ -56,6 +62,15 @@ function safeDownloadName(name: string) {
 
 async function handleReceiptApi(request: Request): Promise<Response | null> {
   const url = new URL(request.url);
+
+  if (url.pathname === "/api/tracking/pageview" && request.method === "POST") {
+    const origin = request.headers.get("origin");
+    if (origin && origin !== url.origin) return json({ ok: false }, 403);
+    const status = await recordPublicPageView(request);
+    return status === "invalid" ? json({ ok: false }, 400)
+      : status === "disabled" ? json({ ok: false }, 503)
+      : json({ ok: true }, 202);
+  }
 
   // Evento primário coletado pelo próprio site. IP é mascarado antes de persistir.
   if (url.pathname === "/api/tracking/ic" && request.method === "POST") {

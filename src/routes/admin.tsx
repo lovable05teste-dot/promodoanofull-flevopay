@@ -14,7 +14,7 @@ export const Route = createFileRoute("/admin")({
 type Receipt = { name: string; uploadedAt: string; size: number; contentType: string };
 type FunnelEvent = {
   id: string;
-  type: "InitiateCheckout" | "CustomerIdentified" | "PixGenerated" | "PixPaid";
+  type: "PageView" | "InitiateCheckout" | "CustomerIdentified" | "PixGenerated" | "PixPaid";
   at: string;
   sessionId: string;
   productId: string;
@@ -25,7 +25,7 @@ type FunnelEvent = {
   traffic?: Record<string, string>;
   location?: { maskedIp: string; city: string; region: string; country: string };
 };
-type Tab = "resumo" | "ic" | "pix" | "comprovantes" | "integracoes";
+type Tab = "resumo" | "visitas" | "ic" | "pix" | "comprovantes" | "integracoes";
 function brl(cents: number) {
   return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format((cents || 0) / 100);
 }
@@ -127,6 +127,8 @@ function AdminPage() {
     setAuthenticated(false); setEvents([]); setReceipts([]); setTab("resumo");
   }
   const report = useMemo(() => {
+    const pageViews = events.filter(e => e.type === "PageView");
+    const googleViews = pageViews.filter(e => e.traffic?.source_detected === "google");
     const ic = events.filter(e => e.type === "InitiateCheckout");
     const pix = events.filter(e => e.type === "PixGenerated");
     const paidIds = new Set(events.filter(e => e.type === "PixPaid").map(e => e.transactionId));
@@ -144,7 +146,7 @@ function AdminPage() {
     }
     const icUnique = ic.filter((e, index, all) => all.findIndex(x => x.sessionId === e.sessionId) === index);
     const rows = icUnique.map(event => ({ event, buyer: latestPix.get(event.sessionId) || identified.get(event.sessionId) }));
-    return { ic: icUnique, pix: uniquePix, paidIds, rows, latestPix };
+    return { pageViews, googleViews, ic: icUnique, pix: uniquePix, paidIds, rows, latestPix };
   }, [events]);
   const searchValue = search.trim().toLowerCase();
   const filteredIc = report.rows.filter(({ event, buyer }) => !searchValue || [
@@ -155,7 +157,7 @@ function AdminPage() {
   ].join(" ").toLowerCase().includes(searchValue));
   const approved = report.pix.filter(e => report.paidIds.has(e.transactionId));
   const tabs: Array<{ id: Tab; title: string }> = [
-    { id: "resumo", title: "Visão geral" }, { id: "ic", title: "Inícios de checkout" },
+    { id: "resumo", title: "Visão geral" }, { id: "visitas", title: "Visitas" }, { id: "ic", title: "Inícios de checkout" },
     { id: "pix", title: "Pix e clientes" }, { id: "comprovantes", title: "Comprovantes" },
     { id: "integracoes", title: "Integrações" },
   ];
@@ -193,9 +195,9 @@ function AdminPage() {
           {tab === "resumo" && <>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <Stat title="Inícios de checkout" value={funnelMessage ? "—" : String(report.ic.length)} caption="Cliques registrados pelo próprio site" />
+              <Stat title="Visitas do Google" value={funnelMessage ? "—" : String(report.googleViews.length)} caption="Entradas com gclid/UTM/referrer Google" />
               <Stat title="Pix gerados" value={funnelMessage ? "—" : String(report.pix.length)} caption="Cobranças criadas na FortPay" />
               <Stat title="Pix confirmados" value={funnelMessage ? "—" : String(approved.length)} caption="Confirmações observadas na consulta de status" />
-              <Stat title="Valor de Pix gerados" value={funnelMessage ? "—" : brl(report.pix.reduce((s, e) => s + e.amountCents, 0))} caption="Não é faturamento recebido" />
             </div>
             <div className="mt-7 grid gap-5 lg:grid-cols-2">
               <section className="rounded-2xl border border-slate-200 bg-white p-6">
@@ -210,6 +212,27 @@ function AdminPage() {
                   <div className="min-w-0"><div className="truncate font-semibold">{event.customer?.name || "Cliente"}</div><div className="truncate text-slate-500">{event.productName}</div></div><strong className="shrink-0">{brl(event.amountCents)}</strong>
                 </div>)}
               </section>
+            </div>
+          </>}
+          {tab === "visitas" && <>
+            <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
+              <SectionTitle title="Visitas e IP parcial" desc="Entradas registradas no servidor, com origem Google quando houver gclid, UTM ou referrer." />
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Buscar origem, IP, cidade ou página" aria-label="Pesquisar visitas" className="w-full max-w-sm rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none focus:border-blue-500" />
+            </div>
+            <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
+              {report.pageViews.length === 0 ? <Empty message="Nenhuma visita registrada ainda." /> : <table className="w-full min-w-[940px] text-left text-sm">
+                <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500"><tr><th className="p-4">Quando</th><th className="p-4">Página</th><th className="p-4">Origem</th><th className="p-4">IP parcial</th><th className="p-4">Localização</th><th className="p-4">Sessão</th></tr></thead>
+                <tbody>{report.pageViews.filter(event => !searchValue || [
+                  event.productName, source(event), event.location?.maskedIp, location(event), event.sessionId,
+                ].join(" ").toLowerCase().includes(searchValue)).slice(0, 120).map(event => <tr key={event.id} className="border-t border-slate-100 align-top">
+                  <td className="p-4 whitespace-nowrap">{date(event.at)}</td>
+                  <td className="p-4">{event.productName}</td>
+                  <td className="p-4">{event.traffic?.source_detected === "google" ? "Google · " : ""}{source(event)}</td>
+                  <td className="p-4">{event.location?.maskedIp || "Não disponível"}</td>
+                  <td className="p-4">{location(event)}</td>
+                  <td className="p-4 text-xs break-all">{event.sessionId}</td>
+                </tr>)}</tbody>
+              </table>}
             </div>
           </>}
           {(tab === "ic" || tab === "pix") && <>

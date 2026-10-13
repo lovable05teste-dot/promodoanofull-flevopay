@@ -5,7 +5,7 @@
  */
 export type FunnelEvent = {
   id: string;
-  type: "InitiateCheckout" | "CustomerIdentified" | "PixGenerated" | "PixPaid";
+  type: "PageView" | "InitiateCheckout" | "CustomerIdentified" | "PixGenerated" | "PixPaid";
   at: string;
   sessionId: string;
   productId: string;
@@ -18,7 +18,18 @@ export type FunnelEvent = {
 };
 
 const PREFIX = "analytics/events/";
-const ALLOWED_UTM = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "src", "sck"] as const;
+const ALLOWED_UTM = [
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "utm_content",
+  "utm_term",
+  "src",
+  "sck",
+  "gclid",
+  "gbraid",
+  "wbraid",
+] as const;
 
 function token() { return process.env.BLOB_READ_WRITE_TOKEN?.trim() || ""; }
 function blobHeaders(value: string, extra: Record<string, string> = {}) {
@@ -42,6 +53,29 @@ function trafficParams(input: unknown): Record<string, string> {
     if (value) safe[key] = value;
   }
   return safe;
+}
+function requestTraffic(request: Request, input: unknown): Record<string, string> {
+  const url = new URL(request.url);
+  const traffic = trafficParams(input);
+  for (const key of ALLOWED_UTM) {
+    const value = text(url.searchParams.get(key), 150);
+    if (value && !traffic[key]) traffic[key] = value;
+  }
+  const referrer = text(request.headers.get("referer"), 300);
+  if (referrer) traffic.referrer = referrer;
+  let refHost = "";
+  try { refHost = referrer ? new URL(referrer).hostname : ""; } catch {}
+  const source = (traffic.utm_source || traffic.src || "").toLowerCase();
+  if (
+    traffic.gclid ||
+    traffic.gbraid ||
+    traffic.wbraid ||
+    /(^|\.)google\./i.test(refHost) ||
+    ["google", "google_ads", "adwords"].includes(source)
+  ) {
+    traffic.source_detected = "google";
+  }
+  return traffic;
 }
 function decodeGeo(value: string | null) {
   try { return decodeURIComponent(value || "").slice(0, 90); }
@@ -98,6 +132,30 @@ export async function saveFunnelEvent(event: Omit<FunnelEvent, "id" | "at">) {
   } catch { return false; }
   finally { clearTimeout(timeout); }
 }
+export async function recordPublicPageView(request: Request): Promise<"recorded" | "disabled" | "invalid"> {
+  let data: Record<string, unknown> = {};
+  try {
+    if (Number(request.headers.get("content-length") || 0) > 4096) return "invalid";
+    if ((request.headers.get("content-length") || "0") !== "0") {
+      const raw = await request.json();
+      if (!raw || typeof raw !== "object" || Array.isArray(raw)) return "invalid";
+      data = raw as Record<string, unknown>;
+    }
+  } catch { return "invalid"; }
+
+  const sessionId = safeSession(data.sessionId);
+  if (!sessionId) return "invalid";
+  const ok = await saveFunnelEvent({
+    type: "PageView",
+    sessionId,
+    productId: text(data.productId, 80),
+    productName: text(data.productName, 160) || text(data.path, 160) || "Página",
+    amountCents: 0,
+    traffic: requestTraffic(request, data.traffic),
+    location: requestLocation(request),
+  });
+  return ok ? "recorded" : "disabled";
+}
 export async function recordPublicIc(request: Request): Promise<"recorded" | "disabled" | "invalid"> {
   let data: Record<string, unknown>;
   try {
@@ -114,7 +172,7 @@ export async function recordPublicIc(request: Request): Promise<"recorded" | "di
     productId: text(data.productId, 80),
     productName: text(data.productName, 160) || "Produto",
     amountCents: Number.isFinite(price) ? Math.min(Math.max(Math.round(price), 0), 100000000) : 0,
-    traffic: trafficParams(data.traffic),
+    traffic: requestTraffic(request, data.traffic),
     location: requestLocation(request),
   });
   return ok ? "recorded" : "disabled";
@@ -190,7 +248,7 @@ export async function listFunnelEvents(): Promise<{ events: FunnelEvent[]; limit
         const response = await fetch(blob.url, { headers: blobHeaders(key) });
         if (!response.ok) return;
         const event = await response.json() as FunnelEvent;
-        if (event && ["InitiateCheckout", "CustomerIdentified", "PixGenerated", "PixPaid"].includes(event.type)) results.push(event);
+        if (event && ["PageView", "InitiateCheckout", "CustomerIdentified", "PixGenerated", "PixPaid"].includes(event.type)) results.push(event);
       } catch {}
     }));
   }

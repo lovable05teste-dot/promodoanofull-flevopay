@@ -13,7 +13,7 @@ import { useEffect, useRef, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { captureUtms } from "../lib/utm";
-import { installFirstPartyCheckoutListener } from "../lib/checkout-tracker";
+import { installFirstPartyCheckoutListener, trackFirstPartyPageView } from "../lib/checkout-tracker";
 import { UTMIFY_PIXEL_LOADER, UTMIFY_UTMS_LOADER } from "../lib/utmify-pixel";
 import { META_PIXEL_ID, META_PIXEL_LOADER } from "../lib/meta-pixel";
 import { GOOGLE_TAG_ID, pushGoogleTagEvent } from "../lib/google-tag";
@@ -188,6 +188,10 @@ function RootComponent() {
     captureUtms();
     return installFirstPartyCheckoutListener();
   }, []);
+  useEffect(() => {
+    captureUtms();
+    trackFirstPartyPageView(pathname);
+  }, [pathname]);
 
   // A primeira PageView é enviada no <head>. Em navegação SPA, enviamos
   // somente uma nova PageView por troca real de pathname.
