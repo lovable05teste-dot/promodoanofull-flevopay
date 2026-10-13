@@ -10,9 +10,28 @@ import {
 import { sendPixCreatedEmail } from "./pix-email.server";
 import { sendPixCreatedToN8n } from "./pix-n8n.server";
 import {
-  enforcePixPendingLimit,
+  listFunnelEvents,
   recordPixGenerated,
 } from "./funnel-events.server";
+
+const PIX_PENDING_LIMIT = 3;
+
+async function countPendingPixForSession(sessionId?: string) {
+  if (!sessionId) return 0;
+  try {
+    const { events } = await listFunnelEvents();
+    const paid = new Set(events.filter(event => event.type === "PixPaid").map(event => event.transactionId).filter(Boolean));
+    const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
+    return events.filter(event =>
+      event.type === "PixGenerated" &&
+      event.sessionId === sessionId &&
+      (!event.transactionId || !paid.has(event.transactionId)) &&
+      Date.parse(event.at) >= oneDayAgo
+    ).length;
+  } catch {
+    return 0;
+  }
+}
 
 export const createPixCharge = createServerFn({ method: "POST" })
   .inputValidator((data: PixChargeInput) => data)
@@ -24,9 +43,8 @@ export const createPixCharge = createServerFn({ method: "POST" })
       );
     }
 
-    const headers = new Headers();
-    const limit = await enforcePixPendingLimit(headers, data.sessionId);
-    if (!limit.allowed) {
+    const pendingPix = await countPendingPixForSession(data.sessionId);
+    if (pendingPix >= PIX_PENDING_LIMIT) {
       throw new Error(
         "Você já tem 3 Pix pendentes. Pague um dos Pix gerados ou aguarde antes de gerar outro.",
       );
@@ -50,7 +68,6 @@ export const createPixCharge = createServerFn({ method: "POST" })
         email: data.email,
         phone: data.phone,
         utm: data.utm,
-        ipHash: limit.ipHash,
       }),
       sendPixCreatedEmail(
         {
