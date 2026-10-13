@@ -1,5 +1,4 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getRequestHeaders } from "@tanstack/start-server-core";
 
 // Gateway de pagamento: FortPay.
 import {
@@ -13,7 +12,6 @@ import { sendPixCreatedToN8n } from "./pix-n8n.server";
 import {
   enforcePixPendingLimit,
   recordPixGenerated,
-  requestLocationFromHeaders,
 } from "./funnel-events.server";
 
 export const createPixCharge = createServerFn({ method: "POST" })
@@ -26,7 +24,7 @@ export const createPixCharge = createServerFn({ method: "POST" })
       );
     }
 
-    const headers = getRequestHeaders();
+    const headers = new Headers();
     const limit = await enforcePixPendingLimit(headers, data.sessionId);
     if (!limit.allowed) {
       throw new Error(
@@ -52,7 +50,6 @@ export const createPixCharge = createServerFn({ method: "POST" })
         email: data.email,
         phone: data.phone,
         utm: data.utm,
-        location: requestLocationFromHeaders(headers),
         ipHash: limit.ipHash,
       }),
       sendPixCreatedEmail(
