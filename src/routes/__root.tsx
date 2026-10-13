@@ -16,8 +16,8 @@ import { captureUtms } from "../lib/utm";
 import { installFirstPartyCheckoutListener } from "../lib/checkout-tracker";
 import { UTMIFY_PIXEL_LOADER, UTMIFY_UTMS_LOADER } from "../lib/utmify-pixel";
 import { META_PIXEL_ID, META_PIXEL_LOADER } from "../lib/meta-pixel";
-import { SITE_PROTECTION_SCRIPT, DOMAIN_NAVIGATION_SCRIPT, enforceSiteDomain } from "../lib/site-protection";
-import { PROTECTION_IMAGE } from "../lib/site-protection-image";
+import { GOOGLE_TAG_ID, pushGoogleTagEvent } from "../lib/google-tag";
+import { GOOGLE_TAG_MANAGER_ID, GOOGLE_TAG_MANAGER_LOADER } from "../lib/google-tag-manager";
 
 function NotFoundComponent() {
   return (
@@ -112,9 +112,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "dns-prefetch", href: "https://connect.facebook.net" },
     ],
     scripts: [
-      { children: SITE_PROTECTION_SCRIPT },
       {
-        src: "https://www.googletagmanager.com/gtag/js?id=G-XY2YRZSDSF",
+        // Google Tag Manager - hub para disparar outros pixels via dataLayer.
+        children: GOOGLE_TAG_MANAGER_LOADER,
+      },
+      {
+        src: `https://www.googletagmanager.com/gtag/js?id=${GOOGLE_TAG_ID}`,
         async: true,
       },
       {
@@ -122,7 +125,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: `window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
-gtag('config', 'G-XY2YRZSDSF');`,
+gtag('config', '${GOOGLE_TAG_ID}');`,
       },
       {
         // Meta Pixel único, inicializa PageView uma vez em cada carga da página.
@@ -151,14 +154,16 @@ function RootShell({ children }: { children: ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <script dangerouslySetInnerHTML={{ __html: DOMAIN_NAVIGATION_SCRIPT }} />
-        <style>{`[data-copy-fallback]{display:none} @media print{body>*{display:none!important}body>[data-copy-fallback]{display:flex!important}}`}</style>
-        <div data-copy-fallback style={{ position: "fixed", inset: 0, zIndex: 2147483647, alignItems: "center", justifyContent: "center", flexDirection: "column", background: "#090909", color: "white", gap: 20, padding: 24, textAlign: "center" }}>
-          <img src={PROTECTION_IMAGE} alt="CLOKER" style={{ width: "min(80vw,420px)", height: "auto" }} />
-          <p>Cópia não autorizada. Acesse o site oficial com JavaScript ativado.</p>
-        </div>
         <noscript>
-          <style>{`body>*{display:none!important}body>[data-copy-fallback]{display:flex!important}`}</style>
+          <iframe
+            src={`https://www.googletagmanager.com/ns.html?id=${GOOGLE_TAG_MANAGER_ID}`}
+            height={0}
+            width={0}
+            style={{ display: "none", visibility: "hidden" }}
+            title="Google Tag Manager"
+          />
+        </noscript>
+        <noscript>
           <img
             alt=""
             height={1}
@@ -180,12 +185,9 @@ function RootComponent() {
   const previousPath = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!enforceSiteDomain()) return;
     captureUtms();
     return installFirstPartyCheckoutListener();
   }, []);
-
-  useEffect(() => { enforceSiteDomain(); }, [pathname]);
 
   // A primeira PageView é enviada no <head>. Em navegação SPA, enviamos
   // somente uma nova PageView por troca real de pathname.
@@ -196,6 +198,11 @@ function RootComponent() {
     }
     if (previousPath.current === pathname) return;
     previousPath.current = pathname;
+    pushGoogleTagEvent("page_view", {
+      page_path: pathname,
+      page_location: window.location.href,
+      page_title: document.title,
+    });
     const fbq = (window as Window & {
       fbq?: (...args: unknown[]) => unknown;
     }).fbq;

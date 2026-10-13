@@ -1,3 +1,5 @@
+import { pushGoogleTagEvent } from "./google-tag";
+
 export type InitiateCheckoutProduct = {
   id: string | string[];
   name: string;
@@ -159,6 +161,18 @@ function recordDebugEvent(event: MetaEvent) {
   }
 }
 
+function pushInitiateCheckoutToGoogleTag(eventId: string, params: MetaEvent["params"]) {
+  pushGoogleTagEvent("InitiateCheckout", {
+    event_id: eventId,
+    content_ids: params.content_ids,
+    content_type: params.content_type,
+    content_name: params.content_name,
+    value: params.value,
+    currency: params.currency,
+    num_items: params.num_items,
+  });
+}
+
 /**
  * O pixel oficial da UTMify observa links internos que apontam para o checkout.
  * O clique sintético mantém esse sinal no mesmo ponto em que o Meta IC é enviado,
@@ -272,6 +286,7 @@ export function trackInitiateCheckout(
       params,
       status: "deduplicated",
     });
+    pushInitiateCheckoutToGoogleTag(existing.eventId, params);
     return Promise.resolve({ eventId: existing.eventId, sent: true, deduplicated: true });
   }
 
@@ -318,6 +333,7 @@ export function trackInitiateCheckout(
       }
       const trackedAt = Date.now();
       saveEventOnCheckoutProduct(contentIds, eventId, trackedAt);
+      pushInitiateCheckoutToGoogleTag(eventId, params);
       recordDebugEvent({
         event_name: "InitiateCheckout",
         event_id: eventId,

@@ -10,9 +10,10 @@ import {
 import { sendPixCreatedEmail } from "./pix-email.server";
 import { sendPixCreatedToN8n } from "./pix-n8n.server";
 import { recordPixGenerated } from "./funnel-events.server";
-import { authorizeUpsell, type UpsellChargeInput } from "./upsell.server";
 
-async function generatePixCharge(data: PixChargeInput): Promise<PixChargeResult> {
+export const createPixCharge = createServerFn({ method: "POST" })
+  .inputValidator((data: PixChargeInput) => data)
+  .handler(async ({ data }): Promise<PixChargeResult> => {
     const apiToken = process.env.FORTPAY_API_TOKEN?.trim();
     if (!apiToken) {
       throw new Error(
@@ -73,19 +74,6 @@ async function generatePixCharge(data: PixChargeInput): Promise<PixChargeResult>
     ]);
 
     return result;
-}
-
-export const createPixCharge = createServerFn({ method: "POST" })
-  .inputValidator((data: PixChargeInput) => data)
-  .handler(async ({ data }) => generatePixCharge(data));
-
-export const createUpsellPixCharge = createServerFn({ method: "POST" })
-  .inputValidator((data: UpsellChargeInput) => data)
-  .handler(async ({ data }) => {
-    const apiToken = process.env.FORTPAY_API_TOKEN?.trim();
-    if (!apiToken) throw new Error("FortPay não está configurada.");
-    const input = await authorizeUpsell(data, apiToken);
-    return generatePixCharge(input);
   });
 
 export const getPixStatus = createServerFn({ method: "GET" })

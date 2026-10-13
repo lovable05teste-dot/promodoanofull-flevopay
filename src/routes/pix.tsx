@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState, lazy, Suspense, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { createPixCharge, getPixStatus } from "@/lib/pix.functions";
 import { getCheckoutSessionId } from "@/lib/checkout-tracker";
@@ -7,7 +7,6 @@ import { captureUtms, getUtmQuery } from "@/lib/utm";
 import QRCode from "qrcode";
 import { SiteFooter } from "@/components/SiteFooter";
 import { PixLoadingScreen } from "@/components/PixLoadingScreen";
-const UpsellOffers = lazy(() => import("@/components/UpsellOffers").then((module) => ({ default: module.UpsellOffers })));
 import { trackStoredInitiateCheckout } from "@/lib/tracking";
 import type { PixChargeResult } from "@/lib/pix.server";
 import { trackConfirmedPixPurchase } from "@/lib/purchase-tracking";
@@ -252,8 +251,6 @@ function PixPage() {
             {paid ? <>Compra concluída com sucesso.</> : <>Pague R$ {priceStr} via Pix<br />para concluir sua compra</>}
           </h1>
         </section>
-
-        {paid && charge && <Suspense fallback={<div className="rounded-lg bg-white p-6 text-center text-sm text-gray-500">Carregando suas ofertas…</div>}><UpsellOffers parent={charge} /></Suspense>}
 
         {!paid && (
           <section className="bg-white rounded-lg p-4 sm:p-6">

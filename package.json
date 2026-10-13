@@ -11,8 +11,7 @@
     "lint": "eslint .",
     "test:ic": "node scripts/verify-ic-tracking.mjs",
     "format": "prettier --write .",
-    "test:purchase": "node scripts/verify-purchase.mjs",
-    "test:upsells": "node scripts/verify-upsells.mjs"
+    "test:purchase": "node scripts/verify-purchase.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

@@ -1,4 +1,5 @@
 import { META_PIXEL_ID } from "./meta-pixel.ts";
+import { pushGoogleTagEvent } from "./google-tag.ts";
 import type { PixChargeResult } from "./pix.server.ts";
 
 const active = new Map<string, Promise<{ sent: boolean; deduplicated: boolean }>>();
@@ -38,6 +39,16 @@ export function trackConfirmedPixPurchase(status: string, charge: PixChargeResul
         num_items: charge.numItems,
         order_id: charge.transactionId,
       }, { eventID: `purchase_${charge.transactionId}` });
+      pushGoogleTagEvent("Purchase", {
+        event_id: `purchase_${charge.transactionId}`,
+        value: charge.amountCents / 100,
+        currency: "BRL",
+        content_ids: charge.contentIds,
+        content_type: "product",
+        content_name: charge.itemTitle,
+        num_items: charge.numItems,
+        order_id: charge.transactionId,
+      });
       queued.add(key);
       try { localStorage.setItem(key, new Date().toISOString()); } catch {}
       // "sent" significa entregue à fila do pixel; não é recibo do Meta.

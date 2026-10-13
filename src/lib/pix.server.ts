@@ -1,4 +1,3 @@
-import { signUpsellContext } from "./upsell-token.server.ts";
 const FORTPAY_BASE_URL = "https://api.fortpayplataforma.com.br/api/public/v1";
 const FORTPAY_PRODUCT_HASH = "txi2kwhf0r";
 const FORTPAY_OFFER_HASH = "o9ybnwoyun";
@@ -27,7 +26,6 @@ export type PixChargeResult = {
   contentIds: string[];
   itemTitle: string;
   numItems: number;
-  upsellToken?: string;
 };
 
 type JsonRecord = Record<string, unknown>;
@@ -64,30 +62,6 @@ function buildTracking(utm?: string): Record<string, string> {
 
 function isRecord(value: unknown): value is JsonRecord {
   return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-/** Ignora envelopes de sucesso e nunca usa IDs/status de clientes ou itens. */
-function transactionEnvelope(value: unknown): JsonRecord | undefined {
-  let current = isRecord(value) ? value : undefined;
-  for (let depth = 0; current && depth < 5; depth++) {
-    if (isRecord(current.transaction)) { current = current.transaction; continue; }
-    if (isRecord(current.charge)) { current = current.charge; continue; }
-    if (isRecord(current.data)) { current = current.data; continue; }
-    if (Array.isArray(current.data) && current.data.length === 1 && isRecord(current.data[0])) {
-      current = current.data[0]; continue;
-    }
-    break;
-  }
-  return current;
-}
-
-function ownString(record: JsonRecord | undefined, keys: string[]) {
-  for (const key of keys) {
-    const value = record?.[key];
-    if (typeof value === 'string' && value.trim()) return value.trim();
-    if (typeof value === 'number' && Number.isFinite(value)) return String(value);
-  }
-  return undefined;
 }
 
 function findStringByKeys(value: unknown, keys: string[]): string | undefined {
@@ -234,24 +208,24 @@ export async function createFortpayPixCharge(
   }
 
   const pixCode = findPixCode(json);
-  const transactionId = ownString(transactionEnvelope(json), [
-    "transaction_hash", "transaction_id", "hash", "id",
-  ]) || findStringByKeys(json, ["transaction_hash", "transaction_id"]);
+  const transactionId = findStringByKeys(json, [
+    "transaction_hash",
+    "transaction_id",
+    "hash",
+    "id",
+  ]);
   if (!pixCode || !transactionId) {
     throw new Error("A FortPay não retornou o código Pix completo.");
   }
 
-  const contentIds = [...new Set((input.contentIds?.length ? input.contentIds : [input.itemId || "6549324"])
-    .map(String).map((id) => id.trim().slice(0, 80)).filter(Boolean))];
-  const expiresAt = Date.now() + 24 * 60 * 60 * 1000;
   return {
     pixCode,
     transactionId,
-    upsellToken: signUpsellContext({ transactionId, contentIds, expiresAt }, config.apiToken),
     createdAt: new Date().toISOString().slice(0, 19).replace("T", " "),
-    expiresAt: new Date(expiresAt).toISOString(),
+    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     amountCents: amount,
-    contentIds,
+    contentIds: [...new Set((input.contentIds?.length ? input.contentIds : [input.itemId || "6549324"])
+      .map(String).map((id) => id.trim().slice(0, 80)).filter(Boolean))],
     itemTitle: title,
     numItems: Number.isFinite(input.numItems) ? Math.max(1, Math.round(input.numItems!)) : 1,
   };
@@ -267,7 +241,7 @@ export async function readFortpayPixStatus(transactionId: string, apiToken: stri
     if (!response.ok) return { status: "PENDING" };
 
     const json = (await response.json()) as JsonRecord;
-    const rawStatus = String(ownString(transactionEnvelope(json), ["status", "payment_status"]) || "pending").toLowerCase();
+    const rawStatus = String(findStringByKeys(json, ["status"]) || "pending").toLowerCase();
     const status =
       rawStatus === "approved" || rawStatus === "paid" || rawStatus === "completed"
         ? "COMPLETED"
