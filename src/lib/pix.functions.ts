@@ -10,6 +10,7 @@ import {
 import { sendPixCreatedEmail } from "./pix-email.server";
 import { sendPixCreatedToN8n } from "./pix-n8n.server";
 import { recordPixGenerated } from "./funnel-events.server";
+import { UPSELL_OFFERS } from "./upsell-catalog";
 
 export const createPixCharge = createServerFn({ method: "POST" })
   .inputValidator((data: PixChargeInput) => data)
@@ -74,6 +75,56 @@ export const createPixCharge = createServerFn({ method: "POST" })
     ]);
 
     return result;
+  });
+
+
+export const createUpsellPixCharge = createServerFn({ method: "POST" })
+  .inputValidator((data: {
+    parentToken: string;
+    offerId: string;
+    sessionId?: string;
+    utm?: string;
+    customer: {
+      name: string;
+      document: string;
+      email: string;
+      phone: string;
+    };
+  }) => data)
+  .handler(async ({ data }): Promise<PixChargeResult> => {
+    const apiToken = process.env.FORTPAY_API_TOKEN?.trim();
+    if (!apiToken) {
+      throw new Error(
+        "FortPay não está configurada. Adicione FORTPAY_API_TOKEN nas variáveis de ambiente.",
+      );
+    }
+
+    if (!data.parentToken?.trim()) {
+      throw new Error("Compra principal não encontrada para gerar o complemento.");
+    }
+
+    const offer = UPSELL_OFFERS.find((item) => item.id === data.offerId);
+    if (!offer) {
+      throw new Error("Complemento não encontrado.");
+    }
+
+    return createFortpayPixCharge(
+      {
+        sessionId: data.sessionId,
+        name: data.customer.name,
+        document: data.customer.document,
+        email: data.customer.email,
+        phone: data.customer.phone,
+        utm: data.utm,
+        amountCents: offer.priceCents,
+        itemTitle: offer.title,
+        itemId: offer.id,
+        itemImage: offer.image,
+        contentIds: [offer.id],
+        numItems: 1,
+      },
+      { apiToken },
+    );
   });
 
 export const getPixStatus = createServerFn({ method: "GET" })

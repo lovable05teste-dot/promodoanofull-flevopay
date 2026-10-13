@@ -26,6 +26,7 @@ export type PixChargeResult = {
   contentIds: string[];
   itemTitle: string;
   numItems: number;
+  upsellToken?: string;
 };
 
 type JsonRecord = Record<string, unknown>;
@@ -228,6 +229,7 @@ export async function createFortpayPixCharge(
       .map(String).map((id) => id.trim().slice(0, 80)).filter(Boolean))],
     itemTitle: title,
     numItems: Number.isFinite(input.numItems) ? Math.max(1, Math.round(input.numItems!)) : 1,
+    upsellToken: transactionId,
   };
 }
 
