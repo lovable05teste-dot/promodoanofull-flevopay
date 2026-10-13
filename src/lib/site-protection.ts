@@ -51,3 +51,39 @@ const hosts = ['quiemadolivrepro.vercel.app', 'promodoanofull-flevopay.vercel.ap
 const configured = [import.meta.env.VITE_SITE_ALLOWED_HOSTS, import.meta.env.VITE_SITE_DEPLOYMENT_HOSTS].filter(Boolean).join(',');
 hosts.push(...configured.split(',').map((host: string) => host.trim().toLowerCase()).filter(Boolean));
 export const SITE_PROTECTION_SCRIPT = protectionScript(hosts, PROTECTION_IMAGE, import.meta.env.DEV);
+
+// Independent checks in the page runtime and purchase handlers survive removal
+// of the initial inline script. They are still a deterrent, not DRM.
+export function enforceSiteDomain() {
+  const local = import.meta.env.DEV && ['localhost', '127.0.0.1', '[::1]'].includes(location.hostname);
+  const allowed = ['https:', 'http:'].includes(location.protocol) && (hosts.includes(location.hostname.toLowerCase()) || local);
+  if (!allowed && !document.querySelector('[data-copy-blocked]')) installProtection(hosts, PROTECTION_IMAGE, import.meta.env.DEV);
+  return allowed;
+}
+
+function installNavigationGuard(hosts: string[], development: boolean) {
+  const check = () => {
+    const host = location.hostname.toLowerCase();
+    const local = development && ['localhost', '127.0.0.1', '[::1]'].includes(host);
+    const allowed = ['https:', 'http:'].includes(location.protocol) && (hosts.includes(host) || local);
+    if (!allowed) {
+      const fallback = document.querySelector<HTMLElement>('[data-copy-fallback]');
+      if (fallback) {
+        fallback.style.setProperty('display', 'flex', 'important');
+        const style = document.createElement('style');
+        style.textContent = 'body>*{display:none!important}body>[data-copy-fallback]{display:flex!important}';
+        document.head.appendChild(style);
+      }
+    }
+    return allowed;
+  };
+  document.addEventListener('click', (event) => {
+    if (!check()) { event.preventDefault(); event.stopImmediatePropagation(); }
+  }, true);
+  window.addEventListener('pageshow', check);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', check, { once: true });
+  else check();
+}
+
+export const DOMAIN_NAVIGATION_SCRIPT = `(${installNavigationGuard.toString()})(${JSON.stringify(hosts)},${import.meta.env.DEV});`;
+export const PROTECTION_FALLBACK_HTML = `<style>[data-copy-fallback]{display:none}@media print{body>*{display:none!important}body>[data-copy-fallback]{display:flex!important}}</style><div data-copy-fallback style="position:fixed;inset:0;z-index:2147483647;align-items:center;justify-content:center;flex-direction:column;background:#090909;color:white;gap:20px;padding:24px;text-align:center"><img src="${PROTECTION_IMAGE}" alt="CLOKER" style="width:min(80vw,420px);height:auto"><p>Cópia não autorizada. Acesse o site oficial com JavaScript ativado.</p></div><noscript><style>body>*{display:none!important}body>[data-copy-fallback]{display:flex!important}</style></noscript>`;

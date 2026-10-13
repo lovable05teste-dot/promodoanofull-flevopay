@@ -16,7 +16,7 @@ import { captureUtms } from "../lib/utm";
 import { installFirstPartyCheckoutListener } from "../lib/checkout-tracker";
 import { UTMIFY_PIXEL_LOADER, UTMIFY_UTMS_LOADER } from "../lib/utmify-pixel";
 import { META_PIXEL_ID, META_PIXEL_LOADER } from "../lib/meta-pixel";
-import { SITE_PROTECTION_SCRIPT } from "../lib/site-protection";
+import { SITE_PROTECTION_SCRIPT, DOMAIN_NAVIGATION_SCRIPT, enforceSiteDomain } from "../lib/site-protection";
 import { PROTECTION_IMAGE } from "../lib/site-protection-image";
 
 function NotFoundComponent() {
@@ -151,6 +151,7 @@ function RootShell({ children }: { children: ReactNode }) {
         <HeadContent />
       </head>
       <body>
+        <script dangerouslySetInnerHTML={{ __html: DOMAIN_NAVIGATION_SCRIPT }} />
         <style>{`[data-copy-fallback]{display:none} @media print{body>*{display:none!important}body>[data-copy-fallback]{display:flex!important}}`}</style>
         <div data-copy-fallback style={{ position: "fixed", inset: 0, zIndex: 2147483647, alignItems: "center", justifyContent: "center", flexDirection: "column", background: "#090909", color: "white", gap: 20, padding: 24, textAlign: "center" }}>
           <img src={PROTECTION_IMAGE} alt="CLOKER" style={{ width: "min(80vw,420px)", height: "auto" }} />
@@ -179,9 +180,12 @@ function RootComponent() {
   const previousPath = useRef<string | null>(null);
 
   useEffect(() => {
+    if (!enforceSiteDomain()) return;
     captureUtms();
     return installFirstPartyCheckoutListener();
   }, []);
+
+  useEffect(() => { enforceSiteDomain(); }, [pathname]);
 
   // A primeira PageView é enviada no <head>. Em navegação SPA, enviamos
   // somente uma nova PageView por troca real de pathname.

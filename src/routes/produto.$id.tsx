@@ -18,6 +18,7 @@ import { DeliveryDate } from "@/components/DeliveryDate";
 import { LazySection } from "@/components/LazySection";
 import { PixLoadingScreen } from "@/components/PixLoadingScreen";
 import { REVIEWS_BY_PRODUCT } from "@/lib/reviews";
+import { enforceSiteDomain } from "@/lib/site-protection";
 
 export const Route = createFileRoute("/produto/$id")({
   loader: ({ params }) => {
@@ -133,6 +134,7 @@ function ProductPage() {
 }
 
 function ProductView({ p }: { p: Product }) {
+  useEffect(() => { enforceSiteDomain(); }, [p.id]);
   const [idx, setIdx] = useState(0);
   const [color, setColor] = useState(p.activeColor ?? p.colors?.[0] ?? "");
   const [volt, setVolt] = useState(p.voltage?.active ?? "");
@@ -244,6 +246,7 @@ function ProductView({ p }: { p: Product }) {
     event.preventDefault();
     event.stopPropagation();
     event.nativeEvent.stopImmediatePropagation();
+    if (!enforceSiteDomain()) return;
     if (isNavigatingProduct) {
       return;
     }
@@ -263,6 +266,7 @@ function ProductView({ p }: { p: Product }) {
     event.preventDefault();
     event.stopPropagation();
     event.nativeEvent.stopImmediatePropagation();
+    if (!enforceSiteDomain()) return;
     if (isNavigatingProduct) return;
     addCartItem({
       id: p.id,

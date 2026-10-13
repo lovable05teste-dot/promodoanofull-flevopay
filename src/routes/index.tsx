@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import html from "../clone-site.html?raw";
 import { ALL_PRODUCTS } from "../lib/products";
 import { SELLER_MODAL_HTML, SELLER_MODAL_SCRIPT } from "../lib/seller-modal";
+import { SITE_PROTECTION_SCRIPT, DOMAIN_NAVIGATION_SCRIPT, PROTECTION_FALLBACK_HTML } from "../lib/site-protection";
 
 const PLACEHOLDER = "/clone-assets/images/placeholder.svg";
 const MAIN_PRODUCT_ID = "6549324";
@@ -124,10 +125,12 @@ const pageHtmlWithRelated =
 
 const homepageTrackingScript = buildHomepageTrackingScript();
 const relatedFallbackScript = buildRelatedFallbackScript();
-const injectedTail = `${PRODUCT_LOADING_SCRIPT}${homepageTrackingScript}${relatedFallbackScript}${SELLER_MODAL_HTML}${SELLER_MODAL_SCRIPT}`;
-const pageHtml = pageHtmlWithRelated.includes("</body>")
-  ? pageHtmlWithRelated.replace("</body>", `${injectedTail}</body>`)
-  : `${pageHtmlWithRelated}${injectedTail}`;
+const injectedTail = `${PROTECTION_FALLBACK_HTML}<script>${DOMAIN_NAVIGATION_SCRIPT}</script>${PRODUCT_LOADING_SCRIPT}${homepageTrackingScript}${relatedFallbackScript}${SELLER_MODAL_HTML}${SELLER_MODAL_SCRIPT}`;
+// This raw HTML response bypasses the React root, so it needs its own guards.
+const protectedHomepage = pageHtmlWithRelated.replace("<head>", `<head><script>${SITE_PROTECTION_SCRIPT}</script>`);
+const pageHtml = protectedHomepage.includes("</body>")
+  ? protectedHomepage.replace("</body>", `${injectedTail}</body>`)
+  : `${protectedHomepage}${injectedTail}`;
 
 export const Route = createFileRoute("/")({
   head: () => ({

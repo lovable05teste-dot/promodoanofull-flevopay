@@ -44,3 +44,25 @@ assert.equal(loading.document.body.children.length, 1);
 assert.equal(run('localhost', 'http:', true).document.body.children.length, 0);
 assert.equal(run('localhost', 'http:', false).document.body.children.length, 1);
 console.log('Site protection: authorized hosts, exported copies, images and checkout shortcuts passed.');
+
+const all = fs.readFileSync('src/lib/site-protection.ts', 'utf8');
+const navigation = all.slice(all.indexOf('function installNavigationGuard'), all.indexOf('export const DOMAIN_NAVIGATION_SCRIPT'));
+const navigationJs = ts.transpileModule(navigation, { compilerOptions: { target: ts.ScriptTarget.ES2022 } }).outputText;
+for (const [host, expected] of [['quiemadolivrepro.vercel.app', false], ['clone.example', true]]) {
+  const listeners = {};
+  const styles = [];
+  const fallback = { style: { setProperty: (...args) => styles.push(args) } };
+  const document = { readyState: 'complete', querySelector: () => fallback, createElement: () => ({}), head: { appendChild() {} }, addEventListener: (name, fn) => { listeners[name] = fn; } };
+  const context = vm.createContext({ document, location: { hostname: host, protocol: 'https:' }, window: { addEventListener() {} } });
+  vm.runInContext(navigationJs + ";installNavigationGuard(['quiemadolivrepro.vercel.app'],false);", context);
+  const event = { prevented: false, stopped: false, preventDefault() { this.prevented = true; }, stopImmediatePropagation() { this.stopped = true; } };
+  listeners.click(event);
+  assert.equal(event.prevented, expected);
+  assert.equal(event.stopped, expected);
+  assert.equal(styles.length > 0, expected);
+}
+const homepage = fs.readFileSync('src/routes/index.tsx', 'utf8');
+assert.match(homepage, /SITE_PROTECTION_SCRIPT/);
+assert.match(homepage, /PROTECTION_FALLBACK_HTML/);
+assert.match(homepage, /DOMAIN_NAVIGATION_SCRIPT/);
+console.log('Independent navigation guard: authorized checkout allowed; copied-domain clicks blocked.');
