@@ -18,6 +18,7 @@ export type FunnelEvent = {
 };
 
 const PREFIX = "analytics/events/";
+const PIX_PENDING_LIMIT = 3;
 const ALLOWED_UTM = [
   "utm_source",
   "utm_medium",
@@ -94,7 +95,9 @@ function maskIp(raw: string) {
   return "";
 }
 function requestLocation(request: Request) {
-  const h = request.headers;
+  return requestLocationFromHeaders(request.headers);
+}
+export function requestLocationFromHeaders(h: Headers) {
   // Dados de geolocalização fornecidos pela Vercel; aproximados e nem sempre presentes.
   const rawIp = (h.get("x-forwarded-for") || h.get("x-real-ip") || "").split(",")[0] || "";
   return {
@@ -103,6 +106,20 @@ function requestLocation(request: Request) {
     region: decodeGeo(h.get("x-vercel-ip-country-region")),
     country: decodeGeo(h.get("x-vercel-ip-country")),
   };
+}
+function requestIp(headers: Headers) {
+  return (headers.get("x-forwarded-for") || headers.get("x-real-ip") || "").split(",")[0]?.trim() || "";
+}
+async function sha256(value: string) {
+  const bytes = new TextEncoder().encode(value);
+  const hash = await crypto.subtle.digest("SHA-256", bytes);
+  return Array.from(new Uint8Array(hash)).map(byte => byte.toString(16).padStart(2, "0")).join("");
+}
+export async function requestIpHash(headers: Headers) {
+  const ip = requestIp(headers);
+  if (!ip) return "";
+  const salt = process.env.IP_HASH_SALT || token().slice(0, 24) || "flevopay-ip-limit";
+  return sha256(`${salt}:${ip}`);
 }
 export function storageConfigured() { return Boolean(token()); }
 
@@ -202,8 +219,11 @@ export async function recordPublicCustomer(request: Request): Promise<"recorded"
 export async function recordPixGenerated(data: {
   sessionId?: string; transactionId: string; itemId?: string; itemTitle?: string;
   amountCents: number; name: string; email?: string; phone?: string; utm?: string;
+  location?: FunnelEvent["location"]; ipHash?: string;
 }) {
   if (!safeSession(data.sessionId)) return false;
+  const traffic = trafficParams(data.utm);
+  if (data.ipHash) traffic.ip_hash = data.ipHash;
   return saveFunnelEvent({
     type: "PixGenerated", sessionId: safeSession(data.sessionId),
     productId: text(data.itemId, 80),
@@ -211,7 +231,8 @@ export async function recordPixGenerated(data: {
     amountCents: data.amountCents,
     transactionId: text(data.transactionId, 120),
     customer: { name: text(data.name, 100), email: text(data.email, 120), phone: text(data.phone, 30) },
-    traffic: trafficParams(data.utm),
+    traffic,
+    location: data.location,
   });
 }
 export async function recordPixPaid(sessionId: string | undefined, transactionId: string) {
@@ -253,4 +274,25 @@ export async function listFunnelEvents(): Promise<{ events: FunnelEvent[]; limit
     }));
   }
   return { events: results.sort((a, b) => b.at.localeCompare(a.at)), limited: more || all.length > selected.length };
+}
+
+export async function enforcePixPendingLimit(headers: Headers, sessionId?: string) {
+  const safeId = safeSession(sessionId);
+  const ipHash = await requestIpHash(headers);
+  if (!token() || (!safeId && !ipHash)) return { allowed: true, pending: 0, ipHash };
+
+  const { events } = await listFunnelEvents();
+  const paid = new Set(events.filter(event => event.type === "PixPaid").map(event => event.transactionId).filter(Boolean));
+  const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
+  const pending = events.filter(event => {
+    if (event.type !== "PixGenerated") return false;
+    if (event.transactionId && paid.has(event.transactionId)) return false;
+    if (Date.parse(event.at) < oneDayAgo) return false;
+    return Boolean(
+      (safeId && event.sessionId === safeId) ||
+      (ipHash && event.traffic?.ip_hash === ipHash),
+    );
+  }).length;
+
+  return { allowed: pending < PIX_PENDING_LIMIT, pending, ipHash };
 }
