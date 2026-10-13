@@ -1881,8 +1881,85 @@
     "title": "JBL Boombox 4 Caixa de Som Bluetooth IP68 34h Playtime",
     "oldPrice": "329,63",
     "newPrice": "69,90",
-    "colors": null,
-    "voltage": null,
+    "colors": [
+      "Azul",
+      "Branco",
+      "Laranja",
+      "Preto",
+      "Verde-musgo"
+    ],
+    "activeColor": "Preto",
+    "colorVariants": [
+      {
+        "name": "Azul",
+        "swatch": "https://i.imgur.com/pvSmRTQ.jpg",
+        "carousel": [
+          "https://i.imgur.com/pvSmRTQ.jpg",
+          "https://i.imgur.com/V0rdqts.jpg",
+          "https://i.imgur.com/6bCFsrR.jpg",
+          "https://i.imgur.com/9EdlCVI.jpg",
+          "https://i.imgur.com/LVHTf8h.jpg",
+          "https://i.imgur.com/hROMyfk.jpg",
+          "https://i.imgur.com/gdAPobQ.jpg",
+          "https://i.imgur.com/kNYlZrU.jpg"
+        ]
+      },
+      {
+        "name": "Branco",
+        "swatch": "https://i.imgur.com/1BZYZXv.jpg",
+        "carousel": [
+          "https://i.imgur.com/1BZYZXv.jpg",
+          "https://i.imgur.com/oh4Kpuy.jpg",
+          "https://i.imgur.com/p8yXy8M.jpg",
+          "https://i.imgur.com/u0yGdGC.jpg",
+          "https://i.imgur.com/zMqUXh7.jpg",
+          "https://i.imgur.com/rKLpwuw.jpg",
+          "https://i.imgur.com/dTflRPi.jpg"
+        ]
+      },
+      {
+        "name": "Laranja",
+        "swatch": "https://i.imgur.com/iSR7yTO.jpg",
+        "carousel": [
+          "https://i.imgur.com/iSR7yTO.jpg",
+          "https://i.imgur.com/1Uqrv0y.jpg",
+          "https://i.imgur.com/FYt3JYs.jpg"
+        ]
+      },
+      {
+        "name": "Preto",
+        "swatch": "https://i.imgur.com/XomrA9k.png",
+        "carousel": [
+          "https://i.imgur.com/XomrA9k.png",
+          "https://i.imgur.com/meef1R1.png",
+          "https://i.imgur.com/f78soxA.png",
+          "https://i.imgur.com/y8oDlNX.png",
+          "https://i.imgur.com/6D24ofo.png",
+          "https://i.imgur.com/i5FD92Q.png",
+          "https://i.imgur.com/gXTUXxK.png"
+        ]
+      },
+      {
+        "name": "Verde-musgo",
+        "swatch": "https://i.imgur.com/ONuAUsE.jpg",
+        "carousel": [
+          "https://i.imgur.com/ONuAUsE.jpg",
+          "https://i.imgur.com/2IeFCR5.jpg",
+          "https://i.imgur.com/tN973bQ.jpg",
+          "https://i.imgur.com/LiqIZqV.jpg",
+          "https://i.imgur.com/TnDabrl.jpg",
+          "https://i.imgur.com/xJrxcEY.jpg",
+          "https://i.imgur.com/N2XGMQK.jpg"
+        ]
+      }
+    ],
+    "voltage": {
+      "options": [
+        "127/220V",
+        "12V"
+      ],
+      "active": ""
+    },
     "carousel": [
       "https://i.imgur.com/XomrA9k.png",
       "https://i.imgur.com/meef1R1.png",
@@ -1902,10 +1979,20 @@
       "https://i.imgur.com/gXTUXxK.png"
     ],
     "reviews": [
-      ["https://i.imgur.com/8bJWihd.jpg"],
-      ["https://i.imgur.com/2V14UX6.jpg", "https://i.imgur.com/s3jKwi4.jpg"],
-      ["https://i.imgur.com/dJ2U5P9.jpg"],
-      ["https://i.imgur.com/7pwps3Y.jpg", "https://i.imgur.com/cqhy2oV.jpg"]
+      [
+        "https://i.imgur.com/8bJWihd.jpg"
+      ],
+      [
+        "https://i.imgur.com/2V14UX6.jpg",
+        "https://i.imgur.com/s3jKwi4.jpg"
+      ],
+      [
+        "https://i.imgur.com/dJ2U5P9.jpg"
+      ],
+      [
+        "https://i.imgur.com/7pwps3Y.jpg",
+        "https://i.imgur.com/cqhy2oV.jpg"
+      ]
     ],
     "hideReviews": false,
     "category": "Eletrônicos",
