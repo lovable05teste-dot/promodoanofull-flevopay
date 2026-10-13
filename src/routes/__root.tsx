@@ -17,6 +17,7 @@ import { installFirstPartyCheckoutListener } from "../lib/checkout-tracker";
 import { UTMIFY_PIXEL_LOADER, UTMIFY_UTMS_LOADER } from "../lib/utmify-pixel";
 import { META_PIXEL_ID, META_PIXEL_LOADER } from "../lib/meta-pixel";
 import { SITE_PROTECTION_SCRIPT } from "../lib/site-protection";
+import { PROTECTION_IMAGE } from "../lib/site-protection-image";
 
 function NotFoundComponent() {
   return (
@@ -150,7 +151,13 @@ function RootShell({ children }: { children: ReactNode }) {
         <HeadContent />
       </head>
       <body>
+        <style>{`[data-copy-fallback]{display:none} @media print{body>*{display:none!important}body>[data-copy-fallback]{display:flex!important}}`}</style>
+        <div data-copy-fallback style={{ position: "fixed", inset: 0, zIndex: 2147483647, alignItems: "center", justifyContent: "center", flexDirection: "column", background: "#090909", color: "white", gap: 20, padding: 24, textAlign: "center" }}>
+          <img src={PROTECTION_IMAGE} alt="CLOKER" style={{ width: "min(80vw,420px)", height: "auto" }} />
+          <p>Cópia não autorizada. Acesse o site oficial com JavaScript ativado.</p>
+        </div>
         <noscript>
+          <style>{`body>*{display:none!important}body>[data-copy-fallback]{display:flex!important}`}</style>
           <img
             alt=""
             height={1}
