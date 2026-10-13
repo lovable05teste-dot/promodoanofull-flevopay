@@ -9,29 +9,8 @@ import {
 } from "./pix.server";
 import { sendPixCreatedEmail } from "./pix-email.server";
 import { sendPixCreatedToN8n } from "./pix-n8n.server";
-import {
-  listFunnelEvents,
-  recordPixGenerated,
-} from "./funnel-events.server";
-
-const PIX_PENDING_LIMIT = 3;
-
-async function countPendingPixForSession(sessionId?: string) {
-  if (!sessionId) return 0;
-  try {
-    const { events } = await listFunnelEvents();
-    const paid = new Set(events.filter(event => event.type === "PixPaid").map(event => event.transactionId).filter(Boolean));
-    const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
-    return events.filter(event =>
-      event.type === "PixGenerated" &&
-      event.sessionId === sessionId &&
-      (!event.transactionId || !paid.has(event.transactionId)) &&
-      Date.parse(event.at) >= oneDayAgo
-    ).length;
-  } catch {
-    return 0;
-  }
-}
+import { recordPixGenerated } from "./funnel-events.server";
+import { UPSELL_OFFERS } from "./upsell-catalog";
 
 export const createPixCharge = createServerFn({ method: "POST" })
   .inputValidator((data: PixChargeInput) => data)
@@ -40,13 +19,6 @@ export const createPixCharge = createServerFn({ method: "POST" })
     if (!apiToken) {
       throw new Error(
         "FortPay não está configurada. Adicione FORTPAY_API_TOKEN nas variáveis de ambiente.",
-      );
-    }
-
-    const pendingPix = await countPendingPixForSession(data.sessionId);
-    if (pendingPix >= PIX_PENDING_LIMIT) {
-      throw new Error(
-        "Você já tem 3 Pix pendentes. Pague um dos Pix gerados ou aguarde antes de gerar outro.",
       );
     }
 
@@ -103,6 +75,56 @@ export const createPixCharge = createServerFn({ method: "POST" })
     ]);
 
     return result;
+  });
+
+
+export const createUpsellPixCharge = createServerFn({ method: "POST" })
+  .inputValidator((data: {
+    parentToken: string;
+    offerId: string;
+    sessionId?: string;
+    utm?: string;
+    customer: {
+      name: string;
+      document: string;
+      email: string;
+      phone: string;
+    };
+  }) => data)
+  .handler(async ({ data }): Promise<PixChargeResult> => {
+    const apiToken = process.env.FORTPAY_API_TOKEN?.trim();
+    if (!apiToken) {
+      throw new Error(
+        "FortPay não está configurada. Adicione FORTPAY_API_TOKEN nas variáveis de ambiente.",
+      );
+    }
+
+    if (!data.parentToken?.trim()) {
+      throw new Error("Compra principal não encontrada para gerar o complemento.");
+    }
+
+    const offer = UPSELL_OFFERS.find((item) => item.id === data.offerId);
+    if (!offer) {
+      throw new Error("Complemento não encontrado.");
+    }
+
+    return createFortpayPixCharge(
+      {
+        sessionId: data.sessionId,
+        name: data.customer.name,
+        document: data.customer.document,
+        email: data.customer.email,
+        phone: data.customer.phone,
+        utm: data.utm,
+        amountCents: offer.priceCents,
+        itemTitle: offer.title,
+        itemId: offer.id,
+        itemImage: offer.image,
+        contentIds: [offer.id],
+        numItems: 1,
+      },
+      { apiToken },
+    );
   });
 
 export const getPixStatus = createServerFn({ method: "GET" })
