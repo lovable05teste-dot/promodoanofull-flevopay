@@ -16,6 +16,7 @@ import { captureUtms } from "../lib/utm";
 import { installFirstPartyCheckoutListener } from "../lib/checkout-tracker";
 import { UTMIFY_PIXEL_LOADER, UTMIFY_UTMS_LOADER } from "../lib/utmify-pixel";
 import { META_PIXEL_ID, META_PIXEL_LOADER } from "../lib/meta-pixel";
+import { SITE_PROTECTION_SCRIPT } from "../lib/site-protection";
 
 function NotFoundComponent() {
   return (
@@ -110,6 +111,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "dns-prefetch", href: "https://connect.facebook.net" },
     ],
     scripts: [
+      { children: SITE_PROTECTION_SCRIPT },
       {
         src: "https://www.googletagmanager.com/gtag/js?id=G-XY2YRZSDSF",
         async: true,
