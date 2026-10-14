@@ -19,6 +19,7 @@ import { Route as EntregaRouteImport } from './routes/entrega'
 import { Route as PagamentoRouteImport } from './routes/pagamento'
 import { Route as PixRouteImport } from './routes/pix'
 import { Route as RevisaoRouteImport } from './routes/revisao'
+import { Route as UpselRouteImport } from './routes/upsel'
 import { Route as ProdutoIdRouteImport } from './routes/produto.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -71,6 +72,11 @@ const RevisaoRoute = RevisaoRouteImport.update({
   path: '/revisao',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UpselRoute = UpselRouteImport.update({
+  id: '/upsel',
+  path: '/upsel',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProdutoIdRoute = ProdutoIdRouteImport.update({
   id: '/produto/$id',
   path: '/produto/$id',
@@ -88,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/pagamento': typeof PagamentoRoute
   '/pix': typeof PixRoute
   '/revisao': typeof RevisaoRoute
+  '/upsel': typeof UpselRoute
   '/produto/$id': typeof ProdutoIdRoute
 }
 export interface FileRoutesByTo {
@@ -101,6 +108,7 @@ export interface FileRoutesByTo {
   '/pagamento': typeof PagamentoRoute
   '/pix': typeof PixRoute
   '/revisao': typeof RevisaoRoute
+  '/upsel': typeof UpselRoute
   '/produto/$id': typeof ProdutoIdRoute
 }
 export interface FileRoutesById {
@@ -115,6 +123,7 @@ export interface FileRoutesById {
   '/pagamento': typeof PagamentoRoute
   '/pix': typeof PixRoute
   '/revisao': typeof RevisaoRoute
+  '/upsel': typeof UpselRoute
   '/produto/$id': typeof ProdutoIdRoute
 }
 export interface FileRouteTypes {
@@ -130,6 +139,7 @@ export interface FileRouteTypes {
     | '/pagamento'
     | '/pix'
     | '/revisao'
+    | '/upsel'
     | '/produto/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -143,6 +153,7 @@ export interface FileRouteTypes {
     | '/pagamento'
     | '/pix'
     | '/revisao'
+    | '/upsel'
     | '/produto/$id'
   id:
     | '__root__'
@@ -156,6 +167,7 @@ export interface FileRouteTypes {
     | '/pagamento'
     | '/pix'
     | '/revisao'
+    | '/upsel'
     | '/produto/$id'
   fileRoutesById: FileRoutesById
 }
@@ -170,6 +182,7 @@ export interface RootRouteChildren {
   PagamentoRoute: typeof PagamentoRoute
   PixRoute: typeof PixRoute
   RevisaoRoute: typeof RevisaoRoute
+  UpselRoute: typeof UpselRoute
   ProdutoIdRoute: typeof ProdutoIdRoute
 }
 
@@ -245,6 +258,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RevisaoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/upsel': {
+      id: '/upsel'
+      path: '/upsel'
+      fullPath: '/upsel'
+      preLoaderRoute: typeof UpselRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/produto/$id': {
       id: '/produto/$id'
       path: '/produto/$id'
@@ -266,6 +286,7 @@ const rootRouteChildren: RootRouteChildren = {
   PagamentoRoute: PagamentoRoute,
   PixRoute: PixRoute,
   RevisaoRoute: RevisaoRoute,
+  UpselRoute: UpselRoute,
   ProdutoIdRoute: ProdutoIdRoute,
 }
 export const routeTree = rootRouteImport

@@ -4,17 +4,20 @@ import { createServerFn } from "@tanstack/react-start";
 import {
   createFortpayPixCharge,
   readFortpayPixStatus,
+  validatePixInput,
   type PixChargeInput,
   type PixChargeResult,
 } from "./pix.server";
 import { sendPixCreatedEmail } from "./pix-email.server";
 import { sendPixCreatedToN8n } from "./pix-n8n.server";
 import { recordPixGenerated } from "./funnel-events.server";
-import { assertPixAllowed, registerPendingPix } from "./pix-limit.server";
-import { UPSELL_OFFERS } from "./upsell-catalog";
+import { generateLimitedPix } from "./pix-limit.server";
+import { pixRequestContext } from "./pix-request.server";
+import { authorizeUpsell } from "./upsell.server";
+import { verifyUpsellContext } from "./upsell-token.server";
 
 export const createPixCharge = createServerFn({ method: "POST" })
-  .inputValidator((data: PixChargeInput) => data)
+  .validator((data: PixChargeInput) => validatePixInput(data))
   .handler(async ({ data }): Promise<PixChargeResult> => {
     const apiToken = process.env.FORTPAY_API_TOKEN?.trim();
     if (!apiToken) {
@@ -23,8 +26,16 @@ export const createPixCharge = createServerFn({ method: "POST" })
       );
     }
 
-    await assertPixAllowed(data.sessionId, apiToken);
-    const result = await createFortpayPixCharge(data, { apiToken });
+    const context = pixRequestContext(apiToken);
+    const { result, reused } = await generateLimitedPix(
+      data,
+      context.ip,
+      context.secret,
+      apiToken,
+      () => createFortpayPixCharge(data, { apiToken }),
+      context.browserId,
+    );
+    if (reused) return result;
     const amountCents =
       Number.isFinite(data.amountCents) && (data.amountCents ?? 0) > 0
         ? Math.round(data.amountCents as number)
@@ -32,7 +43,6 @@ export const createPixCharge = createServerFn({ method: "POST" })
 
     // Falhas de notificações ou analytics nunca invalidam o Pix.
     await Promise.allSettled([
-      registerPendingPix(data.sessionId, result.transactionId),
       recordPixGenerated({
         sessionId: data.sessionId,
         transactionId: result.transactionId,
@@ -80,20 +90,47 @@ export const createPixCharge = createServerFn({ method: "POST" })
     return result;
   });
 
-
 export const createUpsellPixCharge = createServerFn({ method: "POST" })
-  .inputValidator((data: {
-    parentToken: string;
-    offerId: string;
-    sessionId?: string;
-    utm?: string;
-    customer: {
-      name: string;
-      document: string;
-      email: string;
-      phone: string;
-    };
-  }) => data)
+  .validator(
+    (data: {
+      parentToken: string;
+      offerId: string;
+      sessionId?: string;
+      utm?: string;
+      customer: {
+        name: string;
+        document: string;
+        email: string;
+        phone: string;
+      };
+    }) => {
+      if (
+        !data ||
+        typeof data.parentToken !== "string" ||
+        data.parentToken.length > 8192 ||
+        typeof data.offerId !== "string" ||
+        data.offerId.length > 80
+      )
+        throw new Error("Oferta inválida.");
+      const customer = validatePixInput({
+        ...data.customer,
+        sessionId: data.sessionId,
+        utm: data.utm,
+      });
+      return {
+        parentToken: data.parentToken,
+        offerId: data.offerId,
+        sessionId: customer.sessionId,
+        utm: customer.utm,
+        customer: {
+          name: customer.name,
+          document: customer.document,
+          email: customer.email,
+          phone: customer.phone,
+        },
+      };
+    },
+  )
   .handler(async ({ data }): Promise<PixChargeResult> => {
     const apiToken = process.env.FORTPAY_API_TOKEN?.trim();
     if (!apiToken) {
@@ -102,36 +139,31 @@ export const createUpsellPixCharge = createServerFn({ method: "POST" })
       );
     }
 
-    if (!data.parentToken?.trim()) {
-      throw new Error("Compra principal não encontrada para gerar o complemento.");
-    }
-
-    const offer = UPSELL_OFFERS.find((item) => item.id === data.offerId);
-    if (!offer) {
-      throw new Error("Complemento não encontrado.");
-    }
-
-    return createFortpayPixCharge(
-      {
-        sessionId: data.sessionId,
-        name: data.customer.name,
-        document: data.customer.document,
-        email: data.customer.email,
-        phone: data.customer.phone,
-        utm: data.utm,
-        amountCents: offer.priceCents,
-        itemTitle: offer.title,
-        itemId: offer.id,
-        itemImage: offer.image,
-        contentIds: [offer.id],
-        numItems: 1,
-      },
-      { apiToken },
+    const input = validatePixInput(await authorizeUpsell(data, apiToken));
+    const parent = verifyUpsellContext(data.parentToken, apiToken);
+    const context = pixRequestContext(apiToken);
+    const { result } = await generateLimitedPix(
+      input,
+      context.ip,
+      context.secret,
+      apiToken,
+      () => createFortpayPixCharge(input, { apiToken }),
+      context.browserId,
+      `upsell:${parent.transactionId}`,
     );
+    return result;
   });
 
 export const getPixStatus = createServerFn({ method: "GET" })
-  .inputValidator((data: { transactionId: string }) => data)
+  .validator((data: { transactionId: string }) => {
+    if (
+      !data ||
+      typeof data.transactionId !== "string" ||
+      !/^[a-zA-Z0-9_-]{1,120}$/.test(data.transactionId)
+    )
+      throw new Error("Transação inválida.");
+    return { transactionId: data.transactionId };
+  })
   .handler(async ({ data }): Promise<{ status: string; paidAt?: string }> => {
     const apiToken = process.env.FORTPAY_API_TOKEN?.trim();
     if (!apiToken) return { status: "PENDING" };
