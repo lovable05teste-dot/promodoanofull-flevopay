@@ -428,7 +428,7 @@ function ProductView({ p }: { p: Product }) {
                 <span className="text-gray-600">Cor: </span>
                 <span className="font-semibold">{color}</span>
               </p>
-              <div className="mt-3 flex gap-3 flex-wrap">
+              <div className="mt-3 -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 touch-pan-x md:mx-0 md:px-0">
                 {variantCards.map((v) => (
                     <button
                       key={v.name}
@@ -437,7 +437,7 @@ function ProductView({ p }: { p: Product }) {
                         p.compactColorSelector
                           ? "w-[138px] px-2 pt-2 pb-4 items-center text-center"
                           : "w-[150px] p-2 text-left"
-                      } flex flex-col rounded-lg border bg-white overflow-hidden ${
+                      } flex shrink-0 snap-start flex-col rounded-lg border bg-white overflow-hidden ${
                         v.name === color ? "border-[#3483fa] border-2" : "border-gray-200"
                       }`}
                     >
@@ -475,12 +475,12 @@ function ProductView({ p }: { p: Product }) {
                 <span className="text-gray-600">Voltagem: </span>
                 <span className="font-semibold">{volt}</span>
               </p>
-              <div className="mt-2 flex gap-2 flex-wrap">
+              <div className="mt-2 -mx-4 flex snap-x snap-mandatory gap-2 overflow-x-auto px-4 pb-2 touch-pan-x md:mx-0 md:px-0">
                 {p.voltage.options.map((v) => (
                   <button
                     key={v}
                     onClick={() => setVolt(v)}
-                    className={`text-sm px-3 py-2 border rounded-sm ${
+                    className={`shrink-0 snap-start text-sm px-3 py-2 border rounded-sm ${
                       v === volt
                         ? "border-[#3483fa] text-[#3483fa]"
                         : "border-gray-300 text-gray-800"
@@ -500,12 +500,12 @@ function ProductView({ p }: { p: Product }) {
                 <span className="text-gray-600">{p.extra.label}: </span>
                 <span className="font-semibold">{extra}</span>
               </p>
-              <div className="mt-2 flex gap-2 flex-wrap">
+              <div className="mt-2 -mx-4 flex snap-x snap-mandatory gap-2 overflow-x-auto px-4 pb-2 touch-pan-x md:mx-0 md:px-0">
                 {p.extra.options.map((v) => (
                   <button
                     key={v}
                     onClick={() => setExtra(v)}
-                    className={`text-sm px-3 py-2 border rounded-sm ${
+                    className={`shrink-0 snap-start text-sm px-3 py-2 border rounded-sm ${
                       v === extra
                         ? "border-[#3483fa] text-[#3483fa]"
                         : "border-gray-300 text-gray-800"
