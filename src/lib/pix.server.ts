@@ -1,3 +1,6 @@
+import { signUpsellContext } from "./upsell-token.server.ts";
+import { z } from "zod";
+
 const FORTPAY_BASE_URL = "https://api.fortpayplataforma.com.br/api/public/v1";
 const FORTPAY_PRODUCT_HASH = "txi2kwhf0r";
 const FORTPAY_OFFER_HASH = "o9ybnwoyun";
@@ -39,6 +42,41 @@ export function normalizePhone(value: string) {
   while (phone.length > 11 && phone.startsWith("0")) phone = phone.slice(1);
   if (phone.length === 12 && phone.startsWith("0")) phone = phone.slice(1);
   return phone;
+}
+
+const pixInputSchema = z.object({
+  sessionId: z.string().max(90).optional(),
+  name: z.string().trim().min(1).max(120),
+  document: z
+    .string()
+    .max(32)
+    .transform(onlyDigits)
+    .refine((value) => value.length === 11 || value.length === 14),
+  email: z
+    .string()
+    .trim()
+    .max(254)
+    .email()
+    .transform((value) => value.toLowerCase()),
+  phone: z
+    .string()
+    .max(32)
+    .transform(normalizePhone)
+    .refine((value) => value.length === 10 || value.length === 11),
+  utm: z.string().max(4096).optional(),
+  amountCents: z.number().int().min(1).max(100000000).optional(),
+  itemTitle: z.string().trim().max(120).optional(),
+  itemId: z.string().trim().min(1).max(80).optional(),
+  itemImage: z.string().max(2048).optional(),
+  contentIds: z.array(z.string().trim().min(1).max(80)).min(1).max(50).optional(),
+  numItems: z.number().int().min(1).max(100).optional(),
+});
+
+export function validatePixInput(input: unknown): PixChargeInput {
+  const parsed = pixInputSchema.safeParse(input);
+  if (!parsed.success)
+    throw new Error("Dados de pagamento inválidos. Confira nome, CPF/CNPJ, e-mail e telefone.");
+  return parsed.data;
 }
 
 function buildTracking(utm?: string): Record<string, string> {
@@ -98,6 +136,28 @@ function findPixCode(value: unknown) {
   ]);
 }
 
+// IDs/status vêm somente do objeto da transação, nunca de cliente/item.
+function transactionRecord(value: unknown): JsonRecord {
+  if (!isRecord(value)) return {};
+  for (const key of ["transaction", "charge"]) {
+    if (isRecord(value[key])) return transactionRecord(value[key]);
+  }
+  if (isRecord(value.data)) return transactionRecord(value.data);
+  return value;
+}
+
+function transactionString(value: JsonRecord, keys: string[]) {
+  for (const key of keys) {
+    const item = value[key];
+    if (
+      (typeof item === "string" && item.trim()) ||
+      (typeof item === "number" && Number.isFinite(item))
+    )
+      return String(item).trim();
+  }
+  return undefined;
+}
+
 function safeGatewayMessage(raw: string) {
   try {
     const data = JSON.parse(raw) as JsonRecord;
@@ -140,6 +200,7 @@ export async function createFortpayPixCharge(
   input: PixChargeInput,
   config: { apiToken: string },
 ): Promise<PixChargeResult> {
+  input = validatePixInput(input);
   const name = (input.name || "").trim();
   const document = onlyDigits(input.document);
   const email = (input.email || "").trim();
@@ -208,8 +269,9 @@ export async function createFortpayPixCharge(
     throw new Error("A FortPay retornou uma resposta inválida.");
   }
 
-  const pixCode = findPixCode(json);
-  const transactionId = findStringByKeys(json, [
+  const transaction = transactionRecord(json);
+  const pixCode = findPixCode(transaction.pix || transaction.payment || transaction);
+  const transactionId = transactionString(transaction, [
     "transaction_hash",
     "transaction_id",
     "hash",
@@ -225,11 +287,26 @@ export async function createFortpayPixCharge(
     createdAt: new Date().toISOString().slice(0, 19).replace("T", " "),
     expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
     amountCents: amount,
-    contentIds: [...new Set((input.contentIds?.length ? input.contentIds : [input.itemId || "6549324"])
-      .map(String).map((id) => id.trim().slice(0, 80)).filter(Boolean))],
+    contentIds: [
+      ...new Set(
+        (input.contentIds?.length ? input.contentIds : [input.itemId || "6549324"])
+          .map(String)
+          .map((id) => id.trim().slice(0, 80))
+          .filter(Boolean),
+      ),
+    ],
     itemTitle: title,
     numItems: Number.isFinite(input.numItems) ? Math.max(1, Math.round(input.numItems!)) : 1,
-    upsellToken: transactionId,
+    upsellToken: signUpsellContext(
+      {
+        transactionId,
+        contentIds: [
+          ...new Set(input.contentIds?.length ? input.contentIds : [input.itemId || "6549324"]),
+        ],
+        expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
+      },
+      config.apiToken,
+    ),
   };
 }
 
@@ -242,8 +319,8 @@ export async function readFortpayPixStatus(transactionId: string, apiToken: stri
     });
     if (!response.ok) return { status: "PENDING" };
 
-    const json = (await response.json()) as JsonRecord;
-    const rawStatus = String(findStringByKeys(json, ["status"]) || "pending").toLowerCase();
+    const json = transactionRecord(await response.json());
+    const rawStatus = String(transactionString(json, ["status"]) || "pending").toLowerCase();
     const status =
       rawStatus === "approved" || rawStatus === "paid" || rawStatus === "completed"
         ? "COMPLETED"
@@ -259,7 +336,7 @@ export async function readFortpayPixStatus(transactionId: string, apiToken: stri
 
     return {
       status,
-      paidAt: findStringByKeys(json, ["paid_at", "paidAt", "approved_at"]),
+      paidAt: transactionString(json, ["paid_at", "paidAt", "approved_at"]),
     };
   } catch {
     return { status: "PENDING" };

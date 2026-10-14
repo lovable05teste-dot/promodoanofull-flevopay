@@ -69,7 +69,7 @@ async function uploadPixQrCode(args: {
   form.set("type", "image/png");
   form.set(
     "file",
-    new Blob([png], { type: "image/png" }),
+    new Blob([new Uint8Array(png)], { type: "image/png" }),
     `pix-${args.transactionId.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 80) || "qrcode"}.png`,
   );
 
