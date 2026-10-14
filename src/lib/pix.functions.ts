@@ -10,6 +10,7 @@ import {
 import { sendPixCreatedEmail } from "./pix-email.server";
 import { sendPixCreatedToN8n } from "./pix-n8n.server";
 import { recordPixGenerated } from "./funnel-events.server";
+import { assertPixAllowed, registerPendingPix } from "./pix-limit.server";
 import { UPSELL_OFFERS } from "./upsell-catalog";
 
 export const createPixCharge = createServerFn({ method: "POST" })
@@ -22,6 +23,7 @@ export const createPixCharge = createServerFn({ method: "POST" })
       );
     }
 
+    await assertPixAllowed(data.sessionId, apiToken);
     const result = await createFortpayPixCharge(data, { apiToken });
     const amountCents =
       Number.isFinite(data.amountCents) && (data.amountCents ?? 0) > 0
@@ -30,6 +32,7 @@ export const createPixCharge = createServerFn({ method: "POST" })
 
     // Falhas de notificações ou analytics nunca invalidam o Pix.
     await Promise.allSettled([
+      registerPendingPix(data.sessionId, result.transactionId),
       recordPixGenerated({
         sessionId: data.sessionId,
         transactionId: result.transactionId,
