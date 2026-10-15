@@ -4,7 +4,9 @@ import { signUpsellContext, verifyUpsellContext } from '../src/lib/upsell-token.
 import { getUpsellsForProductIds, UPSELL_OFFERS } from '../src/lib/upsell-catalog.ts';
 import { authorizeUpsell } from '../src/lib/upsell.server.ts';
 const catalog=JSON.parse(fs.readFileSync('src/lib/upsell-catalog.json','utf8'));
-assert.equal(Object.keys(catalog.products).length,31);
+const disabledProducts = new Set(['1497000015','5521000018','8834000019','2278000022']);
+const activeProductIds = ['6549324', ...JSON.parse(fs.readFileSync('src/lib/products-data.json','utf8')).filter(p => !disabledProducts.has(p.id)).map(p => p.id)];
+assert.deepEqual(Object.keys(catalog.products).sort(), activeProductIds.sort());
 for(const [id,ids] of Object.entries(catalog.products)){
  const offers=getUpsellsForProductIds([id]);assert.equal(offers.length,3);assert.equal(new Set(ids).size,3);
  for(const offer of offers){assert.ok(offer.priceCents>0);assert.ok(offer.priceCents<=6990||['acc-ps5-controller','acc-xbox-controller'].includes(offer.id));assert.ok(offer.image.startsWith('/img/upsells/'));assert.ok(fs.existsSync(`public${offer.image}`));}
@@ -29,4 +31,4 @@ await assert.rejects(authorizeUpsell({...input,parentToken:token+'bad'},secret))
 for(const status of ['refunded','chargeback','expired','failed','cancelled']){
  globalThis.fetch=async()=>Response.json({status});await assert.rejects(authorizeUpsell(input,secret),/aprovada/);
 }
-console.log(`Upsells: 31 produtos, 3 ofertas cada, ${UPSELL_OFFERS.length} imagens locais, autorização por pagamento, preço no servidor e token contra alterações validados.`);
+console.log(`Upsells: ${activeProductIds.length} produtos, 3 ofertas cada, ${UPSELL_OFFERS.length} imagens locais, autorização por pagamento, preço no servidor e token contra alterações validados.`);

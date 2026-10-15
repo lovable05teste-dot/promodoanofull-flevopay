@@ -26,6 +26,7 @@ export type Product = {
   reviewImagesOnly?: boolean;
   category: string;
   features?: string[];
+  description?: string[];
   specGroups?: { title: string; rows: [string, string][] }[];
   extraSpecGroups?: { title: string; rows: [string, string][] }[];
 };
@@ -124,6 +125,7 @@ export function priceToNumber(p: string): number {
 
 /** Descrição longa gerada para qualquer produto. */
 export function longDescription(p: Product): string[] {
+  if (p.description?.length) return p.description;
   const feats = p.features ?? [];
   return [
     `${p.title} é a escolha certa para quem procura qualidade, durabilidade e um excelente custo-benefício. Produto novo, original, lacrado na caixa e com nota fiscal, enviado com toda a segurança e agilidade do envio FULL do Mercado Livre.`,

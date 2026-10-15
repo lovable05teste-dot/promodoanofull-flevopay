@@ -611,6 +611,16 @@
       "acc-hdmi",
       "acc-tv-mount",
       "acc-screen-cleaner"
+    ],
+    "7189000039": [
+      "acc-bluetooth-earbuds",
+      "acc-microfiber",
+      "acc-cleaning-brush"
+    ],
+    "1869000040": [
+      "acc-bluetooth-earbuds",
+      "acc-microfiber",
+      "acc-cleaning-brush"
     ]
   }
 }
