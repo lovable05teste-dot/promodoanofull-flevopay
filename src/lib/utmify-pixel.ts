@@ -1,4 +1,4 @@
-export const UTMIFY_PIXEL_ID = "6ac9eaf9704861725fcddc19";
+export const UTMIFY_PIXEL_ID = "6a9f7b0f36fa8f4151a7f767";
 export const UTMIFY_PIXEL_SRC = "https://cdn.utmify.com.br/scripts/pixel/pixel.js";
 export const UTMIFY_UTMS_SRC = "https://cdn.utmify.com.br/scripts/utms/latest.js";
 

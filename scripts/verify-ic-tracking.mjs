@@ -73,9 +73,15 @@ check(
 const routeSources = Object.values(routes).join("\n");
 check(!routeSources.includes("icReplay"), "Replay de clique ainda pode duplicar IC");
 check(!routeSources.includes("icProxyRef"), "Há proxy de UTMify duplicado em uma página");
+for (const route of ["root", "home"]) {
+  check(
+    (routes[route].match(/UTMIFY_PIXEL_LOADER/g) || []).length === 2,
+    `Carregador UTMify ausente ou duplicado em ${route} (import + uso)`,
+  );
+}
 check(
-  (routeSources.match(/UTMIFY_PIXEL_LOADER/g) || []).length === 2,
-  "O carregador UTMify não está restrito ao root (import + uso)",
+  (routeSources.match(/UTMIFY_PIXEL_LOADER/g) || []).length === 4,
+  "O carregador UTMify deve existir somente no root React e na resposta HTML da home",
 );
 
 if (failures.length) {
