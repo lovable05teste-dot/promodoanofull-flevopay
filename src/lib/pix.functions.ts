@@ -14,7 +14,7 @@ import { assertPixAllowed, registerPendingPix } from "./pix-limit.server";
 import { UPSELL_OFFERS } from "./upsell-catalog";
 
 export const createPixCharge = createServerFn({ method: "POST" })
-  .inputValidator((data: PixChargeInput) => data)
+  .validator((data: PixChargeInput) => data)
   .handler(async ({ data }): Promise<PixChargeResult> => {
     const apiToken = process.env.FORTPAY_API_TOKEN?.trim();
     if (!apiToken) {
@@ -82,7 +82,7 @@ export const createPixCharge = createServerFn({ method: "POST" })
 
 
 export const createUpsellPixCharge = createServerFn({ method: "POST" })
-  .inputValidator((data: {
+  .validator((data: {
     parentToken: string;
     offerId: string;
     sessionId?: string;
@@ -131,7 +131,7 @@ export const createUpsellPixCharge = createServerFn({ method: "POST" })
   });
 
 export const getPixStatus = createServerFn({ method: "GET" })
-  .inputValidator((data: { transactionId: string }) => data)
+  .validator((data: { transactionId: string }) => data)
   .handler(async ({ data }): Promise<{ status: string; paidAt?: string }> => {
     const apiToken = process.env.FORTPAY_API_TOKEN?.trim();
     if (!apiToken) return { status: "PENDING" };
