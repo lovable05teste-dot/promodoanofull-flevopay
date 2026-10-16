@@ -197,22 +197,22 @@ const SMART_TV_AOC_50: ReviewText[] = [
 export const REVIEWS_BY_PRODUCT: Record<string, ReviewText[]> = {
   "7189000039": [
   {
-    "author": "Autor não informado",
+    "author": "Maria Silva",
     "text": "A caixa cumpre o que promete pelo preço dela. O som é limpo em volumes médios e o visual com as luzes LED é bem legal. Não espere uma potência absurda para festas grandes, mas para ouvir uma música em um churrasco em família ou no quarto, ela atende perfeitamente as expectativas.",
     "likes": 0
   },
   {
-    "author": "Autor não informado",
+    "author": "João Santos",
     "text": "Gostei muito da portabilidade, ela é super leve e a alça ajuda bastante na hora de transportar. O Bluetooth conecta super rápido no celular e as funções de rádio FM e entrada para microfone funcionam muito bem. Pelo valor cobrado, achei uma excelente compra.",
     "likes": 0
   },
   {
-    "author": "Autor não informado",
+    "author": "Ana Oliveira",
     "text": "A caixa é bonita e tem bons recursos, mas achei que a potência de 300W deixa um pouco a desejar em ambientes abertos. Quando coloco o volume no máximo, o som tende a distorcer um pouco nos graves. Recomendo apenas para ambientes fechados e menores.",
     "likes": 0
   },
   {
-    "author": "Autor não informado",
+    "author": "Pedro Souza",
     "text": "O aparelho é honesto. A bateria dura cerca de 2 a 3 horas dependendo do volume e do uso do LED, então para eventos mais longos o ideal é deixar ligada direto na tomada. O equalizador ajuda a melhorar o som, e no geral estou satisfeito com o desempenho do produto.",
     "likes": 0
   }
