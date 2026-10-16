@@ -1101,7 +1101,7 @@ function ProductView({ p }: { p: Product }) {
               key={i}
               n={i + 1}
               images={imgs}
-              texts={REVIEWS_BY_PRODUCT[String(p.id)] ?? REVIEW_TEXTS}
+              texts={REVIEWS_BY_PRODUCT[String(p.id)] ?? (p.reviewImagesOnly ? undefined : REVIEW_TEXTS)}
               commentsOnly={false}
               imagesOnly={p.reviewImagesOnly}
             />
@@ -1243,7 +1243,7 @@ function ReviewBlock({
     return (
       <div className="border-t border-gray-100 pt-4 pb-4">
         <div style={{ width: "100%", display: "flex", alignItems: "center" }}>
-          <span style={{ margin: "0 auto 0 0", color: "rgba(0,0,0,.75)", fontSize: 14, fontWeight: 600 }}>Registro com fotos</span>
+          <span style={{ margin: "0 auto 0 0", color: "rgba(0,0,0,.75)", fontSize: 14, fontWeight: 600 }}>{texts?.length ? `Avaliação ${n}` : "Registro com fotos"}</span>
           <span
             style={{
               margin: "0 0 0 auto",
@@ -1252,7 +1252,7 @@ function ReviewBlock({
               color: "rgba(0,0,0,.55)",
             }}
           >
-            Sem texto
+            {texts?.length ? "" : "Sem texto"}
           </span>
         </div>
         <p
@@ -1264,7 +1264,7 @@ function ReviewBlock({
             color: "rgba(0,0,0,.65)",
           }}
         >
-          Fotos fornecidas para visualização do produto.
+          {texts?.length ? r.text : "Fotos fornecidas para visualização do produto."}
         </p>
         <div className="flex flex-wrap gap-2">
           {images.map((src, i) => (
